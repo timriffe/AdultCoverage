@@ -1,10 +1,13 @@
-# TODO: Add comment
-# 
-# Author: triffe
-###############################################################################
 
+if (system("hostname",intern=TRUE) %in% c("triffe-N80Vm", "tim-ThinkPad-L440")){
+	# if I'm on the laptop
+	setwd("/home/tim/git/AdultCoverage/AdultCoverage")
+} else {
+	# in that case I'm on Berkeley system, and other people in the dept can run this too
+	setwd(paste0("/data/commons/",system("whoami",intern=TRUE),"/git/AdultCoverage/AdultCoverage"))
+}
 
-ITA <- read.table("/hdir/0/triffe/workspace/AdultCoverage/Data/italy.test.txt", 
+ITA <- read.table("Data/italy.test.txt", 
   header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 head(ITA)
 #Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
