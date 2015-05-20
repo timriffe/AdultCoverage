@@ -24,7 +24,8 @@ getRMS <- function(agesi, codi){
 }
 
 # codi <- tab1[[1]]
-coverageFromYear <- function(codi, minA., AgeInt., minAges., dif., ages., fit. = "RMS"){
+coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., fit. = "RMS"){
+  dif.                   <- codi$year2[1] - codi$year1[1] 
   codi$pop1cum           <- rev(cumsum(rev(codi$pop1))) # Tx
   codi$pop2cum           <- rev(cumsum(rev(codi$pop2))) # Tx
   codi$deathcum          <- rev(cumsum(rev(codi$death))) # lx
@@ -109,7 +110,7 @@ coverageFromAges <- function(codi, agesfit){
 # names(tab1)
 ggb <- function(x, minA = 10, AgeInt = 5, minAges = 8, fit = "RMS"){         ##  Data
   tab      <- data.frame(x)           ##  Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
-  dif      <- x$year2[1] - x$year1[1] # TR: account for decimal intervals
+ # TR: account for decimal intervals
   #cod      <- factor(x$cod)
   x$pop1   <- as.double(x$pop1)
   x$pop2   <- as.double(x$pop2)
@@ -126,7 +127,6 @@ ggb <- function(x, minA = 10, AgeInt = 5, minAges = 8, fit = "RMS"){         ## 
       minA. = minA, 
       AgeInt. = AgeInt, 
       minAges. = minAges, 
-      dif. = dif, 
       ages. = ages,
       fit. = fit,
       mc.cores = 4))
@@ -136,7 +136,7 @@ ggb <- function(x, minA = 10, AgeInt = 5, minAges = 8, fit = "RMS"){         ## 
 
 #  head(x)
 #coveragesr2 <- ggb(x, fit = "r2")
-#coveragesRMS <- ggb(x, fit = "RMS")
+#coverageggb <- ggb(x, fit = "RMS")
 #plot(as.integer(names(coverages)), coverages, type = 'l', log = 'y' )
 #abline(h = 1)
 #rect(1872,)
@@ -148,6 +148,30 @@ ggb <- function(x, minA = 10, AgeInt = 5, minAges = 8, fit = "RMS"){         ## 
 #lines(as.integer(names(coveragesRMS)), coveragesRMS, col = "red")
 #abline(h=1)
 #
+
+
+# TODO: the final method is a hybrid of the other two:
+
+
 #var(coveragesRMS)
+tab1[[i]]$intercep<-round(mean(tab1[[i]]$esquerdo[8:15])-
+tab1[[i]]$slope5*mean(tab1[[i]]$direito[8:15]),digits=4) ## adj para 30 a 65+
+tab1[[i]]$relcomp<-round(exp(tab1[[i]]$intercep*dif),digits=2)
+coverageggb <- ggb(x, fit = "RMS")
+
+
+### assuming we have the right ages, agesi
+	slope       <- with(codi, 
+			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
+	)
+	intercept   <-  with(codi, 
+			(mean(lefterm[age %in% agesi]) * slope - mean(rightterm[age %in% agesi]))
+	) 
+	codi$fitted <- codi$rightterm * slope + intercept
+	# get root mean square of residuals
+	sqrt(sum(((codi$lefterm[codi$age %in% agesi] - codi$fitted[codi$age %in% agesi])^2))/length(agesi))
+	
+}
+
 
 
