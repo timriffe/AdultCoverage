@@ -25,6 +25,8 @@ e100 <- colSums(Lx[6:nrow(Lx),]) / lx[6,]
 e105 <- colSums(Lx[11:nrow(Lx),]) / lx[11,]
 e110 <- colSums(Lx[16:nrow(Lx),]) / lx[16,]
 
+library(demogR)
+install.packages("http://cran.r-project.org/src/contrib/Archive/demogR/demogR_0.4.2.tar.gz", repos=NULL)
 ex <- cdmltw()$ex
 exnew <- cbind(ex,e100,e105,e110)
 colnames(exnew) <- c(0,1,seq(5,110,by=5))

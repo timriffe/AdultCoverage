@@ -1,16 +1,16 @@
 ## B-H original method
 head(x)
 minA. <- 10
-bhtable <-  function(x, sex = "f"){        ##  Data
-tab     <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
-dif     <- x$year2[1]-x$year1[1]
-cod     <- x$cod
-tab1    <- split(tab,cod)
+bhtable <-  function(x, minA. = 10, AgeInt. = 5, sex = "f"){        ##  Data
+	tab     <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
+	dif     <- x$year2[1]-x$year1[1]
+	cod     <- x$cod
+	tab1    <- split(tab,cod)
 
-cods    <- unique(tab$cod)
-ages    <- sort(unique(tab$age))
+	cods    <- unique(tab$cod)
+	ages    <- sort(unique(tab$age))
 # temp
-codi    <- tab1[[1]]
+	codi    <- tab1[[1]]
 
 codi$birthdays            <- 0
 # iterate over age groups >= 10
@@ -54,12 +54,12 @@ for (j in 2:length(ages)){
   }
   if (sex == "m"){
     # need to change this:
-    standardratios <- c(1.376,	1.3,	1.233,	1.171,
-                        1.115,	1.062,	1.012,	0.964,
-                        0.918,	0.872,	0.827,	0.787,
-                        0.729,	0.673,	0.617,	0.56,
-                        0.501,	0.438,	0.365,	0.298,
-                        0.235,	0.175,	0.117)
+    standardratios <- c(1.161,	1.094,	1.034,	0.98,	
+						0.93,	0.885,	0.842,	0.802,	
+						0.763,	0.725,	0.689,	0.648,
+						0.609,	0.57,	0.53,	0.49,	
+						0.447,	0.401,	0.352,	0.305,	
+						0.255,	0.202,	0.147)
                       
     #                   ex <- ....
   }
