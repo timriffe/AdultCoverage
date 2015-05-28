@@ -226,18 +226,18 @@ bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
 					mc.cores = 4))
 	coverages
 }
-
-coveragesggb <- ggb(x)
-coveragesbh1 <- bh(x)
-coveragesbh2 <- bh2(x)
-years <- as.integer(names(coveragesggb))
-getwd()
-
-pdf("Figures/ITAfemalesCompareMethods.pdf", height = 5, width = 10)
-plot(years, coveragesggb, type = 'l', col = "green", ylim = c(.7,1.4), main = "Italy, females 1872-2008", sub = "Death registration coverage detected using 3 methods")
-lines(years, coveragesbh1, col = "blue")
-lines(years, coveragesbh2, col = "red")
-abline(v=c(1872, 1924, 1947, 1954, 1981),col="magenta")
-abline(h=1,col="magenta")
-legend("topright", col = c("green","blue","red"), lty=1,legend=c("GGB","BH unadj", "BH adj"))
-dev.off()
+#
+#coveragesggb <- ggb(x)
+#coveragesbh1 <- bh(x)
+#coveragesbh2 <- bh2(x)
+#years <- as.integer(names(coveragesggb))
+#getwd()
+#
+#pdf("Figures/ITAfemalesCompareMethods.pdf", height = 5, width = 10)
+#plot(years, coveragesggb, type = 'l', col = "green", ylim = c(.7,1.4), main = "Italy, females 1872-2008", sub = "Death registration coverage detected using 3 methods")
+#lines(years, coveragesbh1, col = "blue")
+#lines(years, coveragesbh2, col = "red")
+#abline(v=c(1872, 1924, 1947, 1954, 1981),col="magenta")
+#abline(h=1,col="magenta")
+#legend("topright", col = c("green","blue","red"), lty=1,legend=c("GGB","BH unadj", "BH adj"))
+#dev.off()
