@@ -1,17 +1,16 @@
 #####################################################
-
-bhgetRMS <- function(agesi, codi){
+b2hgetRMSbh2getRMS <- function(agesi, codi){
 	# get root mean square of residuals
 	sqrt(sum(codi$RelDiff[codi$age %in% agesi]^2)/length(agesi))
 }
 
-bhCoverageFromAges <- function(codi, agesFit){
+bh2CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
 # change name to GB
-getRMS <- function(agesi, codi){
+bh2getRMS <- function(agesi, codi){
 	slope       <- with(codi, 
 			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
 	)
@@ -201,17 +200,20 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 		}
 	}
 	# TODO: these ages might be different from 'agesfit'. Do we care?
-	agesFit     <- agesL[[which.min(unlist(lapply(agesL, bhgetRMS, codi = codi)))]]
+	agesFit     <- agesL[[which.min(unlist(lapply(agesL, bh2getRMS, codi = codi)))]]
 	
-	bhCoverageFromAges(codi, agesFit)
+	bh2CoverageFromAges(codi, agesFit)
 	
 }
 
 # TODO: detect AgeInt rather than specify as argument
 bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
 	tab     <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
+	tab$pop1   <- as.double(tab$pop1)
+	tab$pop2   <- as.double(tab$pop2)
+	tab$death  <- as.double(tab$death)
 	tab1    <- split(tab,x$cod)
-	cods    <- unique(tab$cod)
+
 	ages    <- sort(unique(tab$age))
 	#minA. = minA;AgeInt. = AgeInt;minAges. = minAges;ages. = ages;sex. = sex
 	# codi <- tab1[[1]]
@@ -222,13 +224,12 @@ bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
 					AgeInt. = AgeInt, 
 					minAges. = minAges,  
 					ages. = ages,
-					sex. = sex,
-					mc.cores = 4))
+					sex. = sex))
 	coverages
 }
 #
 #coveragesggb <- ggb(x)
-#coveragesbh1 <- bh(x)
+#coveragesbh1 <- bh1(x)
 #coveragesbh2 <- bh2(x)
 #years <- as.integer(names(coveragesggb))
 #getwd()

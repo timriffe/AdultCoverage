@@ -1,3 +1,9 @@
+# deprecated
+
+
+
+
+
 ## B-H original method
 bhtable<-function(x){        ##  Data
 tab<-data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death

@@ -1,14 +1,14 @@
-bhgetRMS <- function(agesi, codi){
+bh1getRMS <- function(agesi, codi){
 	# get root mean square of residuals
 	sqrt(sum(codi$RelDiff[codi$age %in% agesi]^2)/length(agesi))
 }
 
-bhCoverageFromAges <- function(codi, agesFit){
+bh1CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
-bhCoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., sex. = "f"){        ##  Data
+bh1CoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., sex. = "f"){        ##  Data
 	
 	dif. <- codi$year2[1] - codi$year1[1]
 	
@@ -26,8 +26,8 @@ bhCoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, age
 	codi[["growth"]]	          <-  log(codi$pop2 / codi$pop1) / dif.
 	codi$growth[is.infinite(codi$growth)] <- 0
 	
-	codi$cumgrowth       <-  0
-	codi$cumgrowth[1]    <-  2.5*codi$growth[1]
+	codi$cumgrowth         <-  0
+	codi$cumgrowth[1]      <-  2.5*codi$growth[1]
 	
 	for (j in 2:length(ages)){
 		codi$cumgrowth[j]  <-  2.5*codi$growth[j]+5*sum(codi$growth[(j-1):1])
@@ -37,7 +37,7 @@ bhCoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, age
 	
 	codi$death_tab       <- codi$death * exp(codi$cumgrowth)
 	
-	ratio           <- sum(codi$death_tab[ages%in%c(10:39)])/sum(codi$death_tab[ages%in%c(40:59)])
+	ratio                <- sum(codi$death_tab[ages%in%c(10:39)])/sum(codi$death_tab[ages%in%c(40:59)])
 	
 	if (sex. == "f"){
 		# TODO: expand ex in-ine out to actual open ages..
@@ -107,28 +107,31 @@ bhCoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, age
 		}
 	}
 	
-	agesFit     <- agesL[[which.min(unlist(lapply(agesL, bhgetRMS, codi = codi)))]]
+	agesFit     <- agesL[[which.min(unlist(lapply(agesL, bh1getRMS, codi = codi)))]]
 	
-	bhCoverageFromAges(codi, agesFit)
+	bh1CoverageFromAges(codi, agesFit)
 	
 }
 
 # TODO: detect AgeInt rather than specify as argument
-bh <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
-	tab     <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
-	tab1    <- split(tab,x$cod)
-	cods    <- unique(tab$cod)
-	ages    <- sort(unique(tab$age))
+bh1 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
+	
+	tab        <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
+	tab$pop1   <- as.double(tab$pop1)
+	tab$pop2   <- as.double(tab$pop2)
+	tab$death  <- as.double(tab$death)
+	tab1       <- split(tab,x$cod)
+
+	ages       <- sort(unique(tab$age))
 	#minA. = minA;AgeInt. = AgeInt;minAges. = minAges;ages. = ages;sex. = sex
 	# codi <- tab1[[1]]
-	coverages <- unlist(parallel::mclapply(
+	coverages <- unlist(mclapply(
 					tab1, 
-					bhCoverageFromYear, 
+					bh1CoverageFromYear, 
 					minA. = minA, 
 					AgeInt. = AgeInt, 
 					minAges. = minAges,  
 					ages. = ages,
-					sex. = sex,
-					mc.cores = 4))
+					sex. = sex))
 	coverages
 }
