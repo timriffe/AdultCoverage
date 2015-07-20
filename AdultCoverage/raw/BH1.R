@@ -125,7 +125,7 @@ bh1 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
 	ages       <- sort(unique(tab$age))
 	#minA. = minA;AgeInt. = AgeInt;minAges. = minAges;ages. = ages;sex. = sex
 	# codi <- tab1[[1]]
-	coverages <- unlist(mclapply(
+	coverages <- unlist(lapply(
 					tab1, 
 					bh1CoverageFromYear, 
 					minA. = minA, 

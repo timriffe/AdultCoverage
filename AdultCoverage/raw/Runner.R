@@ -16,7 +16,7 @@ source("raw/BH2.R")
 source("raw/GGB.R")
 source("R/cdmltw.R")
 # need web connection for this hack
-source("http://www.stat.cmu.edu/~nmv/setup/mclapply.hack.R")
+#source("http://www.stat.cmu.edu/~nmv/setup/mclapply.hack.R")
 # new data for Brasil to run. By regions.
 BR1 <- read.table(file.path("Data","data_Brazil_p1.txt"), 
 		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
@@ -24,6 +24,9 @@ BR2 <- read.table(file.path("Data","data_Brazil_p2.txt"),
 		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 BR3 <- read.table(file.path("Data","data_Brazil_p3.txt"), 
 		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+
+tab <- data.frame(BR1)
+
 # BR1
 BR1ggb.f       <- ggb(BR1[BR1$sex == "f", ])
 BR1bh1.f       <- bh1(BR1[BR1$sex == "f", ], sex = "f")
@@ -70,8 +73,21 @@ Results <- rbind(
 	  data.frame(Data = "BR3", Sex = "m", method = "BH2", cod = names(BR3bh2.m), result = BR3bh2.m ),
 	  data.frame(Data = "BR3", Sex = "m", method = "GGB", cod = names(BR3ggb.m), result = BR3ggb.m )
 )
+
 	 
 write.table(Results, sep = ",", row.names = FALSE, file = "Data/Results.csv")		
 		
 		
-		
+# search for anomaly: BH2
+
+# cod 1302, 1304 bh2 gives 5000 females
+#     1601 females
+
+head(BR1)
+x <- BR1[BR1$cod==1302 & BR1$sex == "f", ]
+BR1[BR1$cod==1304 & BR1$sex == "f", ]
+BR1[BR1$cod==1601 & BR1$sex == "f", ]
+
+
+
+
