@@ -23,7 +23,8 @@ bh2getRMS <- function(agesi, codi){
 	
 }
 
-
+# codi <- tab1[[1]]
+#head(codi)
 bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	dif.                   <- codi$year2[1] - codi$year1[1] 
 	codi$pop1cum           <- rev(cumsum(rev(codi$pop1))) # Tx
@@ -42,23 +43,15 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	} # end age loop
 	
 	# create stationary Lx as geometric avg of within-cohort consecutive ages
-	codi$Lx                <- round(
-			sqrt(codi$pop1cum * codi$pop2cum),
-			digits = 2)
+	codi$Lx                <- sqrt(codi$pop1cum * codi$pop2cum)
 	
 	# growth rate per annum
-	codi$cumgrowth        <- round(
-			log(codi$pop2cum/ codi$pop1cum) / dif.,
-			digits = 5 )
+	codi$cumgrowth        <- log(codi$pop2cum/ codi$pop1cum) / dif.
 	
 	# eqns from formula in Hill/Horiuchi
-	codi$rightterm         <- round(
-			codi$deathcum / codi$Lx, 
-			digits = 5)
+	codi$rightterm         <- codi$deathcum / codi$Lx
 	# eqns from formula in Hill/Horiuchi
-	codi$lefterm           <- round(
-			(codi$birthdays / codi$Lx) - codi$cumgrowth,
-			digits = 5)
+	codi$lefterm           <- (codi$birthdays / codi$Lx) - codi$cumgrowth
 	# certain columns can be safely ignored in future operations
 	codi$exclude          <-  codi$Lx != 0 & codi$birthdays != 0 & codi$age >= 15 & codi$age <= 75
 	
@@ -84,25 +77,45 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 #	if (fit. == "r2"){
 #		agesfit     <- agesL[[which.max(unlist(lapply(agesL, getr2, codi = codi)))]]
 #	}
-	agesfit     <- agesL[[which.min(unlist(lapply(agesL, getRMS, codi = codi)))]]
+
+	agesfit     <- agesL[[which.min(unlist(lapply(agesL, ggbgetRMS, codi = codi)))]]
 	#agesfit     <- agesL[[which.max(unlist(lapply(agesL, getr2, codi = codi)))]]
 	# this is the basic formula
 	#coverageFromAges(codi, agesfit)
 
-    agesi <- codi$age %in% agesfit
-	head(codi)
+## copied and pasted
+#slope       <- with(codi, 
+#		sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
+#)
+#intercept   <-  with(codi, 
+#		(mean(lefterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
+#) 
+#codi$fitted <- codi$rightterm * slope + intercept
+#
+## this is the coverage estimate
+#1/with(codi, sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit]))
+## end copy and paste
 
+
+    agesi       <- codi$age %in% agesfit
 
 	slope       <- with(codi, 
 						sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
 					)
+					#codi$lefterm
+					#codi$rightterm
+					#with(codi,sd(lefterm[age %in% agesfit]))
+                    #with(codi,sd(rightterm[age %in% agesfit]))
 	intercept   <-  with(codi, 
-						(mean(lefterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
+						(mean(lefterm[age %in% agesfit]) - slope * mean(rightterm[age %in% agesfit]))
 					) 
 
+	# relative completeness				
     relcomp     <- exp(intercept * dif.)
 	
+	# relcomp <- 1
 	# adjust the first population count
+# codi$pop1adj <- codi$rightterm * slope + intercept
 	codi$pop1adj <- codi$pop1 / relcomp
 	
 	codi$birthdays            <- 0
@@ -133,7 +146,7 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	ratio           <- sum(codi$death_tab[ages%in%c(10:39)])/sum(codi$death_tab[ages%in%c(40:59)])
 	
 	if (sex. == "f"){
-		# TODO: expand ex in-ine out to actual open ages..
+		# TODO: expand ex in-line out to actual open ages..
 		# model lifetable
 		# based on Bennett & Horiuchi (1984) 
 		# "Mortality Estimateion fro Registered Deaths in Less Developed Countries", Demography
@@ -163,14 +176,14 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	# open at age 110 ....
 	eOpen     <- splinefun(ex[,ncol(ex)]~1:25)(CDlevel)
 	
-	N              <- nrow(codi)
+	N         <- nrow(codi)
 	codi$growth[is.nan(codi$growth)] <- 0
 	if (sign( codi$growth[N ]) == -1){
 		minus <- Re(((eOpen * codi$growth[N ])+.0i)^(1/3)) * 2
 	} else {
 		minus <- (eOpen * codi$growth[N ])^(1/3)
 	}
-	codi$pop_a     <- codi$death[N ] * (exp(eOpen * codi$growth[N ]) -minus)
+	codi$pop_a     <- codi$death[N ] * (exp(eOpen * codi$growth[N ]) - minus)
 	
 	
 	for(j in N:1){
@@ -217,14 +230,14 @@ bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
 	ages    <- sort(unique(tab$age))
 	#minA. = minA;AgeInt. = AgeInt;minAges. = minAges;ages. = ages;sex. = sex
 	# codi <- tab1[[1]]
-	coverages <- unlist(parallel::mclapply(
+	coverages <- unlist(lapply(
 					tab1, 
 					bh2coverageFromYear, 
 					minA. = minA, 
 					AgeInt. = AgeInt, 
 					minAges. = minAges,  
 					ages. = ages,
-					sex. = sex))
+					sex. = sex)) # sex <- "f"
 	coverages
 }
 #

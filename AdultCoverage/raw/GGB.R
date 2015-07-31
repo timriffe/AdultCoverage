@@ -122,12 +122,12 @@ ggb <- function(x, minA = 10, AgeInt = 5, minAges = 8, fit = "RMS"){         ## 
 	tab$pop1   <- as.double(tab$pop1)
 	tab$pop2   <- as.double(tab$pop2)
 	tab$death  <- as.double(tab$death)
-	tab1     <- split(tab, factor(x$cod))
+	tab1       <- split(tab, factor(x$cod))
 	# length(tab1)
 	# iterate over whatever it happens to be: regions, years
 	ages <- sort(unique(tab$age))
 	
-	coverages <- unlist(mclapply(
+	coverages <- unlist(lapply(
 					tab1, 
 					ggbcoverageFromYear, 
 					minA. = minA, 
