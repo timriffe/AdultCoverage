@@ -16,7 +16,8 @@ source("raw/BH2.R")
 source("raw/GGB.R")
 source("R/cdmltw.R")
 # need web connection for this hack
-source("http://www.stat.cmu.edu/~nmv/setup/mclapply.hack.R")
+# source("http://www.stat.cmu.edu/~nmv/setup/mclapply.hack.R")
+# doh, website removed. Eliminate parallel dependency for now.
 # new data for Brasil to run. By regions.
 BR1 <- read.table(file.path("Data","data_Brazil_p1.txt"), 
 		header = TRUE, sep = "\t", stringsAsFactors = FALSE)

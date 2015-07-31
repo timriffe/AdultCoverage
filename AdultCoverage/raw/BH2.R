@@ -34,7 +34,7 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	codi$birthdays            <- 0
 	# iterate over age groups >= 10
 	
-	for (j in seq_along(ages)[ages >= minA.]) {
+	for (j in seq_along(ages.)[ages. >= minA.]) {
 		# take geometric average of p1 pop vs p2 pop within same cohort
 		codi$birthdays[j]       <- round(
 				1 / AgeInt. * sqrt(codi$pop1[j - 1] * codi$pop2[j]), 
@@ -108,7 +108,7 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	codi$birthdays            <- 0
 # iterate over age groups >= 10
 	
-	for (j in seq_along(ages)[ages >= minA.]) {
+	for (j in seq_along(ages.)[ages. >= minA.]) {
 		# take geometric average of p1 pop vs p2 pop within same cohort
 		codi$birthdays[j]       <- 
 				1 / AgeInt. * sqrt(codi$pop1adj[j - 1] * codi$pop2[j])

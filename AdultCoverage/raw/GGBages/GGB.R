@@ -1,21 +1,22 @@
-# TODO: Add comment
+
 # 
 # Author: riffe
 ###############################################################################
 
 
+# deprecated, doesn't give good results
+#ggbgetr2 <- function(agesi, codi){
+#	slope       <- with(codi, 
+#			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
+#	)
+#	intercept   <-  with(codi, 
+#			(mean(lefterm[age %in% agesi]) * slope - mean(rightterm[age %in% agesi]))
+#	) 
+#	codi$fitted <- codi$rightterm * slope + intercept
+#	
+#	summary(lm(codi$lefterm[codi$age %in% agesi] ~ codi$fitted[codi$age %in% agesi]))$r.squared
+#}
 
-ggbgetr2 <- function(agesi, codi){
-	slope       <- with(codi, 
-			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
-	)
-	intercept   <-  with(codi, 
-			(mean(lefterm[age %in% agesi]) * slope - mean(rightterm[age %in% agesi]))
-	) 
-	codi$fitted <- codi$rightterm * slope + intercept
-	
-	summary(lm(codi$lefterm[codi$age %in% agesi] ~ codi$fitted[codi$age %in% agesi]))$r.squared
-}
 ggbgetRMS <- function(agesi, codi){
 	slope       <- with(codi, 
 			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
@@ -30,7 +31,29 @@ ggbgetRMS <- function(agesi, codi){
 }
 
 # codi <- tab1[[1]]
-ggbcoverageFromYear <- function(codi, minA., AgeInt., minAges., ages., fit. = "RMS"){
+ggbcoverageFromYear <- function(codi, minA., AgeInt., minAges., ages.){
+	
+	codi    <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
+	agesfit <- ggbgetAgesFit(codi, ages., minAges.)
+	# this is the basic formula
+    ggbcoverageFromAges(codi, agesfit)
+	
+}
+
+ggbcoverageFromAges <- function(codi, agesfit){
+	slope       <- with(codi, 
+			sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
+	)
+	intercept   <-  with(codi, 
+			(mean(lefterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
+	) 
+	codi$fitted <- codi$rightterm * slope + intercept
+	
+	# this is the coverage estimate
+	1/with(codi, sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit]))
+}
+
+ggbMakeColumns <- function(codi, minA., AgeInt., minAges., ages.){
 	dif.                   <- codi$year2[1] - codi$year1[1] 
 	codi$pop1cum           <- rev(cumsum(rev(codi$pop1))) # Tx
 	codi$pop2cum           <- rev(cumsum(rev(codi$pop2))) # Tx
@@ -40,7 +63,7 @@ ggbcoverageFromYear <- function(codi, minA., AgeInt., minAges., ages., fit. = "R
 	codi$birthdays            <- 0
 	# iterate over age groups >= 10
 	
-	for (j in seq_along(ages)[ages >= minA.]) {
+	for (j in seq_along(ages.)[ages. >= minA.]) {
 		# take geometric average of p1 pop vs p2 pop within same cohort
 		codi$birthdays[j]       <- round(
 				1 / AgeInt. * sqrt(codi$pop1[j - 1] * codi$pop2[j]), 
@@ -67,7 +90,12 @@ ggbcoverageFromYear <- function(codi, minA., AgeInt., minAges., ages., fit. = "R
 			digits = 5)
 	# certain columns can be safely ignored in future operations
 	codi$exclude          <-  codi$Lx != 0 & codi$birthdays != 0 & codi$age >= 15 & codi$age <= 75
+	codi
+}
+
+ggbgetAgesFit <- function(codi, ages., minAges.){
 	
+#	codi <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
 	# intercept
 	
 	maxAges   <- sum(codi$exclude)
@@ -87,35 +115,18 @@ ggbcoverageFromYear <- function(codi, minA., AgeInt., minAges., ages., fit. = "R
 	}
 	
 	# these are the ages that give the best r2 or RMS
-	if (fit. == "r2"){
-		agesfit     <- agesL[[which.max(unlist(lapply(agesL, ggbgetr2, codi = codi)))]]
-	}
-	if (fit. == "RMS"){
-		agesfit     <- agesL[[which.min(unlist(lapply(agesL, ggbgetRMS, codi = codi)))]]
-	}
-	#agesfit     <- agesL[[which.max(unlist(lapply(agesL, getr2, codi = codi)))]]
-	# this is the basic formula
-    ggbcoverageFromAges(codi, agesfit)
-	
+
+	agesfit     <- agesL[[which.min(unlist(lapply(agesL, ggbgetRMS, codi = codi)))]]
+	agesfit
 }
 
-ggbcoverageFromAges <- function(codi, agesfit){
-	slope       <- with(codi, 
-			sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
-	)
-	intercept   <-  with(codi, 
-			(mean(lefterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
-	) 
-	codi$fitted <- codi$rightterm * slope + intercept
-	
-	# this is the coverage estimate
-	1/with(codi, sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit]))
-}
 
-# codi <- tab1[["2003"]]
+
+
+# codi <- tab1[[50]]
 # names(tab1)
-# x <- BR3
-ggb <- function(x, minA = 10, AgeInt = 5, minAges = 8, fit = "RMS"){         ##  Data
+#minA. = 10; AgeInt. = 5; minAges. = 8; ages. = ages
+ggb <- function(x, minA = 10, AgeInt = 5, minAges = 8){         ##  Data
 	tab      <- data.frame(x)           ##  Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
 	# TR: account for decimal intervals
 	#cod      <- factor(x$cod)
@@ -127,14 +138,13 @@ ggb <- function(x, minA = 10, AgeInt = 5, minAges = 8, fit = "RMS"){         ## 
 	# iterate over whatever it happens to be: regions, years
 	ages <- sort(unique(tab$age))
 	
-	coverages <- unlist(mclapply(
+	coverages <- unlist(lapply(
 					tab1, 
 					ggbcoverageFromYear, 
 					minA. = minA, 
 					AgeInt. = AgeInt, 
 					minAges. = minAges, 
-					ages. = ages,
-					fit. = fit))
+					ages. = ages))
 	
 	return(coverages)
 }
