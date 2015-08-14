@@ -50,7 +50,7 @@ ggbcoverageFromAges <- function(codi, agesfit){
 	codi$fitted <- codi$rightterm * slope + intercept
 	
 	# this is the coverage estimate
-	1 / with(codi, sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit]))
+	1 / with(codi, sd(lefterm[age %in% agesfit]) / sd(rightterm[age %in% agesfit]))
 }
 
 ggbMakeColumns <- function(codi, minA., AgeInt., minAges., ages.){
@@ -60,34 +60,25 @@ ggbMakeColumns <- function(codi, minA., AgeInt., minAges., ages.){
 	codi$deathcum          <- rev(cumsum(rev(codi$death))) # lx
 	
 	# define new column for birthdays between pop estimates
-	codi$birthdays            <- 0
+	codi$birthdays         <- 0
 	# iterate over age groups >= 10
 	
 	for (j in seq_along(ages.)[ages. >= minA.]) {
 		# take geometric average of p1 pop vs p2 pop within same cohort
-		codi$birthdays[j]       <- round(
-				1 / AgeInt. * sqrt(codi$pop1[j - 1] * codi$pop2[j]), 
-				digits = 2)
+		codi$birthdays[j] <- 1 / AgeInt. * sqrt(codi$pop1[j - 1] * codi$pop2[j])
+				
 	} # end age loop
 	
 	# create stationary Lx as geometric avg of within-cohort consecutive ages
-	codi$Lx                <- round(
-			sqrt(codi$pop1cum * codi$pop2cum),
-			digits = 2)
+	codi$Lx               <- sqrt(codi$pop1cum * codi$pop2cum)
 	
 	# growth rate per annum
-	codi$cumgrowth        <- round(
-			log(codi$pop2cum/ codi$pop1cum) / dif.,
-			digits = 5 )
+	codi$cumgrowth        <- log(codi$pop2cum / codi$pop1cum) / dif.
 	
 	# eqns from formula in Hill/Horiuchi
-	codi$rightterm         <- round(
-			codi$deathcum / codi$Lx, 
-			digits = 5)
+	codi$rightterm        <- codi$deathcum / codi$Lx
 	# eqns from formula in Hill/Horiuchi
-	codi$lefterm           <- round(
-			(codi$birthdays / codi$Lx) - codi$cumgrowth,
-			digits = 5)
+	codi$lefterm          <- (codi$birthdays / codi$Lx) - codi$cumgrowth
 	# certain columns can be safely ignored in future operations
 	codi$exclude          <-  codi$Lx != 0 & codi$birthdays != 0 & codi$age >= 15 & codi$age <= 75
 	codi

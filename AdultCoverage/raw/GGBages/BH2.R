@@ -36,10 +36,11 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 	
 	# just get left term / right term
 	slope       <- with(codi, 
-			               sd(lefterm[age %in% agesfit.]) /  sd(rightterm[age %in% agesfit.])
+			               sd(lefterm[age %in% agesfit.]) / sd(rightterm[age %in% agesfit.])
 	                     )
 	intercept   <-  with(codi, 
-			              (mean(lefterm[age %in% agesfit.]) * slope - mean(rightterm[age %in% agesfit.]))
+			              (mean(lefterm[age %in% agesfit.]) - 
+									  slope * mean(rightterm[age %in% agesfit.]))
 	                     ) 
 	
 	relcomp     <- exp(intercept * dif.)
@@ -62,10 +63,10 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 	codi$growth[is.infinite(codi$growth)] <- 0
 	
 	codi$cumgrowth         <-  0
-	codi$cumgrowth[1]      <-  2.5*codi$growth[1]
+	codi$cumgrowth[1]      <- 2.5 * codi$growth[1]
 	
 	for (j in 2:length(ages.)){                    # TR: why 5 times?
-		codi$cumgrowth[j]  <-  2.5 * codi$growth[j] + 5 * sum(codi$growth[(j - 1):1])
+		codi$cumgrowth[j]  <- 2.5 * codi$growth[j] + 5 * sum(codi$growth[(j - 1):1])
 	}
 	
 	codi$death_tab         <- codi$death * exp(codi$cumgrowth)
@@ -111,7 +112,6 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 		minus           <- (eOpen * codi$growth[N])^(1 / 3)
 	}
 	codi$pop_a          <- codi$death[N] * (exp(eOpen * codi$growth[N]) - minus)
-	
 	
 	for(j in N:1){
 		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt. * codi$growth[j - 1]) + 
