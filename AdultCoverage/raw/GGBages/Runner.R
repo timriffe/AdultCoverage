@@ -73,3 +73,62 @@ Results <- rbind(
 )
 
 write.table(Results, sep = ",", row.names = FALSE, file = "Data/ResultsGGBages.csv")	
+
+
+# results for UF datasets
+
+UFF <- read.table(file.path("Data","dataUFfemale.txt"), 
+		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+UFM <- read.table(file.path("Data","dataUFmale.txt"), 
+		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+cnames <- colnames(UFF)
+UFF <- UFF[,-1]
+UFM <- UFM[,-1]
+colnames(UFF) <- colnames(UFM) <- cnames[1:ncol(UFF)]
+
+head(UFF)
+head(BR1)
+
+DF1 <- UFF[,c("UF","AGE","POP_80","DEATH_80","POP_91")]
+colnames(DF1) <- c("cod","age","pop1","death","pop2")
+DF1$year1 <- 1980
+DF1$year2 <- 1991
+DF1$sex   <- "f"
+head(UFF)
+DF3 <- UFF[,c("UF","AGE","POP_00","DEATH_00","POP_10")]
+colnames(DF3) <- c("cod","age","pop1","death","pop2")
+DF3$year1 <- 2000
+DF3$year2 <- 2010
+DF3$sex   <- "f"
+
+DM3 <- UFM[,c("UF","AGE","POP_00","DEATH_00","POP_10")]
+colnames(DM3) <- c("cod","age","pop1","death","pop2")
+DM3$year1 <- 2000
+DM3$year2 <- 2010
+DM3$sex   <- "m"
+# UFF
+head(DF1)
+UFF1ggb.f       <- ggb(DF1)
+UFF1bh1.f       <- bh1(DF1, sex = "f")
+UFF1bh2.f       <- bh2(DF1, sex = "f")
+
+UFF3ggb.f       <- ggb(DF3)
+UFF3bh1.f       <- bh1(DF3, sex = "f")
+UFF3bh2.f       <- bh2(DF3, sex = "f")
+
+UFM3ggb.m       <- ggb(DM3)
+UFM3bh1.m       <- bh1(DM3, sex = "m")
+UFM3bh2.m       <- bh2(DM3, sex = "m")
+range(UFF3bh2.f)
+
+plot(UFF1bh2.f,UFF3bh2.f,asp=1)
+abline(a=0,b=1)
+
+head(UFFggb.f)
+
+# UFM
+UFMggb.m       <- ggb(BR2[BR2$sex == "m", ])
+UFMbh1.m       <- bh1(BR2[BR2$sex == "m", ], sex = "m")
+UFMbh2.m       <- bh2(BR2[BR2$sex == "m", ], sex = "m")
+
+
