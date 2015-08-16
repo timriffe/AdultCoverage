@@ -7,13 +7,13 @@ bh1CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
-
+# ages. <- ages.[-2]
 bh1MakeColumns <- function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., sex. = "f"){
 	dif. <- codi$year2[1] - codi$year1[1]
 	
 	codi$birthdays            <- 0
 # iterate over age groups >= 10
-	
+	# dif. <- 10.00137
 	for (j in seq_along(ages.)[ages. >= minA.]) {
 		# take geometric average of p1 pop vs p2 pop within same cohort
 		codi$birthdays[j]       <- 
@@ -21,22 +21,22 @@ bh1MakeColumns <- function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., s
 	} # end age loop
 	
 # age-specific growth
-	
+
 	codi[["growth"]]	          <-  log(codi$pop2 / codi$pop1) / dif.
 	codi$growth[is.infinite(codi$growth)] <- 0
 	
 	codi$cumgrowth         <-  0
-	codi$cumgrowth[1]      <-  2.5 * codi$growth[1]
+	codi$cumgrowth[1]      <-  AgeInt. / 2 * codi$growth[1]
 	
 	for (j in 2:length(ages.)){
-		codi$cumgrowth[j]  <-  2.5 * codi$growth[j] + 5 * sum(codi$growth[(j - 1):1])
+		codi$cumgrowth[j]  <-  AgeInt. / 2 * codi$growth[j] + AgeInt. * sum(codi$growth[(j - 1):1])
 	}
 	
 # stopped here
 	
-	codi$death_tab       <- codi$death * exp(codi$cumgrowth)
+	codi$deathLT       <- codi$death * exp(codi$cumgrowth)
 	
-	ratio                <- sum(codi$death_tab[ages. %in% c(10:39)]) / sum(codi$death_tab[ages. %in% c(40:59)])
+	ratio                <- sum(codi$deathLT[ages. %in% c(10:39)]) / sum(codi$deathLT[ages. %in% c(40:59)])
 	
 	if (sex. == "f"){
 		# TODO: expand ex in-ine out to actual open ages..
@@ -63,24 +63,26 @@ bh1MakeColumns <- function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., s
 		ex <- cdmltw("M")$ex
 	}
 	
+	
 	# TODO: modify definition of AllLevels to be more robust.
 	AllLevels <- 3:25
 	CDlevel   <- splinefun(AllLevels~standardratios)(ratio)
 	# open at age 110 ....
 	eOpen     <- splinefun(ex[,ncol(ex)]~1:25)(CDlevel)
-	
-	N              <- nrow(codi)
+	# eOpen <- 4.9
+	N         <- nrow(codi)
 	codi$growth[is.nan(codi$growth)] <- 0
 	if (sign( codi$growth[N]) == -1){
 		minus <- Re(((eOpen * codi$growth[N]) + .0i)^(1 / 3)) * 2
 	} else {
 		minus <- (eOpen * codi$growth[N])^(1/3)
 	}
+	
 	codi$pop_a     <- codi$death[N] * (exp(eOpen * codi$growth[N]) - minus)
 	
 	
-	for(j in N:1){
-		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt. * codi$growth[j-1]) + 
+	for(j in N:2){
+		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt. * codi$growth[j - 1]) + 
 				codi$death[j - 1] * exp(AgeInt. / 2 * codi$growth[j - 1])
 	}
 	

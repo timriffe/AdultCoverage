@@ -65,7 +65,7 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	ind       <- 0
 	agesL     <- list()
 	# determine ages to test
-	for (Nr in maxAges:minAges){ # Nr <- maxAges
+	for (Nr in maxAges:minAges.){ # Nr <- maxAges
 		its <- length(agesUniv) - Nr + 1
 		for (set in 1:its){ # set <- its[1]
 			ind <- ind + 1
@@ -135,7 +135,7 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	codi$cumgrowth       <-  0
 	codi$cumgrowth[1]    <-  2.5*codi$growth[1]
 	
-	for (j in 2:length(ages)){
+	for (j in 2:length(ages.)){
 		codi$cumgrowth[j]  <-  2.5*codi$growth[j]+5*sum(codi$growth[(j-1):1])
 	}
 	
@@ -143,8 +143,8 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	
 	codi$death_tab       <- codi$death * exp(codi$cumgrowth)
 	
-	ratio           <- sum(codi$death_tab[ages%in%c(10:39)])/sum(codi$death_tab[ages%in%c(40:59)])
-	
+	ratio           <- sum(codi$death_tab[ages.%in%c(10:39)])/sum(codi$death_tab[ages.%in%c(40:59)])
+
 	if (sex. == "f"){
 		# TODO: expand ex in-line out to actual open ages..
 		# model lifetable

@@ -15,7 +15,7 @@ bh1CoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ag
 	codi$birthdays            <- 0
 # iterate over age groups >= 10
 	
-	for (j in seq_along(ages)[ages >= minA.]) {
+	for (j in seq_along(ages.)[ages. >= minA.]) {
 		# take geometric average of p1 pop vs p2 pop within same cohort
 		codi$birthdays[j]       <- 
 				1 / AgeInt. * sqrt(codi$pop1[j - 1] * codi$pop2[j])
@@ -29,7 +29,7 @@ bh1CoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ag
 	codi$cumgrowth         <-  0
 	codi$cumgrowth[1]      <-  2.5*codi$growth[1]
 	
-	for (j in 2:length(ages)){
+	for (j in 2:length(ages.)){
 		codi$cumgrowth[j]  <-  2.5*codi$growth[j]+5*sum(codi$growth[(j-1):1])
 	}
 	
@@ -37,7 +37,7 @@ bh1CoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ag
 	
 	codi$death_tab       <- codi$death * exp(codi$cumgrowth)
 	
-	ratio                <- sum(codi$death_tab[ages%in%c(10:39)])/sum(codi$death_tab[ages%in%c(40:59)])
+	ratio                <- sum(codi$death_tab[ages.%in%c(10:39)])/sum(codi$death_tab[ages.%in%c(40:59)])
 	
 	if (sex. == "f"){
 		# TODO: expand ex in-ine out to actual open ages..
@@ -86,8 +86,8 @@ bh1CoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ag
 	}
 	# plot(codi$pop_a, type = 'l')
 	
-	codi$Cx      <-  codi$pop_a / codi$birthdays
-	codi$RelDiff <-  (codi$pop_a - codi$birthdays) / ( codi$pop_a + codi$birthdays) / 2
+	codi$Cx      <- codi$pop_a / codi$birthdays
+	codi$RelDiff <- (codi$pop_a - codi$birthdays) / ( codi$pop_a + codi$birthdays) / 2
 	
 	codi$exclude          <-  codi$birthdays != 0 & codi$age >= 15 & codi$age <= 75 & !is.nan(codi$Cx) & !is.nan(codi$RelDiff)
 	

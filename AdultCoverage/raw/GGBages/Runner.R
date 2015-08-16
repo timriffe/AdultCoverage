@@ -108,6 +108,7 @@ DM3$year2 <- 2010
 DM3$sex   <- "m"
 # UFF
 head(DF1)
+
 UFF1ggb.f       <- ggb(DF1)
 UFF1bh1.f       <- bh1(DF1, sex = "f")
 UFF1bh2.f       <- bh2(DF1, sex = "f")
@@ -119,6 +120,20 @@ UFF3bh2.f       <- bh2(DF3, sex = "f")
 UFM3ggb.m       <- ggb(DM3)
 UFM3bh1.m       <- bh1(DM3, sex = "m")
 UFM3bh2.m       <- bh2(DM3, sex = "m")
+
+head(DM3)
+
+
+
+codi <- DM3[DM3$cod == 14, ]
+head(codi)
+codi[1,c("pop1","death","pop2")] <- colSums(codi[1:2,c("pop1","death","pop2")])
+codi <- codi[-2, ]
+write.table(codi, sep = ",", row.names = FALSE, file = "Data/testData.csv")	
+
+
+write
+
 range(UFF3bh2.f)
 
 plot(UFF1bh2.f,UFF3bh2.f,asp=1)
