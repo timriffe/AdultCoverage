@@ -146,7 +146,7 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., sex., exa
 # codi <- tab1[["14"]]
 #minA = 10; AgeInt = 5; minAges = 8; sex = "f"
 # TODO: detect AgeInt rather than specify as argument
-bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f", exact.ages){
+bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f", exact.ages = NULL){
 	tab        <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
 	tab$pop1   <- as.double(tab$pop1)
 	tab$pop2   <- as.double(tab$pop2)
