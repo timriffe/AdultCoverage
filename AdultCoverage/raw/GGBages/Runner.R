@@ -106,6 +106,27 @@ colnames(DM3) <- c("cod","age","pop1","death","pop2")
 DM3$year1 <- 2000
 DM3$year2 <- 2010
 DM3$sex   <- "m"
+
+head(DM3[DM3$cod == 14, ])
+# doesn't work well with typical abridged data because
+# age groups need to be conformable.
+codi <- DM3[DM3$cod == 14, ]
+head(DM3)
+groupInfants <- function(codi){
+	if (all(c(0,1) %in% codi$age)){
+		codi[codi$age == 0,c("pop1","death","pop2")] <-
+				colSums(codi[codi$age %in% c(0,1),c("pop1","death","pop2")])
+		codi <- codi[codi$age != 1, ]
+		codi
+	}
+	codi
+}
+
+DM3L <- split(DM3, DM3$cod)
+
+DM3Lgrouped <- lapply(DM3L, groupInfants)
+DM3 <- do.call(rbind,DM3Lgrouped)
+
 # UFF
 head(DF1)
 
@@ -118,32 +139,42 @@ UFF3bh1.f       <- bh1(DF3, sex = "f")
 UFF3bh2.f       <- bh2(DF3, sex = "f")
 
 UFM3ggb.m       <- ggb(DM3)
-UFM3bh1.m       <- bh1(DM3, sex = "m")
+bh1(DM3, sex = "m")
+UFM3bh1.m       <- bh1(DM3, sex = "m", exact.ages = seq(15,65,by=5))
+bh1(DM3, sex = "m")
 UFM3bh2.m       <- bh2(DM3, sex = "m")
 
-head(DM3)
-
-
+plot(bh1(DM3, sex = "m", exact.ages = seq(30,65,by=5)) / bh1(DM3, sex = "m"))
+abline(h=1)
 
 codi <- DM3[DM3$cod == 14, ]
-head(codi)
-codi[1,c("pop1","death","pop2")] <- colSums(codi[1:2,c("pop1","death","pop2")])
-codi <- codi[-2, ]
-write.table(codi, sep = ",", row.names = FALSE, file = "Data/testData.csv")	
+
+codi <- DM3[DM3$cod == 53, ]
+codibh1 <- bh1MakeColumns(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages. = unique(codi$age), sex. = "m")
+codibh1$Cx
+mean(codibh1$Cx[codibh1$age %in% c(seq(15,65,by=5))])
+
+#codi <- DM3[DM3$cod == 14, ]
+#head(codi)
+#codi[1,c("pop1","death","pop2")] <- colSums(codi[1:2,c("pop1","death","pop2")])
+#codi <- codi[-2, ]
+write.table(codi, sep = ",", row.names = FALSE, file = "Data/testData53.csv")	
 
 
-write
+ codi <- read.csv("Data/testData.csv")
+ codi[1,c("pop1","death","pop2")] <- colSums(codi[1:2,c("pop1","death","pop2")])
+ codi <- codi[-2, ]
 
-range(UFF3bh2.f)
-
-plot(UFF1bh2.f,UFF3bh2.f,asp=1)
-abline(a=0,b=1)
-
-head(UFFggb.f)
-
-# UFM
-UFMggb.m       <- ggb(BR2[BR2$sex == "m", ])
-UFMbh1.m       <- bh1(BR2[BR2$sex == "m", ], sex = "m")
-UFMbh2.m       <- bh2(BR2[BR2$sex == "m", ], sex = "m")
+#range(UFF3bh2.f)
+#
+#plot(UFF1bh2.f,UFF3bh2.f,asp=1)
+#abline(a=0,b=1)
+#
+#head(UFFggb.f)
+#
+## UFM
+#UFMggb.m       <- ggb(BR2[BR2$sex == "m", ])
+#UFMbh1.m       <- bh1(BR2[BR2$sex == "m", ], sex = "m")
+#UFMbh2.m       <- bh2(BR2[BR2$sex == "m", ], sex = "m")
 
 

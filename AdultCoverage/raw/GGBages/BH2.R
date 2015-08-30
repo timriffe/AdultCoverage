@@ -102,15 +102,21 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 	AllLevels           <- 3:25
 	CDlevel             <- splinefun(AllLevels~standardratios)(ratio)
 	# open at age 110 ....
-	eOpen               <- splinefun(ex[, ncol(ex)]~1:25)(CDlevel)
-	
+    OA        <- max(ages.)
+    availages <- as.integer(colnames(ex))
+
+    stopifnot(OA %in% availages)
+
+    eOpen     <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
+
 	N                   <- nrow(codi)
 	codi$growth[is.nan(codi$growth)] <- 0
-	if (sign( codi$growth[N ]) == -1){
-		minus           <- Re(((eOpen * codi$growth[N]) + .0i)^(1 / 3)) * 2
-	} else {
-		minus           <- (eOpen * codi$growth[N])^(1 / 3)
-	}
+	#	if (sign( codi$growth[N]) == -1){
+#		minus <- Re(((eOpen * codi$growth[N]) + .0i)^(2 / 6)) * 2
+#	} else {
+#		minus <- (eOpen * codi$growth[N])^(2 / 6)
+#	}
+	minus          <- ((eOpen * codi$growth[N])^2) / 6
 	codi$pop_a          <- codi$death[N] * (exp(eOpen * codi$growth[N]) - minus)
 	
 	for(j in N:1){
@@ -123,9 +129,16 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 	codi
 }
 
-bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., sex.){
+bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., sex., exact.ages. = NULL){
 	codiggb     <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
-	agesfit.    <- ggbgetAgesFit(codiggb, ages., minAges.)
+
+	# this is a test
+	if (is.null(exact.ages.)){
+		agesfit. <- ggbgetAgesFit(codiggb, ages., minAges.)
+	} else {
+		agesfit. <- exact.ages.
+	}
+	
 	codi        <- bh2MakeColumns(codiggb, minA., AgeInt., minAges., ages., sex., agesfit.)
 	bh2CoverageFromAges(codi, agesfit.  )
 	
@@ -133,7 +146,7 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., sex.){
 # codi <- tab1[["14"]]
 #minA = 10; AgeInt = 5; minAges = 8; sex = "f"
 # TODO: detect AgeInt rather than specify as argument
-bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
+bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f", exact.ages){
 	tab        <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
 	tab$pop1   <- as.double(tab$pop1)
 	tab$pop2   <- as.double(tab$pop2)
@@ -150,7 +163,8 @@ bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f"){
 					AgeInt. = AgeInt, 
 					minAges. = minAges,  
 					ages. = ages,
-					sex. = sex))
+					sex. = sex,
+					exact.ages. = exact.ages))
 	coverages
 }
 #

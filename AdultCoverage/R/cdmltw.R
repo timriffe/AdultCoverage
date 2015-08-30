@@ -135,6 +135,12 @@ cdmltw <-
 		
 		nLxf  <-  nLx        #   Save  nLx for females in separate array
 		
+		# TR: column labelling for easier selection afterward:
+		Ncol        <- ncol(ex)
+		cols        <- c(0,1,seq(5,5*(Ncol-2),by=5))
+		colnames(ex)<- cols   # only needed for BH functions
+		
+		
 		out <- list(age=xx,width=nn,lx=lx,nqx=nqx,nax=nax,ndx=ndx,nLx=nLx,nmx=nmx,Tx=Tx,ex=ex)
 		
 		##################################################################
@@ -273,6 +279,12 @@ cdmltw <-
 		ex   <-  Tx/lx
 		
 		nLxm  <-  nLx        #   Save  nLx for males in separate array
+		
+		# TR: column labelling for easier selection afterward:
+		Ncol        <- ncol(ex)
+		cols        <- c(0,1,seq(5,5*(Ncol-2),by=5))
+		colnames(ex)<- cols   # only needed for BH functions
+		
 		
 		out <- list(age=xx,width=nn,lx=lx,nqx=nqx,nax=nax,ndx=ndx,nLx=nLx,nmx=nmx,Tx=Tx,ex=ex)
 		
