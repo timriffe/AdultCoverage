@@ -88,14 +88,14 @@ bhCoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, age
 	# open at age 110 ....
 	eOpen     <- splinefun(ex[,ncol(ex)]~1:25)(CDlevel)
 	
-	N              <- nrow(codi)
+	N         <- nrow(codi)
 	codi$growth[is.nan(codi$growth)] <- 0
 	if (sign( codi$growth[N ]) == -1){
 		minus <- Re(((eOpen * codi$growth[N ])+.0i)^(1/3)) * 2
 	} else {
 		minus <- (eOpen * codi$growth[N ])^(1/3)
 	}
-	codi$pop_a     <- codi$death[N ] * (exp(eOpen * codi$growth[N ]) -minus)
+	codi$pop_a     <- codi$death[N ] * (exp(eOpen * codi$growth[N ]) - minus)
 	
 	
 	for(j in N:1){
@@ -105,9 +105,12 @@ bhCoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, age
 	# plot(codi$pop_a, type = 'l')
 
     codi$Cx      <-  codi$pop_a / codi$birthdays
+	
+	
 	codi$RelDiff <-  (codi$pop_a - codi$birthdays) / ( codi$pop_a + codi$birthdays) / 2
 
-	codi$exclude          <-  codi$birthdays != 0 & codi$age >= 15 & codi$age <= 75 & !is.nan(codi$Cx) & !is.nan(codi$RelDiff)
+	codi$exclude <-  codi$birthdays != 0 & codi$age >= 15 & codi$age <= 75 & 
+			!is.nan(codi$Cx) & !is.nan(codi$RelDiff)
 	
 	# intercept
 	
