@@ -144,6 +144,16 @@ UFM3bh1.m       <- bh1(DM3, sex = "m", exact.ages = seq(15,65,by=5))
 bh1(DM3, sex = "m")
 UFM3bh2.m       <- bh2(DM3, sex = "m")
 
+##############################################
+
+# Everton's theory is that BH2 internal ages
+# are fixed in his code and flexible in ours,
+# and that might explain differences...
+
+##############################################
+
+
+
 plot(bh1(DM3, sex = "m", exact.ages = seq(30,65,by=5)) / bh1(DM3, sex = "m"))
 abline(h=1)
 
