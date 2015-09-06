@@ -1,8 +1,4 @@
 #####################################################
-#b2hgetRMSbh2getRMS <- function(agesi, codi){
-#	# get root mean square of residuals
-#	sqrt(sum(codi$RelDiff[codi$age %in% agesi]^2)/length(agesi))
-#}
 
 bh2CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
@@ -10,25 +6,6 @@ bh2CoverageFromAges <- function(codi, agesFit){
 }
 
 # change name to GB
-#bh2getRMS <- function(agesi, codi){
-#	slope       <- with(codi, 
-#			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
-#	)
-#	intercept   <-  with(codi, 
-#			(mean(lefterm[age %in% agesi]) * slope - mean(rightterm[age %in% agesi]))
-#	) 
-#	codi$fitted <- codi$rightterm * slope + intercept
-#	# get root mean square of residuals
-#	sqrt(sum(((codi$lefterm[codi$age %in% agesi] - codi$fitted[codi$age %in% agesi])^2))/length(agesi))
-#	
-#}
-# names(tab1)
-#x <- BR3[BR3$sex == "f", ]
-#minA. = 10; AgeInt. = 5; minAges. = 8; ages. = ages
-#codi <- tab1[[55]]
-#names(tab1)[80]
-
-
 bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.){
 	
 	dif.        <- codi$year2[1] - codi$year1[1] 
@@ -38,13 +15,13 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 	slope       <- with(codi, 
 			               sd(lefterm[age %in% agesfit.]) / sd(rightterm[age %in% agesfit.])
 	                     )
-	intercept   <-  with(codi, 
+	intercept   <- with(codi, 
 			              (mean(lefterm[age %in% agesfit.]) - 
 									  slope * mean(rightterm[age %in% agesfit.]))
 	                     ) 
 	
 	relcomp     <- exp(intercept * dif.)
-	
+	# relcomp <- .96
 	# adjust the first population count
 	codi$pop1adj <- codi$pop1 / relcomp
 	
@@ -77,7 +54,7 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 		# TODO: expand ex in-ine out to actual open ages..
 		# model lifetable
 		# based on Bennett & Horiuchi (1984) 
-		# "Mortality Estimateion fro Registered Deaths in Less Developed Countries", Demography
+		# "Mortality Estimation from Registered Deaths in Less Developed Countries", Demography
 		standardratios <- c(1.376,	1.3,	1.233,	1.171,
 				1.115,	1.062,	1.012,	0.964,
 				0.918,	0.872,	0.827,	0.787,
@@ -99,39 +76,34 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 	}
 	
 	# TODO: modify definition of AllLevels to be more robust.
-	AllLevels           <- 3:25
-	CDlevel             <- splinefun(AllLevels~standardratios)(ratio)
+	AllLevels             <- 3:25
+	CDlevel               <- splinefun(AllLevels~standardratios)(ratio)
 	# open at age 110 ....
-    OA        <- max(ages.)
-    availages <- as.integer(colnames(ex))
+    OA                    <- max(ages.)
+    availages             <- as.integer(colnames(ex))
 
     stopifnot(OA %in% availages)
 
-    eOpen     <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
+    eOpen                 <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
 
-	N                   <- nrow(codi)
+	N                     <- nrow(codi)
 	codi$growth[is.nan(codi$growth)] <- 0
-	#	if (sign( codi$growth[N]) == -1){
-#		minus <- Re(((eOpen * codi$growth[N]) + .0i)^(2 / 6)) * 2
-#	} else {
-#		minus <- (eOpen * codi$growth[N])^(2 / 6)
-#	}
-	minus          <- ((eOpen * codi$growth[N])^2) / 6
-	codi$pop_a          <- codi$death[N] * (exp(eOpen * codi$growth[N]) - minus)
+
+	minus                 <- ((eOpen * codi$growth[N])^2) / 6
+	codi$pop_a            <- codi$death[N] * (exp(eOpen * codi$growth[N]) - minus)
 	
 	for(j in N:1){
 		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt. * codi$growth[j - 1]) + 
 				codi$death[j - 1] * exp(AgeInt. / 2 * codi$growth[j - 1])
 	}
-	# plot(codi$pop_a, type = 'l')
+
 	
-	codi$Cx             <-  codi$pop_a / codi$birthdays
+	codi$Cx               <-  codi$pop_a / codi$birthdays
 	codi
 }
 
 bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., sex., exact.ages. = NULL){
-	codiggb     <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
-
+	codiggb      <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
 	# this is a test
 	if (is.null(exact.ages.)){
 		agesfit. <- ggbgetAgesFit(codiggb, ages., minAges.)
@@ -139,24 +111,23 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., sex., exa
 		agesfit. <- exact.ages.
 	}
 	
-	codi        <- bh2MakeColumns(codiggb, minA., AgeInt., minAges., ages., sex., agesfit.)
+	codi         <- bh2MakeColumns(codiggb, minA., AgeInt., minAges., ages., sex., agesfit.)
 	bh2CoverageFromAges(codi, agesfit.  )
 	
 }
-# codi <- tab1[["14"]]
-#minA = 10; AgeInt = 5; minAges = 8; sex = "f"
+
 # TODO: detect AgeInt rather than specify as argument
 bh2 <- function(x, minA = 10, AgeInt = 5, minAges = 8, sex = "f", exact.ages = NULL){
 	tab        <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
 	tab$pop1   <- as.double(tab$pop1)
 	tab$pop2   <- as.double(tab$pop2)
 	tab$death  <- as.double(tab$death)
-	tab1    <- split(tab,x$cod)
+	tab1       <- split(tab,x$cod)
 
-	ages    <- sort(unique(tab$age))
+	ages       <- sort(unique(tab$age))
 	#minA. = minA;AgeInt. = AgeInt;minAges. = minAges;ages. = ages;sex. = sex
 	# codi <- tab1[[1]]
-	coverages <- unlist(lapply(
+	coverages  <- unlist(lapply(
 					tab1, 
 					bh2coverageFromYear, 
 					minA. = minA, 

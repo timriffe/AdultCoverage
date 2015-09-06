@@ -23,6 +23,28 @@ BR2 <- read.table(file.path("Data","data_Brazil_p2.txt"),
 		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 BR3 <- read.table(file.path("Data","data_Brazil_p3.txt"), 
 		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+
+groupInfants <- function(codi){
+	if (all(c(0,1) %in% codi$age)){
+		codi[codi$age == 0,c("pop1","death","pop2")] <-
+				colSums(codi[codi$age %in% c(0,1),c("pop1","death","pop2")])
+		codi <- codi[codi$age != 1, ]
+		codi
+	}
+	codi
+}
+
+biggroup <- function(X){
+	XL        <- split(X, X$cod)
+	XLgrouped <- lapply(XL, groupInfants)
+	do.call(rbind, XLgrouped)
+}
+
+BR1 <- rbind(biggroup(BR1[BR1$sex == "m", ]),biggroup(BR1[BR1$sex == "f", ]))
+BR2 <- rbind(biggroup(BR2[BR2$sex == "m", ]),biggroup(BR2[BR2$sex == "f", ]))
+BR3 <- rbind(biggroup(BR3[BR3$sex == "m", ]),biggroup(BR3[BR3$sex == "f", ]))
+
+
 # BR1
 BR1ggb.f       <- ggb(BR1[BR1$sex == "f", ])
 BR1bh1.f       <- bh1(BR1[BR1$sex == "f", ], sex = "f")
@@ -77,72 +99,37 @@ write.table(Results, sep = ",", row.names = FALSE, file = "Data/ResultsGGBages.c
 
 # results for UF datasets
 
-UFF <- read.table(file.path("Data","dataUFfemale.txt"), 
-		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
-UFM <- read.table(file.path("Data","dataUFmale.txt"), 
-		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
-cnames <- colnames(UFF)
-UFF <- UFF[,-1]
-UFM <- UFM[,-1]
-colnames(UFF) <- colnames(UFM) <- cnames[1:ncol(UFF)]
-
-head(UFF)
-head(BR1)
-
-DF1 <- UFF[,c("UF","AGE","POP_80","DEATH_80","POP_91")]
-colnames(DF1) <- c("cod","age","pop1","death","pop2")
-DF1$year1 <- 1980
-DF1$year2 <- 1991
-DF1$sex   <- "f"
-head(UFF)
-DF3 <- UFF[,c("UF","AGE","POP_00","DEATH_00","POP_10")]
-colnames(DF3) <- c("cod","age","pop1","death","pop2")
-DF3$year1 <- 2000
-DF3$year2 <- 2010
-DF3$sex   <- "f"
-
-DM3 <- UFM[,c("UF","AGE","POP_00","DEATH_00","POP_10")]
-colnames(DM3) <- c("cod","age","pop1","death","pop2")
-DM3$year1 <- 2000
-DM3$year2 <- 2010
-DM3$sex   <- "m"
-
-head(DM3[DM3$cod == 14, ])
-# doesn't work well with typical abridged data because
-# age groups need to be conformable.
-codi <- DM3[DM3$cod == 14, ]
-head(DM3)
-groupInfants <- function(codi){
-	if (all(c(0,1) %in% codi$age)){
-		codi[codi$age == 0,c("pop1","death","pop2")] <-
-				colSums(codi[codi$age %in% c(0,1),c("pop1","death","pop2")])
-		codi <- codi[codi$age != 1, ]
-		codi
-	}
-	codi
+showperiod <- function(x,codes){
+	N         <- length(x)
+	
+	
+	plot(1:27,x,type="n")
+	text(1:27,x,names(x))
 }
 
-DM3L <- split(DM3, DM3$cod)
 
-DM3Lgrouped <- lapply(DM3L, groupInfants)
-DM3 <- do.call(rbind,DM3Lgrouped)
+plot(Bernardo1[names(ggb.m1),"Males"], (ggb.m1  + bh2.m1)/2*100, type = "n")
+text(Bernardo1[names(ggb.m1),"Males"], (ggb.m1  + bh2.m1)/2*100,names(ggb.m1))
+abline(a=0,b=1)
 
-# UFF
-head(DF1)
+showperiod(ggb.m1 * 100)
+showperiod(bh1.m1 * 100)
+showperiod(bh2.m1 * 100)
 
-UFF1ggb.f       <- ggb(DF1)
-UFF1bh1.f       <- bh1(DF1, sex = "f")
-UFF1bh2.f       <- bh2(DF1, sex = "f")
 
-UFF3ggb.f       <- ggb(DF3)
-UFF3bh1.f       <- bh1(DF3, sex = "f")
-UFF3bh2.f       <- bh2(DF3, sex = "f")
 
-UFM3ggb.m       <- ggb(DM3)
-bh1(DM3, sex = "m")
-UFM3bh1.m       <- bh1(DM3, sex = "m", exact.ages = seq(15,65,by=5))
-bh1(DM3, sex = "m")
-UFM3bh2.m       <- bh2(DM3, sex = "m")
+# males
+ggb.m1       <- ggb(DM1)
+bh1.m1       <- bh1(DM1, sex = "m")
+bh2.m1       <- bh2(DM1, sex = "m")
+
+ggb.m2       <- ggb(DM2)
+bh1.m2       <- bh1(DM2, sex = "m")
+bh2.m2       <- bh2(DM2, sex = "m")
+
+ggb.m3       <- ggb(DM3)
+bh1.m3       <- bh1(DM3, sex = "m")
+bh2.m3       <- bh2(DM3, sex = "m")
 
 ##############################################
 
@@ -153,27 +140,27 @@ UFM3bh2.m       <- bh2(DM3, sex = "m")
 ##############################################
 
 
-
-plot(bh1(DM3, sex = "m", exact.ages = seq(30,65,by=5)) / bh1(DM3, sex = "m"))
-abline(h=1)
-
-codi <- DM3[DM3$cod == 14, ]
-
-codi <- DM3[DM3$cod == 53, ]
-codibh1 <- bh1MakeColumns(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages. = unique(codi$age), sex. = "m")
-codibh1$Cx
-mean(codibh1$Cx[codibh1$age %in% c(seq(15,65,by=5))])
-
+#
+#plot(bh1(DM3, sex = "m", exact.ages = seq(30,65,by=5)) / bh1(DM3, sex = "m"))
+#abline(h=1)
+#
 #codi <- DM3[DM3$cod == 14, ]
-#head(codi)
-#codi[1,c("pop1","death","pop2")] <- colSums(codi[1:2,c("pop1","death","pop2")])
-#codi <- codi[-2, ]
-write.table(codi, sep = ",", row.names = FALSE, file = "Data/testData53.csv")	
-
-
- codi <- read.csv("Data/testData.csv")
- codi[1,c("pop1","death","pop2")] <- colSums(codi[1:2,c("pop1","death","pop2")])
- codi <- codi[-2, ]
+#
+#codi <- DM3[DM3$cod == 53, ]
+#codibh1 <- bh1MakeColumns(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages. = unique(codi$age), sex. = "m")
+#codibh1$Cx
+#mean(codibh1$Cx[codibh1$age %in% c(seq(15,65,by=5))])
+#
+##codi <- DM3[DM3$cod == 14, ]
+##head(codi)
+##codi[1,c("pop1","death","pop2")] <- colSums(codi[1:2,c("pop1","death","pop2")])
+##codi <- codi[-2, ]
+#write.table(codi, sep = ",", row.names = FALSE, file = "Data/testData53.csv")	
+#
+#
+# codi <- read.csv("Data/testData.csv")
+# codi[1,c("pop1","death","pop2")] <- colSums(codi[1:2,c("pop1","death","pop2")])
+# codi <- codi[-2, ]
 
 #range(UFF3bh2.f)
 #

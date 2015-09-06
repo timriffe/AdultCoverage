@@ -1,8 +1,8 @@
 #####################################################
-b2hgetRMSbh2getRMS <- function(agesi, codi){
-	# get root mean square of residuals
-	sqrt(sum(codi$RelDiff[codi$age %in% agesi]^2)/length(agesi))
-}
+#bh2getRMS <- function(agesi, codi){
+#	# get root mean square of residuals
+#	sqrt(sum(codi$RelDiff[codi$age %in% agesi]^2)/length(agesi))
+#}
 
 bh2CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
@@ -79,24 +79,6 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 #	}
 
 	agesfit     <- agesL[[which.min(unlist(lapply(agesL, ggbgetRMS, codi = codi)))]]
-	#agesfit     <- agesL[[which.max(unlist(lapply(agesL, getr2, codi = codi)))]]
-	# this is the basic formula
-	#coverageFromAges(codi, agesfit)
-
-## copied and pasted
-#slope       <- with(codi, 
-#		sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
-#)
-#intercept   <-  with(codi, 
-#		(mean(lefterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
-#) 
-#codi$fitted <- codi$rightterm * slope + intercept
-#
-## this is the coverage estimate
-#1/with(codi, sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit]))
-## end copy and paste
-
-
     agesi       <- codi$age %in% agesfit
 
 	slope       <- with(codi, 
@@ -179,11 +161,11 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	N         <- nrow(codi)
 	codi$growth[is.nan(codi$growth)] <- 0
 	if (sign( codi$growth[N ]) == -1){
-		minus <- Re(((eOpen * codi$growth[N ])+.0i)^(1/3)) * 2
+		minus             <- Re(((eOpen * codi$growth[N ])+.0i)^(1/3)) * 2
 	} else {
-		minus <- (eOpen * codi$growth[N ])^(1/3)
+		minus             <- (eOpen * codi$growth[N ])^(1/3)
 	}
-	codi$pop_a     <- codi$death[N ] * (exp(eOpen * codi$growth[N ]) - minus)
+	codi$pop_a            <- codi$death[N ] * (exp(eOpen * codi$growth[N ]) - minus)
 	
 	
 	for(j in N:1){
@@ -192,8 +174,8 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages.,sex.){
 	}
 	# plot(codi$pop_a, type = 'l')
 	
-	codi$Cx      <-  codi$pop_a / codi$birthdays
-	codi$RelDiff <-  (codi$pop_a - codi$birthdays) / ( codi$pop_a + codi$birthdays) / 2
+	codi$Cx               <-  codi$pop_a / codi$birthdays
+	codi$RelDiff          <-  (codi$pop_a - codi$birthdays) / ( codi$pop_a + codi$birthdays) / 2
 	
 	codi$exclude          <-  codi$birthdays != 0 & codi$age >= 15 & codi$age <= 75 & !is.nan(codi$Cx) & !is.nan(codi$RelDiff)
 	
