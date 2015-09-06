@@ -24,6 +24,10 @@ BR2 <- read.table(file.path("Data","data_Brazil_p2.txt"),
 BR3 <- read.table(file.path("Data","data_Brazil_p3.txt"), 
 		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 
+# functions to group infants. Assumes data come abridged in the standard
+# way, 0, 1-4, 5-9, etc.
+
+# this works for one population subset
 groupInfants <- function(codi){
 	if (all(c(0,1) %in% codi$age)){
 		codi[codi$age == 0,c("pop1","death","pop2")] <-
@@ -34,12 +38,14 @@ groupInfants <- function(codi){
 	codi
 }
 
+# for one period, since that's how we have the data organized.
 biggroup <- function(X){
 	XL        <- split(X, X$cod)
 	XLgrouped <- lapply(XL, groupInfants)
 	do.call(rbind, XLgrouped)
 }
 
+# need to first group age 0 with 1-4...
 BR1 <- rbind(biggroup(BR1[BR1$sex == "m", ]),biggroup(BR1[BR1$sex == "f", ]))
 BR2 <- rbind(biggroup(BR2[BR2$sex == "m", ]),biggroup(BR2[BR2$sex == "f", ]))
 BR3 <- rbind(biggroup(BR3[BR3$sex == "m", ]),biggroup(BR3[BR3$sex == "f", ]))
@@ -99,37 +105,37 @@ write.table(Results, sep = ",", row.names = FALSE, file = "Data/ResultsGGBages.c
 
 # results for UF datasets
 
-showperiod <- function(x,codes){
-	N         <- length(x)
-	
-	
-	plot(1:27,x,type="n")
-	text(1:27,x,names(x))
-}
+#showperiod <- function(x,codes){
+#	N         <- length(x)
+#	
+#	
+#	plot(1:27,x,type="n")
+#	text(1:27,x,names(x))
+#}
 
 
-plot(Bernardo1[names(ggb.m1),"Males"], (ggb.m1  + bh2.m1)/2*100, type = "n")
-text(Bernardo1[names(ggb.m1),"Males"], (ggb.m1  + bh2.m1)/2*100,names(ggb.m1))
-abline(a=0,b=1)
+#plot(Bernardo1[names(ggb.m1),"Males"], (ggb.m1  + bh2.m1)/2*100, type = "n")
+#text(Bernardo1[names(ggb.m1),"Males"], (ggb.m1  + bh2.m1)/2*100,names(ggb.m1))
+#abline(a=0,b=1)
+#
+#showperiod(ggb.m1 * 100)
+#showperiod(bh1.m1 * 100)
+#showperiod(bh2.m1 * 100)
+#
 
-showperiod(ggb.m1 * 100)
-showperiod(bh1.m1 * 100)
-showperiod(bh2.m1 * 100)
 
-
-
-# males
-ggb.m1       <- ggb(DM1)
-bh1.m1       <- bh1(DM1, sex = "m")
-bh2.m1       <- bh2(DM1, sex = "m")
-
-ggb.m2       <- ggb(DM2)
-bh1.m2       <- bh1(DM2, sex = "m")
-bh2.m2       <- bh2(DM2, sex = "m")
-
-ggb.m3       <- ggb(DM3)
-bh1.m3       <- bh1(DM3, sex = "m")
-bh2.m3       <- bh2(DM3, sex = "m")
+## males
+#ggb.m1       <- ggb(DM1)
+#bh1.m1       <- bh1(DM1, sex = "m")
+#bh2.m1       <- bh2(DM1, sex = "m")
+#
+#ggb.m2       <- ggb(DM2)
+#bh1.m2       <- bh1(DM2, sex = "m")
+#bh2.m2       <- bh2(DM2, sex = "m")
+#
+#ggb.m3       <- ggb(DM3)
+#bh1.m3       <- bh1(DM3, sex = "m")
+#bh2.m3       <- bh2(DM3, sex = "m")
 
 ##############################################
 
