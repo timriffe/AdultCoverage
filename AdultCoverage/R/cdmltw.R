@@ -18,7 +18,6 @@ cdmltw <-
 			eten <- seq(20,84, by = 2)
 		}else eten <- etenf
 		
-
 #    Level 1 is ef=20,  Level 25 is  ef = 80
 #    Estimated  eten values to give levels 1 to 25 (from previous runs) :
 		etenf <- c(        21.40560, 25.32906, 28.86371, 32.07434, 35.01080, 37.71234 )
@@ -63,7 +62,6 @@ cdmltw <-
 		nqx  <-  ifelse(  nqxa <= nqxl  &  slopechk <  1,  nqxa,  nqx )
 		nqx  <-  ifelse(  nqxa <= nqxl  &  slopechk >= 1,  nqxl,  nqx )
 		
-		
 		####################################################################
 		####    Calculate the survivorship proportions   lx  up to age 75
 		##################################################################
@@ -72,8 +70,6 @@ cdmltw <-
 		uu  <-  t( apply( u, c(1), cumsum ) )
 		km1 <-  length( uu[1,]) - 1    #  number of age groups minus 1
 		lx  <-  cbind(  1+0*eee,  exp( uu[ , 1:km1])  )
-		
-		
 		
 		#####################################################################
 #   Special extension from ages 80 to 100 (i.e. for j> 18
@@ -98,18 +94,15 @@ cdmltw <-
 		nL95 <-  llx[, 76:101 ] %*% c( 1/2, rep(1,24), 1/2)*(1/5)
 		T100 <-  as.vector( llx[, 101:201] %*% c( 1/2, rep(1,99), 1/2)*(1/5))
 		
-		
 		#################################################################
 		#####   Compute other functions in the lifetable
 		#################################################################
-		
 		
 		xx   <-  c(0, 1, seq(5,95, by=5) )   #   ages
 		nn   <-  c( diff(xx),8 )              #   age group widths
 		lx   <-  cbind( lx[ , 1:17], llx[ , c(1,26,51,76)] )
 		qqx  <-  ( llx[ , c(1,26,51) ] - llx[ , c(26,51,76)] )/llx[, c(1,26,51)]
 		nqx  <-  cbind( nqx[ , 1:17], qqx, eee  )
-		
 		
 		dimnames(nqx)[[1]] <- paste(seq(eten))
 		dimnames(nqx)[[2]] <- paste(xx)
@@ -154,9 +147,7 @@ cdmltw <-
 		}
 	}
 	
-	
 	######################################################################
-	
 	
 	if(sex=="F") return(out)
 	else{
@@ -190,8 +181,6 @@ cdmltw <-
 		b1x <- c(b1x, -0.05511, -0.05229, -0.04573, -0.03637, -0.02961, -0.02256 )
 		b1x <- c(b1x, -0.01891, -0.01491, -0.01161, -0.00895 )
 		
-		
-		
 		#####################################################################
 		##### #    Calculate an array of probabilities of dying  nqx  up to age 75
 		#######################################################################
@@ -218,8 +207,6 @@ cdmltw <-
 		km1 <-  length( uu[1,]) - 1    #  number of age groups minus 1
 		lx  <-  cbind(  1+0*eee,  exp( uu[ , 1:km1])  )
 		
-		
-		
 		#####################################################################
 #   Special extension from ages 80 to 100 (i.e. for j> 18
 		###############################################################
@@ -243,18 +230,15 @@ cdmltw <-
 		nL95 <-  llx[, 76:101 ] %*% c( 1/2, rep(1,24), 1/2)*(1/5)
 		T100 <-  as.vector( llx[, 101:201] %*% c( 1/2, rep(1,99), 1/2)*(1/5))
 		
-		
 		#################################################################
 		#####   Compute other functions in the lifetable
 		#################################################################
-		
 		
 		xx   <-  c(0, 1, seq(5,95, by=5) )   #   ages
 		nn   <-  c( diff(xx),8 )              #   age group widths
 		lx   <-  cbind( lx[ , 1:17], llx[ , c(1,26,51,76)] )
 		qqx  <-  ( llx[ , c(1,26,51) ] - llx[ , c(26,51,76)] )/llx[, c(1,26,51)]
 		nqx  <-  cbind( nqx[ , 1:17], qqx, eee  )
-		
 		
 		dimnames(nqx)[[1]] <- paste(seq(eten))
 		dimnames(nqx)[[2]] <- paste(xx)
@@ -284,7 +268,6 @@ cdmltw <-
 		Ncol        <- ncol(ex)
 		cols        <- c(0,1,seq(5,5*(Ncol-2),by=5))
 		colnames(ex)<- cols   # only needed for BH functions
-		
 		
 		out <- list(age=xx,width=nn,lx=lx,nqx=nqx,nax=nax,ndx=ndx,nLx=nLx,nmx=nmx,Tx=Tx,ex=ex)
 		
