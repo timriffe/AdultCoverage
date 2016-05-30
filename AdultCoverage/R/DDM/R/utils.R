@@ -19,7 +19,7 @@ detectAgeInterval <- function(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age"){
 	
 	stopifnot("age" %in% towlower(colnames(Dat)))
 	colnames(Dat)[grepl("age",colnames(Dat))] <- "Age"
-if ()
+
 	Ages <- with(Dat, unique(Age[Age >= MinAge & Age <= MaxAge]))
 	Interval <- unique(diff(sort(Ages)))
 	if (length(Interval) > 1){
@@ -102,3 +102,16 @@ NULL
 	x <= y & !is.na(x) & !is.na(y)
 }
 
+#'
+addcod <- function(x){
+	if (!"cod" %in% colnames(x)){
+		x$cod <- 1
+		if ("sex" %in% colnames(x)){
+			sexes         <- unique(x$sex)
+			recvec        <- 1:length(sexes)
+			names(recvec) <- sexes
+			x$cod         <- recvec[x$sex]
+		}
+	}
+    x
+}
