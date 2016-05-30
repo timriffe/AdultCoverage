@@ -3,25 +3,6 @@
 ###############################################################################
 # contains functions related to growth balance method
 
-
-# 
-# Author: riffe
-###############################################################################
-
-
-# deprecated, doesn't give good results
-#ggbgetr2 <- function(agesi, codi){
-#	slope       <- with(codi, 
-#			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
-#	)
-#	intercept   <-  with(codi, 
-#			(mean(lefterm[age %in% agesi]) * slope - mean(rightterm[age %in% agesi]))
-#	) 
-#	codi$fitted <- codi$rightterm * slope + intercept
-#	
-#	summary(lm(codi$lefterm[codi$age %in% agesi] ~ codi$fitted[codi$age %in% agesi]))$r.squared
-#}
-
 ggbgetRMS <- function(agesi, codi){
 	slope       <- with(codi, 
 			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
@@ -35,7 +16,6 @@ ggbgetRMS <- function(agesi, codi){
 	
 }
 
-# codi <- tab1[[1]]
 ggbcoverageFromYear <- function(codi, exact.ages., minA., maxA., minAges.){
 	
 	# if exact.ages is given, we override other age-parameters
@@ -52,10 +32,16 @@ ggbcoverageFromYear <- function(codi, exact.ages., minA., maxA., minAges.){
 	}
 	
 	codi    <- ggbMakeColumns(codi, minA., maxA.)
-	agesfit <- ggbgetAgesFit(codi, minAges.)
+	
+	if (!is.null(exact.ages.) & length(exact.ages.) >= 3){
+		agesfit <- exact.ages.
+	} else {
+		agesfit <- ggbgetAgesFit(codi, minAges.)
+	}
+		
 	# this is the basic formula
 	coverage <- ggbcoverageFromAges(codi, agesfit)
-	list(coverage = coverage, lower = min(agesfit), upper = max(agesfit))
+	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesfit), upper = max(agesfit))
 }
 
 ggbColumnsFromAges <- function(codi, agesfit){
@@ -79,54 +65,45 @@ ggbcoverageFromAges <- function(codi, agesfit){
 ggbMakeColumns <- function(codi, minA., maxA.){
 	AgeInt                 <- detectAgeInterval(codi, MinAge =  minA., MaxAge = maxA., ageColumn = "age")
 	ages                   <- codi$age
-	# make this accept exact dates.
-	dif.                   <- codi$year2[1] - codi$year1[1] 
+	# TR make this accept exact dates.
+	dif.                   <- yint2(codi)
 	
-	codi$pop1cum           <- rev(cumsum(rev(codi$pop1))) # Tx
-	codi$pop2cum           <- rev(cumsum(rev(codi$pop2))) # Tx
-	codi$deathcum          <- rev(cumsum(rev(codi$death))) # lx
+	codi$pop1cum           <- rev(cumsum(rev(codi$pop1)))  # like Tx
+	codi$pop2cum           <- rev(cumsum(rev(codi$pop2)))  # like Tx
+	codi$deathcum          <- rev(cumsum(rev(codi$deaths))) # like lx
 	
 	# define new column for birthdays between pop estimates
-	codi$birthdays         <- 0
-	# iterate over age groups >= 10
+	# TR: loop removed
+	codi$birthdays <- c(0, sqrt(codi$pop1[ -nrow(codi) ] * codi$pop2[ -1 ])) / AgeInt
 	
-	for (j in seq_along(ages)[ages >= minA.]) {
-		# take geometric average of p1 pop vs p2 pop within same cohort
-		codi$birthdays[j] <- 1 / AgeInt * sqrt(codi$pop1[j - 1] * codi$pop2[j])
-		
-	} # end age loop
-	
-	# create stationary Lx as geometric avg of within-cohort consecutive ages
-	codi$Lx               <- sqrt(codi$pop1cum * codi$pop2cum)
+	# create 'stationary' Tx as geometric avg of within-cohort consecutive ages
+	codi$Tx               <- sqrt(codi$pop1cum * codi$pop2cum)
 	
 	# growth rate per annum
 	codi$cumgrowth        <- log(codi$pop2cum / codi$pop1cum) / dif.
 	
 	# eqns from formula in Hill/Horiuchi
-	codi$rightterm        <- codi$deathcum / codi$Lx
+	codi$rightterm        <- codi$deathcum / codi$Tx
 	# eqns from formula in Hill/Horiuchi
-	codi$lefterm          <- (codi$birthdays / codi$Lx) - codi$cumgrowth
+	codi$lefterm          <- (codi$birthdays / codi$Tx) - codi$cumgrowth
 	# certain columns can be safely ignored in future operations
-	codi$exclude          <-  codi$Lx != 0 & codi$birthdays != 0 & codi$age >= minA. & codi$age <= 75
+	codi$exclude          <-  codi$Tx != 0 & codi$birthdays != 0 & codi$age >= minA. & codi$age <= 75
 	codi
 }
 
-ggbgetAgesFit <- function(codi, ages., minAges.){
-	
-#	codi <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
-	# intercept
-	
+ggbgetAgesFit <- function(codi, minAges.){
+		
 	maxAges   <- sum(codi$exclude)
-	agesUniv  <- ages.[codi$exclude]
+	agesUniv  <- codi$age[codi$exclude]
 	
 	FirstAges <- agesUniv[agesUniv < 30]
 	
 	ind       <- 0
 	agesL     <- list()
 	# determine ages to test
-	for (Nr in maxAges:minAges.){ # Nr <- maxAges
+	for (Nr in maxAges:minAges.){ #
 		its <- length(agesUniv) - Nr + 1
-		for (set in 1:its){ # set <- its[1]
+		for (set in 1:its){ # 
 			ind <- ind + 1
 			agesL[[ind]] <- agesUniv[set:(set+Nr-1)]
 		}
@@ -138,35 +115,69 @@ ggbgetAgesFit <- function(codi, ages., minAges.){
 	agesfit
 }
 
-ggb <- function(x, minA = 10, maxA = 75, minAges = 8, exact.ages = NULL){         ##  Data
+
+#'
+#' @title estimate death registration coverage using the GGB method
+#' 
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. 
+#' 
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.
+#' 
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}
+#' 
+
+
+ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){         ##  Data
 	##  Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
-	tab        <- data.frame(x)           
+	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
-	tab        <- addcod(tab)
+	
+	# in case there is no splitting var, this way we split anyway.
+	tab         <- addcod(tab)
+	
+	# guess which column is the deaths column, rename it deaths
+	tab         <- guessDeathsColumn(tab)
 	# TR: account for decimal intervals
-	#cod      <- factor(x$cod)
-	tab$pop1   <- as.double(tab$pop1)
-	tab$pop2   <- as.double(tab$pop2)
-	tab$death  <- as.double(tab$death)
-	tab1       <- split(tab, factor(tab$cod))
+	tab$pop1    <- as.double(tab$pop1)
+	tab$pop2    <- as.double(tab$pop2)
+	tab$deaths  <- as.double(tab$deaths)
+	
+	# this splitting variable, invented if necessary
+	tab1        <- split(tab, factor(tab$cod))
 
 	# iterate over whatever it happens to be: regions, years
-	
-	
-	coverages <- as.data.frame(do.call(rbind,lapply(
-					tab1, 
-					ggbcoverageFromYear, 
-					exact.ages. = exact.ages,
-					minA. = minA, 
-					maxA. = maxA,
-					minAges. = minAges
+	coverages   <- as.data.frame(do.call(rbind,lapply(
+					    tab1, 
+					    ggbcoverageFromYear, 
+					    exact.ages. = exact.ages,
+						minA. = minA, 
+						maxA. = maxA,
+						minAges. = minAges
 					)))
 	
-	coverages$cod <- as.integer(names(tab1))
+	# this has cod as a column, but no year, sex. 
 	return(coverages)
 }
 
+############################################################
+# Note: GGB is used to determine ages for all methods here #
+# ergo, these plotting functions are only implemented for  #
+# GGB method                                               #
+############################################################
 
+# functions related to ggb plotting.
+
+#'
+#' @title does a given pairlist of x and y coordinates fall within the plot region?
+#' 
+#' @description Check to see if a point clicked falls in the plot or outside it. This function is used by \code{plot.ggb()}.
+#' 
+#' @param USR, as given by \code{par("usr")}
+#' @param click a pairlist with elements \code{$x} and \code{$y}, as returned by \code{locator(1)}
+#' 
+#' @return logical. \code{TRUE} if in the plot region.
+#' 
+#' @export
 inUSR <- function(USR, click){
 	x <- click$x
 	y <- click$y
@@ -175,6 +186,15 @@ inUSR <- function(USR, click){
 	}
 	TRUE
 }
+
+#'
+#' @title which age is closest to the point clicked?
+#' @description a utility function called by \code{plot.ggb()}.
+#' 
+#' @param xvec
+#' @param yvec
+#' @param click
+#' @param
 
 guessage <- function(xvec,yvec,click,age){
 	age[which.min(sqrt((xvec - click$x) ^ 2 + (yvec - click$y) ^ 2))]
@@ -193,6 +213,7 @@ adjustages <- function(a, age, agesfit){
 	age[age >= mina & age <= maxa]
 }
 
+
 slopeint <- function(codi, agesfit){
 	slope       <- with(codi, 
 			sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
@@ -203,15 +224,31 @@ slopeint <- function(codi, agesfit){
 	list(b=slope, a=intercept)
 }
 
-plot.ggb <- function(codi, minA. = 10, AgeInt. = 5, minAges. = 8,maxit=15){
-	
-	# generate the basic components used to get GGB estimates,
-	# using the automatic process to find optimal ages
-	# used for adjustment
-	ages.    <- sort(unique(codi$age))
-	codi     <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
+plot.ggb <- function(codi, exact.ages = NULL,minA = 15, maxA = 75, minAges = 8, maxit=15){
 	# this is the automatic age selection.
-	agesfit  <- ggbgetAgesFit(codi, ages., minAges.)
+
+	if (!is.null(exact.ages) & length(exact.ages) >= 3){
+		if (min(exact.ages) < minA){
+			minA <- min(exact.ages)
+		} 
+		if (max(exact.ages) > maxA){
+			maxA <- max(exact.ages)
+		}
+		if (minAges < length(exact.ages)){
+			minAges <- length(exact.ages)
+		}
+	}
+	
+	# 
+	codi    <- ggbMakeColumns(codi, minA, maxA)
+	
+	if (!is.null(exact.ages) & length(exact.ages) >= 3){
+		agesfit <- exact.ages
+	} else {
+		agesfit <- ggbgetAgesFit(codi, minAges)
+	}
+	
+	
 	si       <- slopeint(codi, agesfit)
 	codi     <- ggbColumnsFromAges(codi, agesfit)
 	# this is the basic formula
