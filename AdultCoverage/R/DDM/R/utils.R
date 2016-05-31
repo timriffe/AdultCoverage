@@ -102,7 +102,14 @@ NULL
 	x <= y & !is.na(x) & !is.na(y)
 }
 
-#' addcod
+#' @title append a \code{$cod} column if missing
+#' @description Only handles the case of missing \code{$cod} splitting variable for data of a single year/region. This isn't super robust. If you have many regions or whatever then do it yourself. This function was just written to make \code{ggb()} robust to the case of a user specifying data that don't have any territorial or other subgroups, aside from sex.
+#' 
+#' @param X a \code{data.frame}, possibly but not necessarily with column \code{$sex}.
+#' @return X with a new column, \code{$cod} appended. 
+#' 
+#' @export
+#' 
 addcod <- function(X){
 	stopifnot(is.data.frame(X))
 	if (!"cod" %in% colnames(X)){
@@ -127,14 +134,13 @@ addcod <- function(X){
 #' @return logical is the Year a leap year or not
 #' 
 #' @export
+#' @author Carl Boe
 
 isLeapYear <- function (Year){      # CB: mostly good algorithm from wikipedia
 	ifelse(
 			( (Year %% 4) == 0  &  (Year %% 100) != 0   ) | ( (Year %% 400) == 0 ),
 			TRUE, FALSE )
 }
-#years <- 1700:2200
-#all(lubridate::leap_year(years) == isLeapYear(years))
 
 #'
 #' @title ypart function to determine the proportion of a year passed as of a particular date
