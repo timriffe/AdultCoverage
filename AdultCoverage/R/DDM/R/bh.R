@@ -3,36 +3,29 @@
 ###############################################################################
 # contains functions related to Bennet-Horiuchi methods
 
-
-#bh1getRMS <- function(agesi, codi){
-#	# get root mean square of residuals
-#	sqrt(sum(codi$RelDiff[codi$age %in% agesi]^2)/length(agesi))
-#}
-
 bh1CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 # ages. <- unique(codi$age); sex. <- "m"
-bh1MakeColumns <- function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., sex. = "f"){
-	dif. <- codi$year2[1] - codi$year1[1]
+bh1MakeColumns <- function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f", exact.ages. = NULL){
 	
-	codi$birthdays            <- 0
-# iterate over age groups >= 10
-	# dif. <- 10.00137
-	for (j in seq_along(ages.)[ages. >= minA.]) {
-		# take geometric average of p1 pop vs p2 pop within same cohort
-		codi$birthdays[j]       <- 
-				1 / AgeInt. * sqrt(codi$pop1[j - 1] * codi$pop2[j])
-	} # end age loop
+	sex.                   <- tolower(sex.)
+	AgeInt                 <- detectAgeInterval(codi, MinAge =  minA., MaxAge = maxA., ageColumn = "age")
+	ages                   <- codi$age
+
+	dif.                   <- yint2(codi)
+
+    # TR: loop not necessary
+	codi$birthdays <- c(0, sqrt(codi$pop1[ -nrow(codi) ] * codi$pop2[ -1 ])) / AgeInt
 	
 # age-specific growth
 	
-	codi[["growth"]]	          <-  log(codi$pop2 / codi$pop1) / dif.
+	codi$growth	           <-  log(codi$pop2 / codi$pop1) / dif.
 	codi$growth[is.infinite(codi$growth)] <- 0
 	
 	codi$cumgrowth         <-  0
-	codi$cumgrowth[1]      <-  AgeInt. / 2 * codi$growth[1]
+	codi$cumgrowth[1]      <-  AgeInt / 2 * codi$growth[1]
 	
 	for (j in 2:length(ages.)){
 		codi$cumgrowth[j]  <-  AgeInt. / 2 * codi$growth[j] + AgeInt. * sum(codi$growth[(j - 1):1])
@@ -103,28 +96,73 @@ bh1MakeColumns <- function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., s
 	codi
 }
 
-bh1CoverageFromYear <-  function(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., sex. = "f", exact.ages. = NULL){        ##  Data
+bh1CoverageFromYear <-  function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f", exact.ages. = NULL){        ##  Data
+	# if exact.ages is given, we override other age-parameters
+	if (!is.null(exact.ages.) & length(exact.ages.) >= 3){
+		if (min(exact.ages.) < minA.){
+			minA. <- min(exact.ages.)
+		} 
+		if (max(exact.ages.) > maxA.){
+			maxA. <- max(exact.ages.)
+		}
+		if (minAges. < length(exact.ages.)){
+			minAges. <- length(exact.ages.)
+		}
+	}
 	
-	# this is a test
+	# outsource automatic age selection to GGB method.
 	if (is.null(exact.ages.)){
-		agesFit <- ggbgetAgesFit(ggbMakeColumns(codi, minA., AgeInt., minAges., ages.), 
-				ages., minAges.)
+		agesFit <- ggbgetAgesFit(codi, minA. = minA., maxA. = maxA., minAges. = minAges.)
 	} else {
 		agesFit <- exact.ages.
 	}
-	codi    <- bh1MakeColumns(codi, minA. = 10, AgeInt. = 5, minAges. = 8, ages., sex. = "f")
-	bh1CoverageFromAges(codi, agesFit)
-	# agesFit <- seq(15,65,by=5)
+	
+	codi     <- bh1MakeColumns(codi, minA. = minA., maxA. = maxA., minAges. = 8, sex. = sex.)
+	
+	coverage <- bh1CoverageFromAges(codi, agesFit)
+	
+	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
 
+# TODO: detect AgeInt rather than specify as argument
+bh1 <- function(x, minA = 10, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
+	
+	tab         <- data.frame(X)           
+	colnames(tab) <- tolower(colnames(tab))
+	
+	# in case there is no splitting var, this way we split anyway.
+	tab         <- addcod(tab)
+	
+	# guess which column is the deaths column, rename it deaths
+	tab         <- guessDeathsColumn(tab)
+	# TR: account for decimal intervals
+	tab$pop1    <- as.double(tab$pop1)
+	tab$pop2    <- as.double(tab$pop2)
+	tab$deaths  <- as.double(tab$deaths)
+	
+	tab1        <- split(tab,x$cod)
+	
+	coverages <- unlist(lapply(
+					tab1, 
+					bh1CoverageFromYear, 
+					minA. = minA, 
+					AgeInt. = AgeInt, 
+					minAges. = minAges,  
+					sex. = sex,
+					exact.ages. = exact.ages))
+	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
+	
+	coverages
+}
 
+###################################################################################
 bh2CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
 # change name to GB
-bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.){
+bh2MakeColumns <- function(codi, minA. = 15, maxA. = 75,  minAges. = 8, sex., agesfit.){
 	
 	dif.        <- codi$year2[1] - codi$year1[1] 
 	agesi       <- codi$age %in% agesfit.
@@ -220,7 +258,7 @@ bh2MakeColumns <- function(codi, minA., AgeInt., minAges., ages., sex., agesfit.
 	codi
 }
 
-bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., sex., exact.ages. = NULL){
+bh2coverageFromYear <- function(codi, minA., minAges., sex. = "f", exact.ages. = NULL){
 	codiggb      <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
 	# this is a test
 	if (is.null(exact.ages.)){
@@ -234,33 +272,6 @@ bh2coverageFromYear <- function(codi, minA., AgeInt., minAges., ages., sex., exa
 	
 }
 
-# TODO: detect AgeInt rather than specify as argument
-bh1 <- function(x, minA = 10, maxA = 75, AgeInt = 5, minAges = 8, sex = "f", exact.ages = NULL){
-	
-	tab        <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
-	tab$pop1   <- as.double(tab$pop1)
-	tab$pop2   <- as.double(tab$pop2)
-	tab$death  <- as.double(tab$death)
-	
-	
-	tab1       <- split(tab,x$cod)
-	
-	ages       <- sort(unique(tab$age))
-	#minA. = minA;AgeInt. = AgeInt;minAges. = minAges;ages. = ages;sex. = sex
-	# codi <- tab1[[1]]
-	coverages <- unlist(lapply(
-					tab1, 
-					bh1CoverageFromYear, 
-					minA. = minA, 
-					AgeInt. = AgeInt, 
-					minAges. = minAges,  
-					ages. = ages,
-					sex. = sex,
-					exact.ages. = exact.ages))
-	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
-	
-	coverages
-}
 
 
 #######################################
@@ -285,7 +296,7 @@ bh1 <- function(x, minA = 10, maxA = 75, AgeInt = 5, minAges = 8, sex = "f", exa
 #' 
 
 # TODO: detect AgeInt rather than specify as argument
-bh2 <- function(x, minA = 10, maxA = 75, AgeInt = 5, minAges = 8, sex = "f", exact.ages = NULL){
+bh2 <- function(x, minA = 10, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
 	tab        <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
 	tab$pop1   <- as.double(tab$pop1)
 	tab$pop2   <- as.double(tab$pop2)
