@@ -11,4 +11,4 @@ ggb(x, exact.ages = seq(30,75,by=5))
 bh1(x,exact.ages=seq(15,55,by=5))
 plot.ggb(tab1[[2]])$coverage
 
-
+codi <- 
