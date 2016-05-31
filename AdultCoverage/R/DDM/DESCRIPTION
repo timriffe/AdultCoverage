@@ -1,0 +1,14 @@
+Package: DDM
+Type: Package
+Title: Death registration coverage estimation
+Version: 0.1
+Date: 2016-05-31
+Author: Tim Riffe, Everton Lima
+Maintainer: Tim Riffe <riffe@demogr.mpg.de>
+Description: An implementation of the GGB, and two Bennet-Horiuchi methods to indirectly estimate the degree of death registration for a population. Methods produce automatic estimation, but users may also specify exact parameters or user a graphical interface if required.
+Depends:
+    R (>= 2.15)
+Imports:
+    data.table
+License: GPL-2
+LazyData: TRUE

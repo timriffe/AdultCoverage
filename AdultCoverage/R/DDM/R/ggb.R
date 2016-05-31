@@ -97,13 +97,14 @@ ggbFittedFromAges <- function(codi, agesfit){
 		codi <- ggbMakeColumns(codi)
 	}
 	# assumes ggbMakeColumns() has been run.
-	slope       <- with(codi, 
-			sd(leftterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
-	)
-	intercept   <-  with(codi, 
-			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
-	) 
-	codi$fitted <- codi$rightterm * slope + intercept
+#	slope       <- with(codi, 
+#			sd(leftterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
+#	)
+#	intercept   <-  with(codi, 
+#			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
+#	) 
+	coefs       <- slopeint(codi, agesfit)
+	codi$fitted <- coefs$a + codi$rightterm * coefs$b 
 	codi
 }
 
@@ -167,7 +168,12 @@ ggbMakeColumns <- function(codi, minA. = 15, maxA. = 75){
 #' @description Called by \code{ggbcoverageFromYear()} whenever \code{exact.ages} are not given. This automates what one typically does visually.
 #' @seealso plot.ggb
 #' 
-#' @param
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
+#' @param minAges. the minimum number of adjacent ages to be used in estimating
+#' 
+#' @return a vector of ages that minimizes the RMSE
+#' 
+#' @export
 
 ggbgetAgesFit <- function(codi, minAges.){
 		
@@ -202,10 +208,10 @@ ggbgetAgesFit <- function(codi, minAges.){
 #' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimate for a variety of intercensal periods, then stack them, and use a variable called \code{$cod} with unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc.
 #' 
 #' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.
-#' @param minA
-#' @param maxA
-#' @param minAges
-#' @param exact.ages
+#' @param minA the lowest age to be included in search
+#' @param maxA the highest age to be included in search (the lower bound thereof)
+#' @param minAges the minimum number of adjacent ages to be used in estimating
+#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
@@ -275,15 +281,29 @@ inUSR <- function(USR, click){
 #' @title which age is closest to the point clicked?
 #' @description a utility function called by \code{plot.ggb()}.
 #' 
-#' @param xvec
-#' @param yvec
-#' @param click
-#' @param
-
+#' @param xvec \code{$rightterm}, as given by \code{ggbMakeColumns()}
+#' @param yvec \code{$lefttterm}, as given by \code{ggbMakeColumns()}
+#' @param click a point given by \code{locator(1)}
+#' @param age ages present in dataset
+#' 
+#' @return the age corresponding to the x,y pair of \code{$rightterm}, \code{$lefttterm} closest to the point clicked.
+#' 
+#' @export
 guessage <- function(xvec,yvec,click,age){
 	age[which.min(sqrt((xvec - click$x) ^ 2 + (yvec - click$y) ^ 2))]
 }
 
+#'
+#' @title adjust the range of ages used by \code{plot.ggb()}
+#' @description a utility function called by \code{plot.ggb()}. After clicking a point, this function readjusts the age range
+#' 
+#' @param a an age specified by the user, as returned by \code{guessage()}
+#' @param age ages present in dataset
+#' @param agesfit the former age range used for calculating the coverage coefficient
+#' 
+#' @return the adjusted set of ages used for calculating the coverage coefficient
+#' 
+#' @export
 adjustages <- function(a, age, agesfit){
 	maxa <- max(agesfit)
 	mina <- min(agesfit)
@@ -297,20 +317,50 @@ adjustages <- function(a, age, agesfit){
 	age[age >= mina & age <= maxa]
 }
 
-
+#' @title get the slope the slope and intercept implied by a set of ages
+#' @description Called by \code{ggbFittedFromAges()} and \code{plot.ggb()}
+#' @param codi \code{data.frame} as produced by \code{ggbMakeColumns()}
+#' @param agesfit a set of ages to estimate coverage from 
+#' @return a pairlist with elements \code{$a} for the intercept and \code{$b} for the slope
+#' @export
 slopeint <- function(codi, agesfit){
+	# a robustness measure
+	if (! "leftterm" %in% colnames(codi)){
+		codi <- ggbMakeColumns(codi, minA. = min(agesfit), maxA. = max(agesfit))
+	}
+	# TODO: find eq numbers to cite here
 	slope       <- with(codi, 
 			sd(leftterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
 	)
 	intercept   <-  with(codi, 
 			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
 	) 
-	list(b=slope, a=intercept)
+	list(a = intercept, b = slope)
 }
 
-plot.ggb <- function(codi, exact.ages = NULL,minA = 15, maxA = 75, minAges = 8, maxit=15){
-	# this is the automatic age selection.
 
+#'
+#' @title interactively determine ages to use for estimating coverage
+#' @description In a spreadsheet one would typically set up the GGB method to produce a plot that updates as the user changes the age range. This function implements that kind of workflow. This will be intuitive for spreadsheet users, but it does not scale well. Imagine you have 200 territorial units, then you wouldn't want to repeat this task. \code{ggb()} does the same thing automatically. You can compare the age range you select manually with the one given back by \code{ggb()} as a diagnostic, for instance. To set up the plot device, just give a single year/region/sex of data. By default it will give the RMSE-optimized age range to start with, but you can specify a  vector of exact ages to use as well. All points are plotted, with a fitted line that has been set to a subset of the points, which is plotted in a different color. You can click any point to change the age range, and the plot updates accordingly, up to a maximum of 15 clicks so you don't waste your time. You can stop the plot by either clicking on the graphics device outside the plot area or clicking out the 15 tries (or more if you increase \code{maxit}).
+#' @details If you want to send the results of this into \code{ggb()}, you can do so by setting \code{Exact.ages} to \code{seq(lower,upper,by=5)}, where \code{$lower}, and \code{$upper} are the results returned from \code{plot.ggb()} after you're done manually determining the age range.
+#' 
+#' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.
+#' @param minA the lowest age to be included in search
+#' @param maxA the highest age to be included in search (the lower bound thereof)
+#' @param minAges the minimum number of adjacent ages to be used in estimating
+#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation. 
+#' @param maxit the maximum number of clicks you can take. Default 15.
+#' 
+#' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, and \code{$upper}.
+#' 
+#' @export 
+plot.ggb <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, maxit = 15){
+	# this is the automatic age selection.
+	
+	# only run if in anteractive r session...
+    stopifnot(interactive())
+	
+	# reset ages if necessary
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		if (min(exact.ages) < minA){
 			minA <- min(exact.ages)
@@ -323,18 +373,18 @@ plot.ggb <- function(codi, exact.ages = NULL,minA = 15, maxA = 75, minAges = 8, 
 		}
 	}
 	
-	# 
+	# start GGB stuff
 	codi    <- ggbMakeColumns(codi, minA, maxA)
 	
+	# some potential starting ages. either auto or self-supplied
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		agesfit <- exact.ages
 	} else {
 		agesfit <- ggbgetAgesFit(codi, minAges)
 	}
 	
-	
+	# starting values for abline
 	si       <- slopeint(codi, agesfit)
-	codi     <- ggbFittedFromAges(codi, agesfit)
 	# this is the basic formula
 	coverage <- ggbcoverageFromAges(codi, agesfit)
 	
@@ -379,8 +429,7 @@ plot.ggb <- function(codi, exact.ages = NULL,minA = 15, maxA = 75, minAges = 8, 
 			# new range of ages used for fitting
 			amin     <- min(agesfit.)
 			amax     <- max(agesfit.)
-			# regenerate $fitted column of codi using new ages
-			codi     <- ggbFittedFromAges(codi, agesfit.)
+			
 			# an estimate of the resulting coverage
 			coverage <- ggbcoverageFromAges(codi, agesfit.)
 			# get params for abline..
@@ -410,18 +459,11 @@ plot.ggb <- function(codi, exact.ages = NULL,minA = 15, maxA = 75, minAges = 8, 
 		}
 	}
 	
-	# click outside the margin to save results,
-	# in this case return potentially useful stuff 
-	list(agesfit = agesfit., codi = codi, coverage = coverage)
+	# click outside the margin to return results
+    data.frame(coverage = coverage, lower = min(agesfit.), upper = max(agesfit.))
 }
 
-#
-#makeggb <- function(x){
-#	
-#}
-#codi <- DM3[DM3$cod == 53, ]
-#class(codi) <- "ggb"
-#plot(codi, maxit=25)
+# end
 
 
 

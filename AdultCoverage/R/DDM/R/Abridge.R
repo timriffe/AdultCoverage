@@ -2,6 +2,16 @@
 # Author: tim
 ###############################################################################
 
+#'
+#' @title single ages to standard abridged ages
+#' @description convert ages of the form 0,1,2,3,4,5,... into 0,1,1,1,1,5,...
+#' 
+#' @param x vector of single ages (lower bound) a.k.a. completed age.
+#' 
+#' @return vector of the same length indicating which abridged age group each single age belongs to (lower bound)
+#' 
+#' @export
+
 single2abr <- function(x){
 	stopifnot(is.integer(x))
 	x5 <- x - x %% 5
@@ -11,6 +21,7 @@ single2abr <- function(x){
 
 #' @title Abridge population or death data 
 #' @description This function assumes you have columns named Age, Sex, AgeInterval, and Year
+#' 
 #' @importFrom data.table data.table
 Abridge <- function(X, value.var = "Deaths"){
 	# assume we have Age, AgeInterval, etc.
