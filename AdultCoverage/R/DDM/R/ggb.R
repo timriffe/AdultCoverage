@@ -3,18 +3,51 @@
 ###############################################################################
 # contains functions related to growth balance method
 
+
+#' @title calcuate the root means square of the error to help find optimal age range
+#' 
+#' @description Called by \code{ggbgetAgesFit()} whenever the user doesn't want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to \code{ggbcoverageFromYear()} where \code{ggbgetRMS} is called and add another condition or make it call something else.
+#' 
+#' @param agesi the set of ages used for this iteration
+#' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}. 
+#' 
+#' @return the RMSE
+#' 
+#' @export 
+#' 
+
 ggbgetRMS <- function(agesi, codi){
-	slope       <- with(codi, 
-			sd(lefterm[age %in% agesi]) /  sd(rightterm[age %in% agesi])
-	)
-	intercept   <-  with(codi, 
-			(mean(lefterm[age %in% agesi]) * slope - mean(rightterm[age %in% agesi]))
-	) 
-	codi$fitted <- codi$rightterm * slope + intercept
+	codi <- ggbFittedFromAges(codi, agesfit = agesi)
 	# get root mean square of residuals
-	sqrt(sum(((codi$lefterm[codi$age %in% agesi] - codi$fitted[codi$age %in% agesi])^2))/length(agesi))
-	
+	# I'd do this with magrittr, but just to stay dependency-free...
+	sqrt(
+		sum(
+			  (
+				 (codi$leftterm[codi$age %in% agesi] - codi$fitted[codi$age %in% agesi]) ^ 2
+			   )
+	        ) / length(agesi)
+         )
+	# no checks here for NAs...
 }
+
+
+#'
+#' @title estimate death registration coverage for a single year/sex/region using the GGB method
+#' 
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. Called by \code{ggb()}. Users probably don't need to call this directly. Just use \code{ggb()} instead.
+#' 
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. 
+#' 
+#' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.
+#' @param exact.ages. optional. use an exact set of ages to estimate coverage.
+#' @param minA. the minimum of the age range searched. Default 15
+#' @param maxA. the maximum of the age range searched. Default 75
+#' @param minAges. the minimum number of adjacent ages needed as points for fitting. Default 8
+#' 
+#' 
+#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
+#' 
+#' @export
 
 ggbcoverageFromYear <- function(codi, exact.ages., minA., maxA., minAges.){
 	
@@ -44,25 +77,62 @@ ggbcoverageFromYear <- function(codi, exact.ages., minA., maxA., minAges.){
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesfit), upper = max(agesfit))
 }
 
-ggbColumnsFromAges <- function(codi, agesfit){
+
+#'
+#' @title make the growth-adjusted quasi lifetable columns required by GGB method
+#' 
+#' @description Called by \code{plot.ggb()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.
+#' 
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
+#' @param minA. the minimum of the age range searched. Default 15
+#' @param maxA. the maximum of the age range searched. Default 75
+#' 
+#' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
+#' 
+#' @export
+
+ggbFittedFromAges <- function(codi, agesfit){
+	
+	if (! "leftterm" %in% colnames(codi)){
+		codi <- ggbMakeColumns(codi)
+	}
 	# assumes ggbMakeColumns() has been run.
 	slope       <- with(codi, 
-			sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
+			sd(leftterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
 	)
 	intercept   <-  with(codi, 
-			(mean(lefterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
+			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
 	) 
 	codi$fitted <- codi$rightterm * slope + intercept
 	codi
 }
 
+#' @title given a set of ages, what is the implied death registration coverage?
+#' 
+#' @description For a single year/sex/region of data (formatted as required by \code{ggb()}), what is the registration coverage implied by a given age range? Called by \code{ggbcoverageFromYear()} and \code{plot.ggb()}.
+
 ggbcoverageFromAges <- function(codi, agesfit){
-	codi <- ggbColumnsFromAges(codi, agesfit)	
+	if (! "leftterm" %in% colnames(codi)){
+		codi <- ggbMakeColumns(codi, minA. = min(agesfit), maxA. = max(agesfit))
+	}
 	# this is the coverage estimate
-	1 / with(codi, sd(lefterm[age %in% agesfit]) / sd(rightterm[age %in% agesfit]))
+	1 / with(codi, sd(leftterm[age %in% agesfit]) / sd(rightterm[age %in% agesfit]))
 }
 
-ggbMakeColumns <- function(codi, minA., maxA.){
+
+#'
+#' @title make the growth-adjusted quasi lifetable columns required by GGB method
+#' 
+#' @description Called by \code{plot.ggb()} and \code{ggbcoverageFromYear()}. This simply modulates some cod ethat would otherwise be repeated. Users probably don't need to call this function directly. 
+#' 
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
+#' @param minA. the minimum of the age range searched. Default 15
+#' @param maxA. the maximum of the age range searched. Default 75
+#' 
+#' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
+#' 
+#' @export
+ggbMakeColumns <- function(codi, minA. = 15, maxA. = 75){
 	AgeInt                 <- detectAgeInterval(codi, MinAge =  minA., MaxAge = maxA., ageColumn = "age")
 	ages                   <- codi$age
 	# TR make this accept exact dates.
@@ -85,11 +155,19 @@ ggbMakeColumns <- function(codi, minA., maxA.){
 	# eqns from formula in Hill/Horiuchi
 	codi$rightterm        <- codi$deathcum / codi$Tx
 	# eqns from formula in Hill/Horiuchi
-	codi$lefterm          <- (codi$birthdays / codi$Tx) - codi$cumgrowth
+	codi$leftterm          <- (codi$birthdays / codi$Tx) - codi$cumgrowth
 	# certain columns can be safely ignored in future operations
 	codi$exclude          <-  codi$Tx != 0 & codi$birthdays != 0 & codi$age >= minA. & codi$age <= 75
 	codi
 }
+
+
+#'
+#' @title determine the age range that minimizes the mean squared error
+#' @description Called by \code{ggbcoverageFromYear()} whenever \code{exact.ages} are not given. This automates what one typically does visually.
+#' @seealso plot.ggb
+#' 
+#' @param
 
 ggbgetAgesFit <- function(codi, minAges.){
 		
@@ -121,11 +199,17 @@ ggbgetAgesFit <- function(codi, minAges.){
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. 
 #' 
-#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimate for a variety of intercensal periods, then stack them, and use a variable called \code{$cod} with unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc.
 #' 
-#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.
+#' @param minA
+#' @param maxA
+#' @param minAges
+#' @param exact.ages
 #' 
-
+#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
+#' 
+#' @export
 
 ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){         ##  Data
 	##  Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
@@ -216,10 +300,10 @@ adjustages <- function(a, age, agesfit){
 
 slopeint <- function(codi, agesfit){
 	slope       <- with(codi, 
-			sd(lefterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
+			sd(leftterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
 	)
 	intercept   <-  with(codi, 
-			(mean(lefterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
+			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
 	) 
 	list(b=slope, a=intercept)
 }
@@ -250,13 +334,13 @@ plot.ggb <- function(codi, exact.ages = NULL,minA = 15, maxA = 75, minAges = 8, 
 	
 	
 	si       <- slopeint(codi, agesfit)
-	codi     <- ggbColumnsFromAges(codi, agesfit)
+	codi     <- ggbFittedFromAges(codi, agesfit)
 	# this is the basic formula
 	coverage <- ggbcoverageFromAges(codi, agesfit)
 	
 	# some objects used throughout
 	age     <- codi$age
-	leftt   <- codi$lefterm
+	leftt   <- codi$leftterm
 	rightt  <- codi$rightterm
 	
 	# age ranges used for fitting
@@ -295,8 +379,8 @@ plot.ggb <- function(codi, exact.ages = NULL,minA = 15, maxA = 75, minAges = 8, 
 			# new range of ages used for fitting
 			amin     <- min(agesfit.)
 			amax     <- max(agesfit.)
-			# regenerate columns of codi using new ages
-			codi     <- ggbColumnsFromAges(codi, agesfit.)
+			# regenerate $fitted column of codi using new ages
+			codi     <- ggbFittedFromAges(codi, agesfit.)
 			# an estimate of the resulting coverage
 			coverage <- ggbcoverageFromAges(codi, agesfit.)
 			# get params for abline..
