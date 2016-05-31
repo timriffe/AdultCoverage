@@ -64,6 +64,9 @@ ggbcoverageFromYear <- function(codi, exact.ages., minA., maxA., minAges.){
 		}
 	}
 	
+	# TR: test add this step, just in case
+	codi    <- codi[with(codi, order(age)), ]
+	
 	codi    <- ggbMakeColumns(codi, minA., maxA.)
 	
 	if (!is.null(exact.ages.) & length(exact.ages.) >= 3){
@@ -175,8 +178,12 @@ ggbMakeColumns <- function(codi, minA. = 15, maxA. = 75){
 #' 
 #' @export
 
-ggbgetAgesFit <- function(codi, minAges.){
+ggbgetAgesFit <- function(codi, minA. = 15, maxA. = 75, minAges.){
 		
+	if (!"leftterm" %in% colnames(codi)){
+		codi <- ggbMakeColumns(codi, minA. = minA., maxA. = maxA.)
+	}
+	
 	maxAges   <- sum(codi$exclude)
 	agesUniv  <- codi$age[codi$exclude]
 	
@@ -194,7 +201,7 @@ ggbgetAgesFit <- function(codi, minAges.){
 	}
 	
 	# these are the ages that give the best r2 or RMS
-	
+	# this would be much better using pipes, but hey, one less dependency...
 	agesfit     <- agesL[[which.min(unlist(lapply(agesL, ggbgetRMS, codi = codi)))]]
 	agesfit
 }
