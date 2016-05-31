@@ -274,11 +274,11 @@ bh1 <- function(x, minA = 10, maxA = 75, AgeInt = 5, minAges = 8, sex = "f", exa
 #'
 #' @title estimate the coverage coefficients
 #' 
-#' @description
+#' @description x
 #' 
-#' @param
+#' @param x
 #' 
-#' @return
+#' @return x
 #' 
 #' @export 
 #' 
