@@ -17,8 +17,8 @@
 
 detectAgeInterval <- function(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age"){
 	
-	stopifnot("age" %in% tolower(colnames(Dat)))
-	colnames(Dat)[grepl("age",colnames(Dat))] <- "Age"
+	stopifnot(tolower(ageColumn) %in% tolower(colnames(Dat)))
+	colnames(Dat)[grepl(tolower(ageColumn),tolower(colnames(Dat)))] <- "Age"
 
 	Ages <- with(Dat, unique(Age[Age >= MinAge & Age <= MaxAge]))
 	Interval <- unique(diff(sort(Ages)))
