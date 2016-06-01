@@ -30,6 +30,70 @@ detectAgeInterval <- function(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age"){
 }
 
 
+#'
+#' @title Detect the sex for some demographic data
+#' 
+#' @description The column name can 
+#' 
+#' @param Dat a \code{data.frame} containing a column called \code{Sex}, or code{sex}. 
+
+#' @return either \code{"f"} or \code{"m"}
+#' @export
+#' 
+
+detectSex <- function(Dat, sexColumn = "Sex"){
+	
+	stopifnot(tolower(sexColumn) %in% tolower(colnames(Dat)))
+	colnames(Dat)[grepl(tolower(sexColumn),tolower(colnames(Dat)))] <- "Sex"
+	
+    if (length(unique(Dat$Sex))>1){
+		warning("You have more than one sex in this data!")
+	}
+		
+	Sex <- unique(Dat$Sex)
+
+	if (is.character(Sex)){
+		Sex <- tolower(Sex)
+		if (    grepl("f",Sex) | 
+				grepl("fem",Sex) | 
+				grepl("wom",Sex) | 
+				grepl("frau",Sex) | 
+				grepl("weib",Sex) | 
+				grepl("muj",Sex) | 
+				grepl("don", Sex) | 
+				grepl("mul", Sex) 
+		){
+			Sex <- "f"
+		} else {
+			if (    grepl("m",Sex) | 
+					grepl("mal",Sex) | 
+					grepl("men",Sex) | 
+					grepl("män",Sex) | 
+					grepl("herr",Sex) | 
+					grepl("hom",Sex)
+			){
+				Sex <- "m"
+			} 
+		}
+	}
+	
+	if (is.integer(Sex)){
+		if (Sex == 1){
+			Sex <- "m"
+		}
+		# coding traditions I've seen in different places... 
+		if (Sex %in% c(0,2,6)){
+			Sex <- "f"
+		}
+		
+	}
+	
+	if (!Sex%in%c("m","f")){
+		stop("Couldn't determine the sex automatically. Code using m and f please")
+	}
+	Sex
+}
+
 #' @title a cheap way to choose which column to assign a NoteCode to
 #' 
 #' @description One property of the LexisDB scripts that might be useful for downstream checks is the ability to trace which functions have modified a given data object. These can go into NoteCode slots. This function writes \code{code} to the first unoccupied \code{NoteCode} column. If all three \code{NoteCode} columns are occupied, it concatenates the end of the third column. This way we preserve a full history. Unfortunately it gets split between columns. Oh well. Good for eyeballing. This function written for the sake of modularity. Function copied from HMD collection directly as-is.

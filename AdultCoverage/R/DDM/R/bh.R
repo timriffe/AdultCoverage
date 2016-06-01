@@ -7,7 +7,7 @@ bh1CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
-# ages. <- unique(codi$age); sex. <- "m"
+
 bh1MakeColumns <- function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f", exact.ages. = NULL){
 	
 	sex.                   <- tolower(sex.)
@@ -19,16 +19,16 @@ bh1MakeColumns <- function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f
     # TR: loop not necessary
 	codi$birthdays <- c(0, sqrt(codi$pop1[ -nrow(codi) ] * codi$pop2[ -1 ])) / AgeInt
 	
-# age-specific growth
-	
+    # age-specific growth
 	codi$growth	           <-  log(codi$pop2 / codi$pop1) / dif.
 	codi$growth[is.infinite(codi$growth)] <- 0
 	
+	# TR: loop not necessary?
 	codi$cumgrowth         <-  0
 	codi$cumgrowth[1]      <-  AgeInt / 2 * codi$growth[1]
 	
 	for (j in 2:length(ages.)){
-		codi$cumgrowth[j]  <-  AgeInt. / 2 * codi$growth[j] + AgeInt. * sum(codi$growth[(j - 1):1])
+		codi$cumgrowth[j]  <-  AgeInt / 2 * codi$growth[j] + AgeInt * sum(codi$growth[(j - 1):1])
 	}
 	
 # stopped here
@@ -124,8 +124,8 @@ bh1CoverageFromYear <-  function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
 
-# TODO: detect AgeInt rather than specify as argument
-bh1 <- function(x, minA = 10, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
+# TODO: detect sex rather than specify as argument X <-x
+bh1 <- function(X, minA = 10, maxA = 75, minAges = 8, exact.ages = NULL){
 	
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
@@ -140,13 +140,13 @@ bh1 <- function(x, minA = 10, maxA = 75, minAges = 8, sex = "f", exact.ages = NU
 	tab$pop2    <- as.double(tab$pop2)
 	tab$deaths  <- as.double(tab$deaths)
 	
-	tab1        <- split(tab,x$cod)
+	tab1        <- split(tab,X$cod)
 	
 	coverages <- unlist(lapply(
 					tab1, 
 					bh1CoverageFromYear, 
 					minA. = minA, 
-					AgeInt. = AgeInt, 
+					maxA. = maxA,
 					minAges. = minAges,  
 					sex. = sex,
 					exact.ages. = exact.ages))
