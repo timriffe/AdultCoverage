@@ -1,7 +1,7 @@
 
 # Author: tim
 ###############################################################################
-# contains functions related to growth balance method
+# contains functions related to the generalized growth balance method
 
 
 #' @title calcuate the root means square of the error to help find optimal age range
@@ -212,9 +212,9 @@ ggbgetAgesFit <- function(codi, minA. = 15, maxA. = 75, minAges.){
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. 
 #' 
-#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimate for a variety of intercensal periods, then stack them, and use a variable called \code{$cod} with unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc.
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimate for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term.
 #' 
-#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
 #' @param minAges the minimum number of adjacent ages to be used in estimating
@@ -234,6 +234,7 @@ ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){       
 	
 	# guess which column is the deaths column, rename it deaths
 	tab         <- guessDeathsColumn(tab)
+	
 	# TR: account for decimal intervals
 	tab$pop1    <- as.double(tab$pop1)
 	tab$pop2    <- as.double(tab$pop2)

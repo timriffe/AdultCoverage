@@ -176,6 +176,7 @@ NULL
 #' 
 addcod <- function(X){
 	stopifnot(is.data.frame(X))
+	
 	if (!"cod" %in% colnames(X)){
 		X$cod <- 1
 		if ("sex" %in% colnames(X)){

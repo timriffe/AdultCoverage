@@ -207,17 +207,17 @@ cdmltw <-
 		lx  <-  cbind(  1+0*eee,  exp( uu[ , 1:km1])  )
 		
 		#####################################################################
-#   Special extension from ages 80 to 100 (i.e. for j> 18
+        #   Special extension from ages 80 to 100 (i.e. for j> 18
 		###############################################################
 		
 		nL75 <-   5*lx[,17]*(1-nqx[,17])  + (1/2)*5*lx[,17]*nqx[,17]
 		leighty <- lx[,17]*(1-nqx[,17])         #  Survivorship to age 80
-		m77  <-   lx[,17]*nqx[,17]/nL75        #  m77 is hazard age 77.5.
+		m77  <-   lx[,17]*nqx[,17]/nL75         #  m77 is hazard age 77.5.
 		m105 <-   0.613+ 1.75*nqx[,17]
-		kappa  <- (1/27.5)*log( m105 / m77 )  # THIS CORRECTS COALE'S MISTAKE
+		kappa  <- (1/27.5)*log( m105 / m77 )    # THIS CORRECTS COALE'S MISTAKE
 		m80    <-  m77*exp(kappa*2.5)           #  Hazard at age 80
 		
-		xlong <- seq(80,121, by = 0.2 ) - 80   #  ages in 1/5 years -80
+		xlong <- seq(80,121, by = 0.2 ) - 80    #  ages in 1/5 years -80
 		uu  <-    kappa %o% xlong
 		u   <-    (-m80/kappa) %o% ( 1 + 0*xlong)
 		llx  <-   leighty  %o% ( 1 + 0*xlong)
