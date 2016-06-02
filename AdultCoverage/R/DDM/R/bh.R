@@ -11,16 +11,16 @@
 #' @param agesFit an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
-#' @param eOmega optional. A value for remaining life expectancy in the open age group.
+#' @param eOpen optional. A value for remaining life expectancy in the open age group.
 #'
 #' 
 #' @return numeric. the estimated level of coverage.
 #' @export
 
-bh1CoverageFromAges <- function(codi, agesFit, minA = 15, maxA = 75, eOmega = NULL){
+bh1CoverageFromAges <- function(codi, agesFit, minA = 15, maxA = 75, eOpen = NULL){
 	
 	if (!"Cx" %in% colnames(codi)){
-		codi <- bh1MakeColumns(codi = codi, minA = minA, maxA = maxA, eOmega = eOmega)
+		codi <- bh1MakeColumns(codi = codi, minA = minA, maxA = maxA, eOpen = eOpen)
 	}
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
@@ -35,13 +35,13 @@ bh1CoverageFromAges <- function(codi, agesFit, minA = 15, maxA = 75, eOmega = NU
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{bh1()}
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
-#' @param eOmega optional. A value for remaining life expectancy in the open age group.
+#' @param eOpen optional. A value for remaining life expectancy in the open age group.
 #' 
 #' @return codi, with many columns added, most importantly \code{$Cx}.
 #' 
 #' @export
 
-bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOmega = NULL){
+bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL){
 	
 	# this throws an error if sex isn't coded as expected
 	sex                    <- detectSex(Dat = codi, sexColumn = "sex")
@@ -71,7 +71,7 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOmega = NULL){
 	###################################################################
 	# TR: begin precarious chunk
 	# optional specify eOpen?
-	if (is.null(eOmega)){
+	if (is.null(eOpen)){
 	ratio                  <- with(codi,
 			                   sum(deathLT[ages %in% c(10:39)]) / 
 					           sum(deathLT[ages %in% c(40:59)]))
@@ -113,18 +113,11 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOmega = NULL){
 	
 	eOpen     <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
 	} else {
-		eOpen <- eOmega
+		eOpen <- eOpen
 	}
 	###################################################################
     # TR: end precarious chunk
 	###################################################################
-
-	
-	###############
-	# change to within() statement? This is rather convoluted
-#    minus          <- ((eOpen * codi$growth[N])^2) / 6
-
-
 	eON   <- eOpen * codi$growth[N]
 
 	codi <- within(codi, {
@@ -154,14 +147,14 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOmega = NULL){
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
-#' @param eOmega optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
 #' @export
 
 
-bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOmega = NULL){        ##  Data
+bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){        ##  Data
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		if (min(exact.ages) < minA){
@@ -185,7 +178,7 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 	codi     <- bh1MakeColumns(	codi = codi, 
 								minA = minA, 
 								maxA = maxA,
-								eOmega = eOmega )
+								eOpen = eOpen )
 	
 	coverage <- bh1CoverageFromAges(codi = codi, agesFit = agesFit)
 
@@ -198,19 +191,19 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value.
 #' 
-#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOmega} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOpen} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
 #' 
 #' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
-#' @param eOmega optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
-bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOmega = NULL){
+bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 	
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
@@ -236,7 +229,7 @@ bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOmega 
 							maxA = maxA,
 							minAges = minAges,  
 							exact.ages = exact.ages,
-							eOmega = eOmega
+							eOpen = eOpen
             )))
 	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
 	
@@ -254,88 +247,88 @@ bh2CoverageFromAges <- function(codi, agesFit){
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
-# change name to GB
-bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, agesFit, eOmega = NULL){
+
+bh2MakeColumns <- function(
+		codi, 
+		minA = 15, 
+		maxA = 75,  
+		minAges = 8, 
+		agesFit, 
+		eOpen = NULL){
+	# this throws an error if sex isn't coded as expected
+	sex                    <- detectSex(Dat = codi, sexColumn = "sex")
 	
-	AgeInt      <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
-	ages        <- codi$age
-	dif         <- yint2(X = codi)
-	agesi       <- codi$age %in% agesFit
+	AgeInt       <- detectAgeInterval(
+							Dat = codi, 
+							MinAge =  minA, 
+							MaxAge = maxA, 
+							ageColumn = "age")
+	ages         <- codi$age
+	dif          <- yint2(X = codi)
 	
 	# just get left term / right term
-	slope       <- with(codi, 
-			sd(lefterm[age %in% agesFit]) / sd(rightterm[age %in% agesFit])
-	)
-	intercept   <- with(codi, 
-			(mean(lefterm[age %in% agesFit]) - 
-						slope * mean(rightterm[age %in% agesFit]))
-	) 
+	# slopeint() is in the ggb() family
+	ab           <- slopeint(codi = codi, agesfit = agesFit)
 	
-	relcomp     <- exp(intercept * dif)
+	relcomp      <- exp(ab$a * dif)
 	# relcomp <- .96
 	# adjust the first population count
-	codi$pop1adj <- codi$pop1 / relcomp
+    # some of the other columns are redundantly calculated, since
+	# we're passing in a ggb-modified codi...
+	codi <- within(codi,{
+				pop1adj   <- pop1 / relcomp
+				# birthdays, as in GGB
+				birthdays <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
+				# age-specific growth
+				growth    <- log(pop2 / pop1) / dif
+				growth[is.infinite(growth) | is.nan(growth)] <- 0
+				# cumulative growth
+				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
+				deathLT   <- deaths * exp(cumgrowth)
+			})
 	
-	codi$birthdays            <- 0
-    # iterate over age groups >= 10
-	
-	for (j in seq_along(ages)[ages >= minA]) {
-		# take geometric average of p1 pop vs p2 pop within same cohort
-		codi$birthdays[j]       <- 
-				1 / AgeInt * sqrt(codi$pop1adj[j - 1] * codi$pop2[j])
-	} # end age loop
-	
-    # age-specific growth
-	
-	codi[["growth"]]	   <-  log(codi$pop2 / codi$pop1adj) / dif
-	codi$growth[is.infinite(codi$growth)] <- 0
-	
-	codi$cumgrowth         <-  0
-	codi$cumgrowth[1]      <- 2.5 * codi$growth[1]
-	
-	for (j in 2:length(ages)){                    # TR: why 5 times?
-		codi$cumgrowth[j]  <- 2.5 * codi$growth[j] + 5 * sum(codi$growth[(j - 1):1])
-	}
-	
-	codi$death_tab         <- codi$death * exp(codi$cumgrowth)
-	
-	ratio                  <- sum(codi$death_tab[ages %in% c(10:39)]) / sum(codi$death_tab[ages%in%c(40:59)])
-	
-	if (sex == "f"){
-		# TODO: expand ex in-ine out to actual open ages.
-		# model lifetable
-		# based on Bennett & Horiuchi (1984) 
-		# "Mortality Estimation from Registered Deaths in Less Developed Countries", Demography
-		standardratios <- c(1.376,	1.3,	1.233,	1.171,
-				1.115,	1.062,	1.012,	0.964,
-				0.918,	0.872,	0.827,	0.787,
-				0.729,	0.673,	0.617,	0.56,
-				0.501,	0.438,	0.365,	0.298,
-				0.235,	0.175,	0.117)
-		ex <- cdmltw("F")$ex
-	}
-	if (sex == "m"){
-		# need to change this:
-		standardratios <- c(1.161,	1.094,	1.034,	0.98,	
-				0.93,	0.885,	0.842,	0.802,	
-				0.763,	0.725,	0.689,	0.648,
-				0.609,	0.57,	0.53,	0.49,	
-				0.447,	0.401,	0.352,	0.305,	
-				0.255,	0.202,	0.147)
+	if (is.null(eOpen)){
+		ratio        <- with(codi,
+							sum(deathLT[ages %in% c(10:39)]) / 
+							sum(deathLT[ages %in% c(40:59)]))
 		
-		ex <- cdmltw("M")$ex
-	}
-	
-	# TODO: modify definition of AllLevels to be more robust.
-	AllLevels             <- 3:25
-	CDlevel               <- splinefun(AllLevels~standardratios)(ratio)
-	# open at age 110 ....
-	OA                    <- max(ages)
-	availages             <- as.integer(colnames(ex))
-	
-	stopifnot(OA %in% availages)
-	
-	eOpen                 <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
+		
+		if (sex == "f"){
+			# TODO: expand ex in-ine out to actual open ages.
+			# model lifetable
+			# based on Bennett & Horiuchi (1984) 
+			# "Mortality Estimation from Registered Deaths in Less Developed Countries", Demography
+			standardratios <- c(1.376,	1.3,	1.233,	1.171,
+					1.115,	1.062,	1.012,	0.964,
+					0.918,	0.872,	0.827,	0.787,
+					0.729,	0.673,	0.617,	0.56,
+					0.501,	0.438,	0.365,	0.298,
+					0.235,	0.175,	0.117)
+			ex <- cdmltw("F")$ex
+		}
+		if (sex == "m"){
+			# need to change this:
+			standardratios <- c(1.161,	1.094,	1.034,	0.98,	
+					0.93,	0.885,	0.842,	0.802,	
+					0.763,	0.725,	0.689,	0.648,
+					0.609,	0.57,	0.53,	0.49,	
+					0.447,	0.401,	0.352,	0.305,	
+					0.255,	0.202,	0.147)
+			
+			ex <- cdmltw("M")$ex
+		}
+		
+		# TODO: modify definition of AllLevels to be more robust.
+		AllLevels             <- 3:25
+		CDlevel               <- splinefun(AllLevels~standardratios)(ratio)
+		# open at age 110 ....
+		OA                    <- max(ages)
+		availages             <- as.integer(colnames(ex))
+		
+		stopifnot(OA %in% availages)
+		
+		eOpen                 <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
+	} 	
 	
 	N                     <- nrow(codi)
 	codi$growth[is.nan(codi$growth)] <- 0
@@ -356,7 +349,7 @@ bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, agesFit, eO
 
 bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){
 	codiggb      <- ggbMakeColumns(codi = codi, minA = minA, maxA = maxA)
-	# this is a test
+	# Get age range using the GGB auto fitting
 	if (is.null(exact.ages)){
 		agesFit <- ggbgetAgesFit(codi = codiggb, 
 								minA = minA, 
@@ -383,20 +376,20 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.a
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value.
 #' 
-#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOmega} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOpen} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
 #' 
 #' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
-#' @param eOmega optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
 
-bh2 <- function(x, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL, eOmega = NULL){
+bh2 <- function(x, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL, eOpen = NULL){
 
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
@@ -423,7 +416,7 @@ bh2 <- function(x, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NU
 						maxA = maxA,
 						minAges = minAges,  	
 						exact.ages = exact.ages,
-						eOmega = eOmega
+						eOpen = eOpen
                   )))
 	coverages
 }
