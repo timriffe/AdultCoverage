@@ -114,7 +114,10 @@ ggbFittedFromAges <- function(codi, agesfit){
 #' @title given a set of ages, what is the implied death registration coverage?
 #' 
 #' @description For a single year/sex/region of data (formatted as required by \code{ggb()}), what is the registration coverage implied by a given age range? Called by \code{ggbcoverageFromYear()} and \code{plot.ggb()}.
-
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
+#' @param agesfit an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.
+#' @return numeric. the estimated level of coverage.
+#' @export
 ggbcoverageFromAges <- function(codi, agesfit){
 	if (! "leftterm" %in% colnames(codi)){
 		codi <- ggbMakeColumns(codi = codi, minA = min(agesfit), maxA = max(agesfit))
