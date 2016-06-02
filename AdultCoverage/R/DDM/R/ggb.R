@@ -130,7 +130,7 @@ ggbcoverageFromAges <- function(codi, agesfit){
 #'
 #' @title make the growth-adjusted quasi lifetable columns required by GGB method
 #' 
-#' @description Called by \code{plot.ggb()} and \code{ggbcoverageFromYear()}. This simply modulates some cod ethat would otherwise be repeated. Users probably don't need to call this function directly. 
+#' @description Called by \code{plot.ggb()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
 #' 
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param minA the minimum of the age range searched. Default 15

@@ -4,7 +4,7 @@
 \alias{bh2}
 \title{estimate the coverage coefficients}
 \usage{
-bh2(x, minA = 10, maxA = 75, AgeInt = 5, minAges = 8, sex = "f",
+bh2(x, minA = 10, maxA = 75, minAges = 8, sex = "f",
   exact.ages = NULL)
 }
 \arguments{

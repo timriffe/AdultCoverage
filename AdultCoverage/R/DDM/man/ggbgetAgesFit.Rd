@@ -4,12 +4,12 @@
 \alias{ggbgetAgesFit}
 \title{determine the age range that minimizes the mean squared error}
 \usage{
-ggbgetAgesFit(codi, minAges.)
+ggbgetAgesFit(codi, minA = 15, maxA = 75, minAges = 8)
 }
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
 
-\item{minAges.}{the minimum number of adjacent ages to be used in estimating}
+\item{minAges}{the minimum number of adjacent ages to be used in estimating}
 }
 \value{
 a vector of ages that minimizes the RMSE

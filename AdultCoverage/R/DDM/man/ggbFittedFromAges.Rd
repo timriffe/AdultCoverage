@@ -9,9 +9,9 @@ ggbFittedFromAges(codi, agesfit)
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
 
-\item{minA.}{the minimum of the age range searched. Default 15}
+\item{minA}{the minimum of the age range searched. Default 15}
 
-\item{maxA.}{the maximum of the age range searched. Default 75}
+\item{maxA}{the maximum of the age range searched. Default 75}
 }
 \value{
 codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.

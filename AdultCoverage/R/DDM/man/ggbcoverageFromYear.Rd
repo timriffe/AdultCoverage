@@ -4,18 +4,19 @@
 \alias{ggbcoverageFromYear}
 \title{estimate death registration coverage for a single year/sex/region using the GGB method}
 \usage{
-ggbcoverageFromYear(codi, exact.ages., minA., maxA., minAges.)
+ggbcoverageFromYear(codi, exact.ages = NULL, minA = 15, maxA = 75,
+  minAges = 8)
 }
 \arguments{
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}
 
-\item{exact.ages.}{optional. use an exact set of ages to estimate coverage.}
+\item{exact.ages}{optional. use an exact set of ages to estimate coverage.}
 
-\item{minA.}{the minimum of the age range searched. Default 15}
+\item{minA}{the minimum of the age range searched. Default 15}
 
-\item{maxA.}{the maximum of the age range searched. Default 75}
+\item{maxA}{the maximum of the age range searched. Default 75}
 
-\item{minAges.}{the minimum number of adjacent ages needed as points for fitting. Default 8}
+\item{minAges}{the minimum number of adjacent ages needed as points for fitting. Default 8}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.

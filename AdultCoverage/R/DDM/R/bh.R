@@ -3,14 +3,43 @@
 ###############################################################################
 # contains functions related to Bennet-Horiuchi methods
 
-bh1CoverageFromAges <- function(codi, agesFit, minA = 15, maxA = 75){
+#' @title given a set of ages, what is the implied death registration coverage?
+#' 
+#' @description For a single year/sex/region of data (formatted as required by \code{bh1()}), what is the registration coverage implied by a given age range? Called by \code{bh1CoverageFromYear()}. Here, the function simply takes the arithmetic mean of a given age range of \code{$Cx}, as returned by \code{bh1MakeColumns()}.
+#' 
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
+#' @param agesFit an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.
+#' @param minA the minimum of the age range searched. Default 15
+#' @param maxA the maximum of the age range searched. Default 75
+#' @param eOmega optional. A value for remaining life expectancy in the open age group.
+#'
+#' 
+#' @return numeric. the estimated level of coverage.
+#' @export
+
+bh1CoverageFromAges <- function(codi, agesFit, minA = 15, maxA = 75, eOmega = NULL){
 	
 	if (!"Cx" %in% colnames(codi)){
-		codi <- bh1MakeColumns(codi = codi, minA = minA, maxA = maxA)
+		codi <- bh1MakeColumns(codi = codi, minA = minA, maxA = maxA, eOmega = eOmega)
 	}
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
+
+
+#'
+#' @title make the Bennett-Horiuchi quasi lifetable columns required by the estimation method
+#' 
+#' @description Called by \code{bh1CoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
+#' 
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{bh1()}
+#' @param minA the minimum of the age range searched. Default 15
+#' @param maxA the maximum of the age range searched. Default 75
+#' @param eOmega optional. A value for remaining life expectancy in the open age group.
+#' 
+#' @return codi, with many columns added, most importantly \code{$Cx}.
+#' 
+#' @export
 
 bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOmega = NULL){
 	
@@ -113,6 +142,25 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOmega = NULL){
 	codi
 }
 
+#'
+#' @title estimate death registration coverage for a single year/sex/region using the Bennet-Horiuchi method
+#' 
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. Called by \code{bh1()}. Users probably do not need to use this function directly.
+#' 
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. 
+#' 
+#' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$sex}, \code{$age}, and \code{$cod} (to indicate regions, periods, sexes).
+#' @param exact.ages optional. use an exact set of ages to estimate coverage.
+#' @param minA the minimum of the age range searched. Default 15
+#' @param maxA the maximum of the age range searched. Default 75
+#' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
+#' @param eOmega optional. A user-specified value for remaining life-expectancy in the open age group.
+#' 
+#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
+#' 
+#' @export
+
+
 bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOmega = NULL){        ##  Data
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
@@ -144,7 +192,24 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
 
-# TODO: detect sex rather than specify as argument X <-x
+
+#'
+#' @title estimate death registration coverage using the Bennet-Horiuchi method 
+#' 
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value.
+#' 
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOmega} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
+#' 
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
+#' @param minA the lowest age to be included in search
+#' @param maxA the highest age to be included in search (the lower bound thereof)
+#' @param minAges the minimum number of adjacent ages to be used in estimating
+#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
+#' @param eOmega optional. A user-specified value for remaining life-expectancy in the open age group.
+#' 
+#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
+#' 
+#' @export
 bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOmega = NULL){
 	
 	tab         <- data.frame(X)           
