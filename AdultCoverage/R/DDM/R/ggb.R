@@ -221,7 +221,6 @@ ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){       
 	##  Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
-	
 	# in case there is no splitting var, this way we split anyway.
 	tab         <- addcod(tab)
 	
