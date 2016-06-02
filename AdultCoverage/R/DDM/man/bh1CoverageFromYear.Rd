@@ -5,7 +5,7 @@
 \title{estimate death registration coverage for a single year/sex/region using the Bennet-Horiuchi method}
 \usage{
 bh1CoverageFromYear(codi, minA = 15, maxA = 75, minAges = 8,
-  exact.ages = NULL, eOmega = NULL)
+  exact.ages = NULL, eOpen = NULL)
 }
 \arguments{
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$sex}, \code{$age}, and \code{$cod} (to indicate regions, periods, sexes).}
@@ -18,7 +18,7 @@ bh1CoverageFromYear(codi, minA = 15, maxA = 75, minAges = 8,
 
 \item{exact.ages}{optional. use an exact set of ages to estimate coverage.}
 
-\item{eOmega}{optional. A user-specified value for remaining life-expectancy in the open age group.}
+\item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.

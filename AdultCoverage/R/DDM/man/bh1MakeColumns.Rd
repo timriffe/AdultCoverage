@@ -4,7 +4,7 @@
 \alias{bh1MakeColumns}
 \title{make the Bennett-Horiuchi quasi lifetable columns required by the estimation method}
 \usage{
-bh1MakeColumns(codi, minA = 15, maxA = 75, eOmega = NULL)
+bh1MakeColumns(codi, minA = 15, maxA = 75, eOpen = NULL)
 }
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{bh1()}}
@@ -13,7 +13,7 @@ bh1MakeColumns(codi, minA = 15, maxA = 75, eOmega = NULL)
 
 \item{maxA}{the maximum of the age range searched. Default 75}
 
-\item{eOmega}{optional. A value for remaining life expectancy in the open age group.}
+\item{eOpen}{optional. A value for remaining life expectancy in the open age group.}
 }
 \value{
 codi, with many columns added, most importantly \code{$Cx}.
