@@ -286,16 +286,16 @@ ypart <- function(Year, Month, Day, reproduce.matlab = TRUE, detect.mid.year = F
 #' @param Day1 Day of second date
 #' @param Month1 Month of second date
 #' @param Year1 Year of second date
-#' @param reproduce.matlab logical. default \code{TRUE}. Assume 365 days in all years?
-#' @param detect.mid.year logical. default \code{FALSE}. Should June 30 and July 1 be considered .5?
+#' @param reproduce.matlab logical. default \code{FALSE}. Assume 365 days in all years?
+#' @param detect.mid.year logical. default \code{TRUE}. Should June 30 and July 1 be considered .5?
 #' @param detect.start.end logical. default \code{TRUE}. Should Jan 1 always be 0 and Dec 31 always be 1?
 #' 
 #' @return decimal value of year fraction (can be greater than 1)
 #' 
 #' @export
 #' 
-yint <- function(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = TRUE, 
-		detect.mid.year = FALSE, detect.start.end = TRUE){
+yint <- function(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = FALSE, 
+		detect.mid.year = TRUE, detect.start.end = TRUE){
 	if (reproduce.matlab){
 		return(abs(Year1 - Year2 + (Day1 - Day2) / 365 +  (Month1 - Month2) / 12))
 	}
