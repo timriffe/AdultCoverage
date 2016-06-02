@@ -255,7 +255,7 @@ bh2CoverageFromAges <- function(codi, agesFit){
 }
 
 # change name to GB
-bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, sex, agesFit){
+bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, agesFit, eOmega = NULL){
 	
 	AgeInt      <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
 	ages        <- codi$age
@@ -354,7 +354,7 @@ bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, sex, agesFi
 	codi
 }
 
-bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
+bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){
 	codiggb      <- ggbMakeColumns(codi = codi, minA = minA, maxA = maxA)
 	# this is a test
 	if (is.null(exact.ages)){
@@ -373,48 +373,57 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, sex = "
 								minAges = minAges, 
 								sex = sex, 
 								agesFit = agesFit)
-	bh2CoverageFromAges(codi = codi, agesFit = agesFit )
+	Coverages <- bh2CoverageFromAges(codi = codi, agesFit = agesFit )
+	data.frame(cod = unique(codi$cod), coverage = Coverages, lower = min(agesFit), upper = max(agesFit))
 }
 
 
-
-#######################################
-# TODO: death column should be mean intercensal deaths within an age. Could be simple avg,
-# or the avg of the death around the time of the first and second censuses. Would be nice
-# to calculate it from a separate Deaths object. Rather than have everything in 'x',
-# the functions should have a Pop data.frame and a Deaths data.frame, fully specified
-# in terms of AgeIntervals and YearIntervals, etc.
-#######################################
-
 #'
-#' @title estimate the coverage coefficients
+#' @title estimate death registration coverage using the adjusted Bennet-Horiuchi method 
 #' 
-#' @description x
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value.
 #' 
-#' @param x
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOmega} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
 #' 
-#' @return x
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
+#' @param minA the lowest age to be included in search
+#' @param maxA the highest age to be included in search (the lower bound thereof)
+#' @param minAges the minimum number of adjacent ages to be used in estimating
+#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
+#' @param eOmega optional. A user-specified value for remaining life-expectancy in the open age group.
 #' 
-#' @export 
+#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
-#' 
+#' @export
 
-bh2 <- function(x, minA = 10, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
-	tab        <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
-	tab$pop1   <- as.double(tab$pop1)
-	tab$pop2   <- as.double(tab$pop2)
-	tab$death  <- as.double(tab$death)
-	tab1       <- split(tab,x$cod)
+bh2 <- function(x, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL, eOmega = NULL){
+
+	tab         <- data.frame(X)           
+	colnames(tab) <- tolower(colnames(tab))
+	# in case there is no splitting var, this way we split anyway.
+	tab         <- addcod(tab)
 	
-	ages       <- sort(unique(tab$age))
-
-	coverages  <- unlist(lapply(
-					tab1, 
-					bh2coverageFromYear, 
-					minA = minA,  
-					maxA = maxA,
-					minAges = minAges,  
-					sex = sex,
-					exact.ages = exact.ages))
+	# guess which column is the deaths column, rename it deaths
+	tab         <- guessDeathsColumn(tab)
+	# TR: account for decimal intervals
+	tab$pop1    <- as.double(tab$pop1)
+	tab$pop2    <- as.double(tab$pop2)
+	tab$deaths  <- as.double(tab$deaths)
+	
+	tab1        <- split(tab, X$cod)
+	
+	
+	coverages <- as.data.frame(
+			do.call(
+					rbind,
+					lapply(
+						tab1, 
+						bh2coverageFromYear, 
+						minA = minA,  
+						maxA = maxA,
+						minAges = minAges,  	
+						exact.ages = exact.ages,
+						eOmega = eOmega
+                  )))
 	coverages
 }
