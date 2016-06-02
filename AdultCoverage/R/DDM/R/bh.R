@@ -3,12 +3,16 @@
 ###############################################################################
 # contains functions related to Bennet-Horiuchi methods
 
-bh1CoverageFromAges <- function(codi, agesFit){
+bh1CoverageFromAges <- function(codi, agesFit, minA = 15, maxA = 75){
+	
+	if (!"Cx" %in% colnames(codi)){
+		codi <- bh1MakeColumns(codi = codi, minA = minA, maxA = maxA)
+	}
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
-bh1MakeColumns <- function(codi, minA = 15, maxA = 75, minAges = 8){
+bh1MakeColumns <- function(codi, minA = 15, maxA = 75){
 	
 	# this throws an error if sex isn't coded as expected
 	sex                    <- detectSex(Dat = codi, sexColumn = "sex")
@@ -84,23 +88,28 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, minAges = 8){
 
 	
 	###############
-	# change to within() statement
-    minus          <- ((eOpen * codi$growth[N])^2) / 6
-	codi$pop_a     <- codi$death[N] * (exp(eOpen * codi$growth[N]) - minus)
+	# change to within() statement? This is rather convoluted
+#    minus          <- ((eOpen * codi$growth[N])^2) / 6
+
+
+	eON   <- eOpen * codi$growth[N]
+
+	codi <- within(codi, {
+				pop_a <- 0
+				pop_a[N] <- deaths[N] * exp(eON - (eON ^ (1/3)))
+				for(j in N:2){
+					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
+							deaths[j - 1] * exp(AgeInt / 2 * growth[j - 1])
+				}
+				rm(j)
+				Cx <- pop_a / birthdays
+			})
 	
-	
-	for(j in N:2){
-		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
-				codi$death[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
-	}
-	
-	
-	codi$Cx               <-  codi$pop_a / codi$birthdays
 	################
 	codi
 }
 
-bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){        ##  Data
+bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){        ##  Data
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		if (min(exact.ages) < minA){
@@ -123,10 +132,7 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, sex = 
 	
 	codi     <- bh1MakeColumns(	codi = codi, 
 								minA = minA, 
-								maxA = maxA, 
-								minAges = minAges, 
-								sex = sex, 
-								exact.ages = exact.ages)
+								maxA = maxA )
 	
 	coverage <- bh1CoverageFromAges(codi = codi, agesFit = agesFit)
 
@@ -134,7 +140,7 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, sex = 
 }
 
 # TODO: detect sex rather than specify as argument X <-x
-bh1 <- function(X, minA = 10, maxA = 75, minAges = 8, exact.ages = NULL){
+bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){
 	
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
