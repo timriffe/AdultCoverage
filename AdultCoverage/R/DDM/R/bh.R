@@ -12,7 +12,7 @@ bh1CoverageFromAges <- function(codi, agesFit, minA = 15, maxA = 75){
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
-bh1MakeColumns <- function(codi, minA = 15, maxA = 75){
+bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOmega = NULL){
 	
 	# this throws an error if sex isn't coded as expected
 	sex                    <- detectSex(Dat = codi, sexColumn = "sex")
@@ -42,6 +42,7 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75){
 	###################################################################
 	# TR: begin precarious chunk
 	# optional specify eOpen?
+	if (is.null(eOmega)){
 	ratio                  <- with(codi,
 			                   sum(deathLT[ages %in% c(10:39)]) / 
 					           sum(deathLT[ages %in% c(40:59)]))
@@ -82,6 +83,9 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75){
 	stopifnot(OA %in% as.integer(colnames(ex)))
 	
 	eOpen     <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
+	} else {
+		eOpen <- eOmega
+	}
 	###################################################################
     # TR: end precarious chunk
 	###################################################################
@@ -96,7 +100,7 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75){
 
 	codi <- within(codi, {
 				pop_a <- 0
-				pop_a[N] <- deaths[N] * exp(eON - (eON ^ (1/3)))
+				pop_a[N] <- deaths[N] * exp(eON) - (eON ^ (2/6))
 				for(j in N:2){
 					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
 							deaths[j - 1] * exp(AgeInt / 2 * growth[j - 1])
@@ -109,7 +113,7 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75){
 	codi
 }
 
-bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){        ##  Data
+bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOmega = NULL){        ##  Data
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		if (min(exact.ages) < minA){
@@ -132,7 +136,8 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 	
 	codi     <- bh1MakeColumns(	codi = codi, 
 								minA = minA, 
-								maxA = maxA )
+								maxA = maxA,
+								eOmega = eOmega )
 	
 	coverage <- bh1CoverageFromAges(codi = codi, agesFit = agesFit)
 
@@ -140,7 +145,7 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 }
 
 # TODO: detect sex rather than specify as argument X <-x
-bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){
+bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOmega = NULL){
 	
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
@@ -165,7 +170,8 @@ bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){
 							minA = minA, 
 							maxA = maxA,
 							minAges = minAges,  
-							exact.ages = exact.ages
+							exact.ages = exact.ages,
+							eOmega = eOmega
             )))
 	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
 	
