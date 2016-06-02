@@ -8,10 +8,10 @@ bh1CoverageFromAges <- function(codi, agesFit){
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
-bh1MakeColumns <- function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f", exact.ages. = NULL){
+bh1MakeColumns <- function(codi, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
 	
-	sex.                   <- tolower(sex.)
-	AgeInt                 <- detectAgeInterval(codi, MinAge =  minA., MaxAge = maxA., ageColumn = "age")
+	sex                   <- tolower(sex)
+	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
 	ages                   <- codi$age
 
 	dif.                   <- yint2(codi)
@@ -35,9 +35,9 @@ bh1MakeColumns <- function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f
 	
 	codi$deathLT       <- codi$death * exp(codi$cumgrowth)
 	
-	ratio                <- sum(codi$deathLT[ages. %in% c(10:39)]) / sum(codi$deathLT[ages. %in% c(40:59)])
+	ratio              <- sum(codi$deathLT[ages. %in% c(10:39)]) / sum(codi$deathLT[ages. %in% c(40:59)])
 	
-	if (sex. == "f"){
+	if (sex == "f"){
 		# TODO: expand ex in-ine out to actual open ages..
 		# model lifetable
 		# based on Bennett & Horiuchi (1984) 
@@ -50,7 +50,7 @@ bh1MakeColumns <- function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f
 				0.235,	0.175,	0.117)
 		ex <- cdmltw("F")$ex
 	}
-	if (sex. == "m"){
+	if (sex == "m"){
 		# need to change this:
 		standardratios <- c(1.161,	1.094,	1.034,	0.98,	
 				0.93,	0.885,	0.842,	0.802,	
@@ -61,7 +61,6 @@ bh1MakeColumns <- function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f
 		
 		ex <- cdmltw("M")$ex
 	}
-	
 	
 	# TODO: modify definition of AllLevels to be more robust.
 	AllLevels <- 3:25
@@ -96,30 +95,35 @@ bh1MakeColumns <- function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f
 	codi
 }
 
-bh1CoverageFromYear <-  function(codi, minA. = 15, maxA. = 75, minAges. = 8, sex. = "f", exact.ages. = NULL){        ##  Data
+bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){        ##  Data
 	# if exact.ages is given, we override other age-parameters
-	if (!is.null(exact.ages.) & length(exact.ages.) >= 3){
-		if (min(exact.ages.) < minA.){
-			minA. <- min(exact.ages.)
+	if (!is.null(exact.ages) & length(exact.ages) >= 3){
+		if (min(exact.ages) < minA){
+			minA <- min(exact.ages)
 		} 
-		if (max(exact.ages.) > maxA.){
-			maxA. <- max(exact.ages.)
+		if (max(exact.ages) > maxA){
+			maxA <- max(exact.ages)
 		}
-		if (minAges. < length(exact.ages.)){
-			minAges. <- length(exact.ages.)
+		if (minAges < length(exact.ages)){
+			minAges <- length(exact.ages)
 		}
 	}
 	
 	# outsource automatic age selection to GGB method.
-	if (is.null(exact.ages.)){
-		agesFit <- ggbgetAgesFit(codi, minA. = minA., maxA. = maxA., minAges. = minAges.)
+	if (is.null(exact.ages)){
+		agesFit <- ggbgetAgesFit(codi = codi, minA = minA, maxA = maxA, minAges = minAges)
 	} else {
-		agesFit <- exact.ages.
+		agesFit <- exact.ages
 	}
 	
-	codi     <- bh1MakeColumns(codi, minA. = minA., maxA. = maxA., minAges. = 8, sex. = sex.)
+	codi     <- bh1MakeColumns(	codi = codi, 
+								minA = minA, 
+								maxA = maxA, 
+								minAges = minAges, 
+								sex = sex, 
+								exact.ages = exact.ages)
 	
-	coverage <- bh1CoverageFromAges(codi, agesFit)
+	coverage <- bh1CoverageFromAges(codi = codi, agesFit = agesFit)
 	
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
@@ -140,16 +144,15 @@ bh1 <- function(X, minA = 10, maxA = 75, minAges = 8, exact.ages = NULL){
 	tab$pop2    <- as.double(tab$pop2)
 	tab$deaths  <- as.double(tab$deaths)
 	
-	tab1        <- split(tab,X$cod)
+	tab1        <- split(tab, X$cod)
 	
 	coverages <- unlist(lapply(
 					tab1, 
 					bh1CoverageFromYear, 
-					minA. = minA, 
-					maxA. = maxA,
-					minAges. = minAges,  
-					sex. = sex,
-					exact.ages. = exact.ages))
+					minA = minA, 
+					maxA = maxA,
+					minAges = minAges,  
+					exact.ages = exact.ages))
 	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
 	
 	coverages
@@ -162,7 +165,7 @@ bh2CoverageFromAges <- function(codi, agesFit){
 }
 
 # change name to GB
-bh2MakeColumns <- function(codi, minA. = 15, maxA. = 75,  minAges. = 8, sex., agesfit.){
+bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, sex, agesfit.){
 	
 	dif.        <- codi$year2[1] - codi$year1[1] 
 	agesi       <- codi$age %in% agesfit.
@@ -184,7 +187,7 @@ bh2MakeColumns <- function(codi, minA. = 15, maxA. = 75,  minAges. = 8, sex., ag
 	codi$birthdays            <- 0
 # iterate over age groups >= 10
 	
-	for (j in seq_along(ages.)[ages. >= minA.]) {
+	for (j in seq_along(ages.)[ages. >= minA]) {
 		# take geometric average of p1 pop vs p2 pop within same cohort
 		codi$birthdays[j]       <- 
 				1 / AgeInt. * sqrt(codi$pop1adj[j - 1] * codi$pop2[j])
@@ -206,7 +209,7 @@ bh2MakeColumns <- function(codi, minA. = 15, maxA. = 75,  minAges. = 8, sex., ag
 	
 	ratio                  <- sum(codi$death_tab[ages. %in% c(10:39)]) / sum(codi$death_tab[ages.%in%c(40:59)])
 	
-	if (sex. == "f"){
+	if (sex == "f"){
 		# TODO: expand ex in-ine out to actual open ages..
 		# model lifetable
 		# based on Bennett & Horiuchi (1984) 
@@ -219,7 +222,7 @@ bh2MakeColumns <- function(codi, minA. = 15, maxA. = 75,  minAges. = 8, sex., ag
 				0.235,	0.175,	0.117)
 		ex <- cdmltw("F")$ex
 	}
-	if (sex. == "m"){
+	if (sex == "m"){
 		# need to change this:
 		standardratios <- c(1.161,	1.094,	1.034,	0.98,	
 				0.93,	0.885,	0.842,	0.802,	
@@ -258,16 +261,16 @@ bh2MakeColumns <- function(codi, minA. = 15, maxA. = 75,  minAges. = 8, sex., ag
 	codi
 }
 
-bh2coverageFromYear <- function(codi, minA., minAges., sex. = "f", exact.ages. = NULL){
-	codiggb      <- ggbMakeColumns(codi, minA., AgeInt., minAges., ages.)
+bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
+	codiggb      <- ggbMakeColumns(codi, minA, AgeInt., minAges, ages.)
 	# this is a test
-	if (is.null(exact.ages.)){
-		agesfit. <- ggbgetAgesFit(codiggb, ages., minAges.)
+	if (is.null(exact.ages)){
+		agesfit. <- ggbgetAgesFit(codiggb, ages., minAges)
 	} else {
-		agesfit. <- exact.ages.
+		agesfit. <- exact.ages
 	}
 	
-	codi         <- bh2MakeColumns(codiggb, minA., AgeInt., minAges., ages., sex., agesfit.)
+	codi         <- bh2MakeColumns(codiggb, minA, maxA, minAges, sex, agesfit.)
 	bh2CoverageFromAges(codi, agesfit.  )
 	
 }
@@ -304,16 +307,15 @@ bh2 <- function(x, minA = 10, maxA = 75, minAges = 8, sex = "f", exact.ages = NU
 	tab1       <- split(tab,x$cod)
 	
 	ages       <- sort(unique(tab$age))
-	#minA. = minA;AgeInt. = AgeInt;minAges. = minAges;ages. = ages;sex. = sex
+	#minA = minA;AgeInt. = AgeInt;minAges = minAges;ages. = ages;sex = sex
 	# codi <- tab1[[1]]
 	coverages  <- unlist(lapply(
 					tab1, 
 					bh2coverageFromYear, 
-					minA. = minA, 
-					AgeInt. = AgeInt, 
-					minAges. = minAges,  
-					ages. = ages,
-					sex. = sex,
-					exact.ages. = exact.ages))
+					minA = minA,  
+					maxA = maxA,
+					minAges = minAges,  
+					sex = sex,
+					exact.ages = exact.ages))
 	coverages
 }
