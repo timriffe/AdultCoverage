@@ -141,30 +141,20 @@ ggbcoverageFromAges <- function(codi, agesfit){
 #' @export
 ggbMakeColumns <- function(codi, minA = 15, maxA = 75){
 	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
-	ages                   <- codi$age
-	# TR make this accept exact dates.
-	dif.                   <- yint2(codi)
-	
-	codi$pop1cum           <- rev(cumsum(rev(codi$pop1)))  # like Tx
-	codi$pop2cum           <- rev(cumsum(rev(codi$pop2)))  # like Tx
-	codi$deathcum          <- rev(cumsum(rev(codi$deaths))) # like lx
-	
-	# define new column for birthdays between pop estimates
-	# TR: loop removed
-	codi$birthdays <- c(0, sqrt(codi$pop1[ -nrow(codi) ] * codi$pop2[ -1 ])) / AgeInt
-	
-	# create 'stationary' Tx as geometric avg of within-cohort consecutive ages
-	codi$Tx               <- sqrt(codi$pop1cum * codi$pop2cum)
-	
-	# growth rate per annum
-	codi$cumgrowth        <- log(codi$pop2cum / codi$pop1cum) / dif.
-	
-	# eqns from formula in Hill/Horiuchi
-	codi$rightterm        <- codi$deathcum / codi$Tx
-	# eqns from formula in Hill/Horiuchi
-	codi$leftterm          <- (codi$birthdays / codi$Tx) - codi$cumgrowth
-	# certain columns can be safely ignored in future operations
-	codi$exclude          <-  codi$Tx != 0 & codi$birthdays != 0 & codi$age >= minA & codi$age <= 75
+	dif                    <- yint2(codi)
+	N                      <- nrow(codi)
+	codi      <- within(codi, {
+			pop1cum        <- rev(cumsum(rev(pop1)))
+			pop2cum        <- rev(cumsum(rev(pop2))) 
+			deathcum       <- rev(cumsum(rev(deaths)))
+			birthdays      <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
+			Tx             <- sqrt(pop1cum * pop2cum)
+			cumgrowth      <- log(pop2cum / pop1cum) / dif
+			rightterm      <- deathcum / Tx
+			leftterm       <- (birthdays / Tx) - cumgrowth
+			exclude        <-  Tx != 0 & birthdays != 0 & age >= minA & age <= maxA
+		         })
+
 	codi
 }
 
