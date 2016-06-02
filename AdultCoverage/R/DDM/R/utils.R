@@ -33,66 +33,40 @@ detectAgeInterval <- function(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age"){
 #'
 #' @title Detect the sex for some demographic data
 #' 
-#' @description The column name can 
+#' @description The column name can be \code{"sex"} or \code{"Sex"} and nothing else. If coded with integer, the number 1 is recognized as male and numbers, 0, 2, or 6 are assumed to be female. Any other integer will throw an error. If character, if the first letter is \code{"f"}, then we assume female, and if the first letter is \code{"m"} we assume male. Case does not matter. Anything else will throw an error. This function allows for just a little flexibility.
 #' 
-#' @param Dat a \code{data.frame} containing a column called \code{Sex}, or code{sex}. 
+#' @param Dat a \code{data.frame} containing a column called \code{Sex}, or code{sex}.
 
 #' @return either \code{"f"} or \code{"m"}
 #' @export
 #' 
 
-#detectSex <- function(Dat, sexColumn = "Sex"){
-#	
-#	stopifnot(tolower(sexColumn) %in% tolower(colnames(Dat)))
-#	colnames(Dat)[grepl(tolower(sexColumn),tolower(colnames(Dat)))] <- "Sex"
-#	
-#    if (length(unique(Dat$Sex))>1){
-#		warning("You have more than one sex in this data!")
-#	}
-#		
-#	Sex <- unique(Dat$Sex)
-#
-#	if (is.character(Sex)){
-#		Sex <- tolower(Sex)
-#		if (    grepl("f",Sex) | 
-#				grepl("fem",Sex) | 
-#				grepl("wom",Sex) | 
-#				grepl("frau",Sex) | 
-#				grepl("weib",Sex) | 
-#				grepl("muj",Sex) | 
-#				grepl("don", Sex) | 
-#				grepl("mul", Sex) 
-#		){
-#			Sex <- "f"
-#		} else {
-#			if (    grepl("m",Sex) | 
-#					grepl("mal",Sex) | 
-#					grepl("men",Sex) | 
-#					grepl("män",Sex) | 
-#					grepl("herr",Sex) | 
-#					grepl("hom",Sex)
-#			){
-#				Sex <- "m"
-#			} 
-#		}
-#	}
-#	
-#	if (is.integer(Sex)){
-#		if (Sex == 1){
-#			Sex <- "m"
-#		}
-#		# coding traditions I've seen in different places... 
-#		if (Sex %in% c(0,2,6)){
-#			Sex <- "f"
-#		}
-#		
-#	}
-#	
-#	if (!Sex%in%c("m","f")){
-#		stop("Couldn't determine the sex automatically. Code using m and f please")
-#	}
-#	Sex
-#}
+detectSex <- function(Dat, sexColumn = "Sex"){
+	
+	tempnames <- tolower(colnames(Dat))
+	stopifnot(tolower(sexColumn) %in% tempnames)
+	
+	# make column easier to call
+	colnames(Dat)[grepl(tolower(sexColumn),tempnames)] <- "Sex"
+
+	sex <- unique(Dat$Sex)
+	
+	# if it's integer, accept 0,2,6 for female, 1 for male
+	if (is.integer(sex)){
+		stopifnot(sex %in% c(0,1,2,6))
+		sex <- ifelse(sex %in% c(0,2,6),"f","m")
+	}
+	if (is.character(sex)){
+		sex <- tolower(sex)
+		sex <- unlist(strsplit(sex,""))[1]
+		if (sex %in% c("m","f")){
+			return(sex)
+		} else {
+			stop("must indicate sex using 'm' and 'f'")
+		}
+	}
+	stop("must specify sex using a character class column called sex, with values 'm' and/or 'f'")
+}
 
 #' @title a cheap way to choose which column to assign a NoteCode to
 #' 
