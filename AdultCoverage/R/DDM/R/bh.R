@@ -8,37 +8,42 @@ bh1CoverageFromAges <- function(codi, agesFit){
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
-bh1MakeColumns <- function(codi, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
+bh1MakeColumns <- function(codi, minA = 15, maxA = 75, minAges = 8){
 	
-	sex                   <- tolower(sex)
+	# this throws an error if sex isn't coded as expected
+	sex                    <- detectSex(Dat = codi, sexColumn = "sex")
+	# attempt to detect AgeInterval, should be obvious. And really, we only consider 5-yr intervals.
+	# if this were done w single ages minAges would need to increase to at least 35 I guess.
 	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
 	ages                   <- codi$age
-
-	dif.                   <- yint2(codi)
-
-    # TR: loop not necessary
-	codi$birthdays <- c(0, sqrt(codi$pop1[ -nrow(codi) ] * codi$pop2[ -1 ])) / AgeInt
+	# ages better be unique! I expect this will work unless $cod is mis-specified. 
+	# This is a good catch for that
+    stopifnot(length(ages) == length(unique(ages)))
 	
-    # age-specific growth
-	codi$growth	           <-  log(codi$pop2 / codi$pop1) / dif.
-	codi$growth[is.infinite(codi$growth)] <- 0
+	# codi can use date columns, or year, month, day columns...
+	dif                    <- yint2(X = codi)
+	N                      <- nrow(codi)
 	
-	# TR: loop not necessary?
-	codi$cumgrowth         <-  0
-	codi$cumgrowth[1]      <-  AgeInt / 2 * codi$growth[1]
+	codi <- within(codi,{
+				# birthdays, as in GGB
+				birthdays <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
+				# age-specific growth
+	        	growth    <- log(pop2 / pop1) / dif
+				growth[is.infinite(growth) | is.nan(growth)] <- 0
+				# cumulative growth
+				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
+				deathLT   <- deaths * exp(cumgrowth)
+			})
 	
-	for (j in 2:length(ages.)){
-		codi$cumgrowth[j]  <-  AgeInt / 2 * codi$growth[j] + AgeInt * sum(codi$growth[(j - 1):1])
-	}
-	
-# stopped here
-	
-	codi$deathLT       <- codi$death * exp(codi$cumgrowth)
-	
-	ratio              <- sum(codi$deathLT[ages. %in% c(10:39)]) / sum(codi$deathLT[ages. %in% c(40:59)])
+	###################################################################
+	# TR: begin precarious chunk
+	# optional specify eOpen?
+	ratio                  <- with(codi,
+			                   sum(deathLT[ages %in% c(10:39)]) / 
+					           sum(deathLT[ages %in% c(40:59)]))
 	
 	if (sex == "f"){
-		# TODO: expand ex in-ine out to actual open ages..
+		# TODO: expand ex in-ine out to actual open ages.
 		# model lifetable
 		# based on Bennett & Horiuchi (1984) 
 		# "Mortality Estimateion fro Registered Deaths in Less Developed Countries", Demography
@@ -62,36 +67,36 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, minAges = 8, sex = "f", e
 		ex <- cdmltw("M")$ex
 	}
 	
-	# TODO: modify definition of AllLevels to be more robust.
+	# this spits back a C-D level that is a decimal estimate
 	AllLevels <- 3:25
 	CDlevel   <- splinefun(AllLevels~standardratios)(ratio)
+	
 	# which is the open age?
-	OA        <- max(ages.)
+	OA        <- max(ages)
 	availages <- as.integer(colnames(ex))
 	
-	stopifnot(OA %in% availages)
+	stopifnot(OA %in% as.integer(colnames(ex)))
 	
 	eOpen     <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
-	# eOpen <- 4.9
-	N         <- nrow(codi)
-	codi$growth[is.nan(codi$growth)] <- 0
-#	if (sign( codi$growth[N]) == -1){
-#		minus <- Re(((eOpen * codi$growth[N]) + .0i)^(2 / 6)) * 2
-#	} else {
-#		minus <- (eOpen * codi$growth[N])^(2 / 6)
-#	}
-	minus          <- ((eOpen * codi$growth[N])^2) / 6
+	###################################################################
+    # TR: end precarious chunk
+	###################################################################
+
+	
+	###############
+	# change to within() statement
+    minus          <- ((eOpen * codi$growth[N])^2) / 6
 	codi$pop_a     <- codi$death[N] * (exp(eOpen * codi$growth[N]) - minus)
 	
 	
 	for(j in N:2){
-		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt. * codi$growth[j - 1]) + 
-				codi$death[j - 1] * exp(AgeInt. / 2 * codi$growth[j - 1])
+		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
+				codi$death[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
 	}
 	
 	
 	codi$Cx               <-  codi$pop_a / codi$birthdays
-	
+	################
 	codi
 }
 
@@ -124,7 +129,7 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, sex = 
 								exact.ages = exact.ages)
 	
 	coverage <- bh1CoverageFromAges(codi = codi, agesFit = agesFit)
-	
+
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
 
@@ -133,7 +138,6 @@ bh1 <- function(X, minA = 10, maxA = 75, minAges = 8, exact.ages = NULL){
 	
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
-	
 	# in case there is no splitting var, this way we split anyway.
 	tab         <- addcod(tab)
 	
@@ -146,71 +150,82 @@ bh1 <- function(X, minA = 10, maxA = 75, minAges = 8, exact.ages = NULL){
 	
 	tab1        <- split(tab, X$cod)
 	
-	coverages <- unlist(lapply(
-					tab1, 
-					bh1CoverageFromYear, 
-					minA = minA, 
-					maxA = maxA,
-					minAges = minAges,  
-					exact.ages = exact.ages))
+	coverages <- as.data.frame(
+					do.call(
+						rbind,
+						lapply(
+							tab1, 
+							bh1CoverageFromYear, 
+							minA = minA, 
+							maxA = maxA,
+							minAges = minAges,  
+							exact.ages = exact.ages
+            )))
 	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
 	
 	coverages
 }
 
 ###################################################################################
+# End BH1 functions
+###################################################################################
+# Start BH2 functions
+###################################################################################
+
 bh2CoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
 # change name to GB
-bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, sex, agesfit.){
+bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, sex, agesFit){
 	
-	dif.        <- codi$year2[1] - codi$year1[1] 
-	agesi       <- codi$age %in% agesfit.
+	AgeInt      <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
+	ages        <- codi$age
+	dif         <- yint2(X = codi)
+	agesi       <- codi$age %in% agesFit
 	
 	# just get left term / right term
 	slope       <- with(codi, 
-			sd(lefterm[age %in% agesfit.]) / sd(rightterm[age %in% agesfit.])
+			sd(lefterm[age %in% agesFit]) / sd(rightterm[age %in% agesFit])
 	)
 	intercept   <- with(codi, 
-			(mean(lefterm[age %in% agesfit.]) - 
-						slope * mean(rightterm[age %in% agesfit.]))
+			(mean(lefterm[age %in% agesFit]) - 
+						slope * mean(rightterm[age %in% agesFit]))
 	) 
 	
-	relcomp     <- exp(intercept * dif.)
+	relcomp     <- exp(intercept * dif)
 	# relcomp <- .96
 	# adjust the first population count
 	codi$pop1adj <- codi$pop1 / relcomp
 	
 	codi$birthdays            <- 0
-# iterate over age groups >= 10
+    # iterate over age groups >= 10
 	
-	for (j in seq_along(ages.)[ages. >= minA]) {
+	for (j in seq_along(ages)[ages >= minA]) {
 		# take geometric average of p1 pop vs p2 pop within same cohort
 		codi$birthdays[j]       <- 
-				1 / AgeInt. * sqrt(codi$pop1adj[j - 1] * codi$pop2[j])
+				1 / AgeInt * sqrt(codi$pop1adj[j - 1] * codi$pop2[j])
 	} # end age loop
 	
-# age-specific growth
+    # age-specific growth
 	
-	codi[["growth"]]	   <-  log(codi$pop2 / codi$pop1adj) / dif.
+	codi[["growth"]]	   <-  log(codi$pop2 / codi$pop1adj) / dif
 	codi$growth[is.infinite(codi$growth)] <- 0
 	
 	codi$cumgrowth         <-  0
 	codi$cumgrowth[1]      <- 2.5 * codi$growth[1]
 	
-	for (j in 2:length(ages.)){                    # TR: why 5 times?
+	for (j in 2:length(ages)){                    # TR: why 5 times?
 		codi$cumgrowth[j]  <- 2.5 * codi$growth[j] + 5 * sum(codi$growth[(j - 1):1])
 	}
 	
 	codi$death_tab         <- codi$death * exp(codi$cumgrowth)
 	
-	ratio                  <- sum(codi$death_tab[ages. %in% c(10:39)]) / sum(codi$death_tab[ages.%in%c(40:59)])
+	ratio                  <- sum(codi$death_tab[ages %in% c(10:39)]) / sum(codi$death_tab[ages%in%c(40:59)])
 	
 	if (sex == "f"){
-		# TODO: expand ex in-ine out to actual open ages..
+		# TODO: expand ex in-ine out to actual open ages.
 		# model lifetable
 		# based on Bennett & Horiuchi (1984) 
 		# "Mortality Estimation from Registered Deaths in Less Developed Countries", Demography
@@ -238,7 +253,7 @@ bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, sex, agesfi
 	AllLevels             <- 3:25
 	CDlevel               <- splinefun(AllLevels~standardratios)(ratio)
 	# open at age 110 ....
-	OA                    <- max(ages.)
+	OA                    <- max(ages)
 	availages             <- as.integer(colnames(ex))
 	
 	stopifnot(OA %in% availages)
@@ -251,9 +266,10 @@ bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, sex, agesfi
 	minus                 <- ((eOpen * codi$growth[N])^2) / 6
 	codi$pop_a            <- codi$death[N] * (exp(eOpen * codi$growth[N]) - minus)
 	
+	# TODO: remove loop?
 	for(j in N:1){
-		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt. * codi$growth[j - 1]) + 
-				codi$death[j - 1] * exp(AgeInt. / 2 * codi$growth[j - 1])
+		codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
+				codi$death[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
 	}
 	
 	
@@ -262,17 +278,25 @@ bh2MakeColumns <- function(codi, minA = 15, maxA = 75,  minAges = 8, sex, agesfi
 }
 
 bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
-	codiggb      <- ggbMakeColumns(codi, minA, AgeInt., minAges, ages.)
+	codiggb      <- ggbMakeColumns(codi = codi, minA = minA, maxA = maxA)
 	# this is a test
 	if (is.null(exact.ages)){
-		agesfit. <- ggbgetAgesFit(codiggb, ages., minAges)
+		agesFit <- ggbgetAgesFit(codi = codiggb, 
+								minA = minA, 
+								maxA = maxA, 
+								minAges = minAges)
 	} else {
-		agesfit. <- exact.ages
+		agesFit <- exact.ages
 	}
 	
-	codi         <- bh2MakeColumns(codiggb, minA, maxA, minAges, sex, agesfit.)
-	bh2CoverageFromAges(codi, agesfit.  )
-	
+	codi         <- bh2MakeColumns(
+								codi = codiggb, 
+								minA = minA, 
+								maxA = maxA, 
+								minAges = minAges, 
+								sex = sex, 
+								agesFit = agesFit)
+	bh2CoverageFromAges(codi = codi, agesFit = agesFit )
 }
 
 
@@ -298,7 +322,6 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, sex = "
 #' 
 #' 
 
-# TODO: detect AgeInt rather than specify as argument
 bh2 <- function(x, minA = 10, maxA = 75, minAges = 8, sex = "f", exact.ages = NULL){
 	tab        <- data.frame(x)           ##  Dat in data frame : cod, age, pop1, year1, pop2, year2, death
 	tab$pop1   <- as.double(tab$pop1)
@@ -307,8 +330,7 @@ bh2 <- function(x, minA = 10, maxA = 75, minAges = 8, sex = "f", exact.ages = NU
 	tab1       <- split(tab,x$cod)
 	
 	ages       <- sort(unique(tab$age))
-	#minA = minA;AgeInt. = AgeInt;minAges = minAges;ages. = ages;sex = sex
-	# codi <- tab1[[1]]
+
 	coverages  <- unlist(lapply(
 					tab1, 
 					bh2coverageFromYear, 
