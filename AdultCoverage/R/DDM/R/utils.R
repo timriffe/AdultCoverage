@@ -389,3 +389,4 @@ guessDeathsColumn <- function(X){
 	colnames(X)[dcol] <- "deaths"
 	X
 }
+
