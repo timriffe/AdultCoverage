@@ -4,8 +4,8 @@
 \alias{yint}
 \title{yint get interval as fraction of full years}
 \usage{
-yint(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = TRUE,
-  detect.mid.year = FALSE, detect.start.end = TRUE)
+yint(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = FALSE,
+  detect.mid.year = TRUE, detect.start.end = TRUE)
 }
 \arguments{
 \item{Day1}{Day of first date}
@@ -14,9 +14,9 @@ yint(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = TRUE,
 
 \item{Year1}{Year of first date}
 
-\item{reproduce.matlab}{logical. default \code{TRUE}. Assume 365 days in all years?}
+\item{reproduce.matlab}{logical. default \code{FALSE}. Assume 365 days in all years?}
 
-\item{detect.mid.year}{logical. default \code{FALSE}. Should June 30 and July 1 be considered .5?}
+\item{detect.mid.year}{logical. default \code{TRUE}. Should June 30 and July 1 be considered .5?}
 
 \item{detect.start.end}{logical. default \code{TRUE}. Should Jan 1 always be 0 and Dec 31 always be 1?}
 
