@@ -49,7 +49,7 @@ ggbgetRMS <- function(agesi, codi){
 #' 
 #' @export
 
-ggbcoverageFromYear <- function(codi, exact.ages, minA, maxA, minAges){
+ggbcoverageFromYear <- function(codi, exact.ages = NULL, minA = 15, maxA = 75, minAges = 8){
 	
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
