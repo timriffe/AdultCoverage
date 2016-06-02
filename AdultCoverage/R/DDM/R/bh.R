@@ -185,7 +185,6 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
 
-
 #'
 #' @title estimate death registration coverage using the Bennet-Horiuchi method 
 #' 
