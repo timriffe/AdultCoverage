@@ -366,7 +366,9 @@ slopeint <- function(codi, agesfit){
 #' 
 #' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, and \code{$upper}.
 #' @method plot ggb
-#' @export 
+#' @export
+#' @rdname plot.ggb
+#' 
 plot.ggb <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, maxit = 15){
 	# this is the automatic age selection.
 	
