@@ -3,7 +3,7 @@
 S3method(plot,ddm)
 S3method(plot,ggb)
 export(plot.ggb)
-export(plot.ggb)
+export(plot.ddm)
 export(addcod)
 export(adjustages)
 export(assignNoteCode)
