@@ -212,6 +212,8 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
+#' 
+#' @references Need to cite stuff here.
 bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 	
 	tab         <- data.frame(X)           
@@ -385,6 +387,7 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.a
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
+#' @references Need to cite stuff here.
 
 bh2 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 

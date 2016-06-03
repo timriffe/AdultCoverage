@@ -392,3 +392,6 @@ guessDeathsColumn <- function(X){
 	X
 }
 
+
+
+
