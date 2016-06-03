@@ -356,7 +356,7 @@ slopeint <- function(codi, agesfit){
 #' @param maxit the maximum number of clicks you can take. Default 15.
 #' 
 #' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, and \code{$upper}.
-#' 
+#' @method plot ggb
 #' @export 
 plot.ggb <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, maxit = 15){
 	# this is the automatic age selection.
