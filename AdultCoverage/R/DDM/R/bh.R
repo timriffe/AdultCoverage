@@ -273,8 +273,6 @@ bh2MakeColumns <- function(
 		maxA = 75,  
 		agesFit, 
 		eOpen = NULL){
-	# this throws an error if sex isn't coded as expected
-	sex                    <- detectSex(Dat = codi, sexColumn = "sex")
 	
 	AgeInt       <- detectAgeInterval(
 							Dat = codi, 
@@ -361,8 +359,7 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.a
 	codi         <- bh2MakeColumns(
 								codi = codiggb, 
 								minA = minA, 
-								maxA = maxA, 
-								sex = sex, 
+								maxA = maxA, 	
 								agesFit = agesFit,
 								eOpen = eOpen)
 	coverage <- bhCoverageFromAges(codi = codi, agesFit = agesFit )
