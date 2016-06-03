@@ -11,10 +11,17 @@
 #' 
 #' All three methods require time points of the two censuses. Census dates can be given in a variety of ways: 1) (preferred) using \code{Date} classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing respective integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.  Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. 
 #' 
-#' The Bennett-Horiuchi methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. If 
-
+#' The Bennett-Horiuchi methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. That is a place where things can be improved.
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
+#' @param minA the lowest age to be included in search
+#' @param maxA the highest age to be included in search (the lower bound thereof)
+#' @param minAges the minimum number of adjacent ages to be used in estimating
+#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
+#' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' 
+#' @return data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}. 
 #' @references Need to cite stuff here.
-
+#' @export
 ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 	ggbres <- ggb(X = X, 
 					minA = minA, 
@@ -45,6 +52,20 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 	results
 }
 
+
+#'
+#' @title get a quick overview of the different estimates produced
+#' @description produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. You can either feed this function the output of \code{ddm()} or feed it the data that you would otherwise give to \code{ddm()}. In the second case, you need to spell out \code{plot.ddm()}, and in the first case it will recognize that the data is of class \code{ddm}, so \code{plot()} is enough.
+#' 
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
+#' @param minA the lowest age to be included in search
+#' @param maxA the highest age to be included in search (the lower bound thereof)
+#' @param minAges the minimum number of adjacent ages to be used in estimating
+#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
+#' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @return called for its graphical device side-effects.
+#' @method plot ddm
+#' @export
 plot.ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 	if (class(X) == "data.frame"){
 		X <- ddm(X, minA = minA, 
