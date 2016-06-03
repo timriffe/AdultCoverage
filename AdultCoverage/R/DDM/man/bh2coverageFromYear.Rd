@@ -5,7 +5,7 @@
 \title{estimate death registration coverage for a single year/sex/region using the modified Bennet-Horiuchi method}
 \usage{
 bh2coverageFromYear(codi, minA = 15, maxA = 75, minAges = 8,
-  exact.ages = NULL)
+  exact.ages = NULL, eOpen = NULL)
 }
 \arguments{
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$sex}, \code{$age}, and \code{$cod} (to indicate regions, periods, sexes).}
