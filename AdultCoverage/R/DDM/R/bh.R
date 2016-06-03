@@ -346,7 +346,7 @@ bh2MakeColumns <- function(
 #' @export
 
 
-bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){
+bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 	codiggb      <- ggbMakeColumns(codi = codi, minA = minA, maxA = maxA)
 	# Get age range using the GGB auto fitting
 	if (is.null(exact.ages)){
@@ -363,7 +363,8 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.a
 								minA = minA, 
 								maxA = maxA, 
 								sex = sex, 
-								agesFit = agesFit)
+								agesFit = agesFit,
+								eOpen = eOpen)
 	coverage <- bhCoverageFromAges(codi = codi, agesFit = agesFit )
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
