@@ -48,10 +48,9 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 				lower = ggbres$lower,
 				upper = ggbres$upper
 			)
-	class(results) <- "ddm"
+	class(results) <- c("data.frame","ddm")
 	results
 }
-
 
 #'
 #' @title get a quick overview of the different estimates produced
