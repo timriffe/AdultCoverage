@@ -225,7 +225,7 @@ bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 	tab$pop2    <- as.double(tab$pop2)
 	tab$deaths  <- as.double(tab$deaths)
 	
-	tab1        <- split(tab, X$cod)
+	tab1        <- split(tab, tab$cod)
 	
 	coverages <- as.data.frame(
 					do.call(
@@ -401,7 +401,7 @@ bh2 <- function(x, minA = 15, maxA = 75, minAges = 8, sex = "f", exact.ages = NU
 	tab$pop2    <- as.double(tab$pop2)
 	tab$deaths  <- as.double(tab$deaths)
 	
-	tab1        <- split(tab, X$cod)
+	tab1        <- split(tab, tab$cod)
 	
 	
 	coverages <- as.data.frame(
