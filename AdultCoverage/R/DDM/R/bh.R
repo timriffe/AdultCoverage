@@ -386,7 +386,7 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.a
 #' 
 #' @export
 
-bh2 <- function(x, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
+bh2 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
