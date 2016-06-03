@@ -32,11 +32,25 @@ group01 <- function(X){
 x <- do.call(rbind,lapply(split(x,x$cod),group01))
 x$sex <- "f"
 
+# age-determination
+ggbChooseAges(x[x$cod==53,])
+allddm <- ddm(x)
+ddmplot(allddm)
+#or
+ddm(x)
+
+#or
+ggb(x)
+bh1(x)
+bh2(x)
+
+
+x$cod
 #ggb(x, exact.ages =seq(20,60,by=5))
 #bh1(x, exact.ages =seq(20,60,by=5))
 #bh2(x, exact.ages =seq(20,60,by=5))
 
-ddm <- data.frame(
+data.frame(
 		ggb = ggb(x)$coverage, 
 		bh1 = bh1(x)$coverage, 
 		bh2 = bh2(x)$coverage)

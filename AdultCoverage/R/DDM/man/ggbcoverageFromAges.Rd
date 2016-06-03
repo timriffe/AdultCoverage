@@ -15,6 +15,6 @@ ggbcoverageFromAges(codi, agesfit)
 numeric. the estimated level of coverage.
 }
 \description{
-For a single year/sex/region of data (formatted as required by \code{ggb()}), what is the registration coverage implied by a given age range? Called by \code{ggbcoverageFromYear()} and \code{plot.ggb()}.
+For a single year/sex/region of data (formatted as required by \code{ggb()}), what is the registration coverage implied by a given age range? Called by \code{ggbcoverageFromYear()} and \code{ggbChooseAges()}.
 }
 

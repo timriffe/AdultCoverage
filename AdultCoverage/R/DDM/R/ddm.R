@@ -48,7 +48,7 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 				lower = ggbres$lower,
 				upper = ggbres$upper
 			)
-	class(results) <- c("data.frame","ddm")
+
 	results
 }
 
@@ -65,7 +65,7 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 #' @return called for its graphical device side-effects.
 #' @method plot ddm
 #' @export
-plot.ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
+ddmplot <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 	if (class(X) == "data.frame"){
 		X <- ddm(X, minA = minA, 
 				maxA = maxA, 
@@ -84,14 +84,21 @@ plot.ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eO
 		n <- length(x)
 		prod(x)^(1/n)
 	}
-	plot(X$x,X$ggb, pch = 19,col="#FFA155", ylim=range(X[,c("ggb","bh1","bh2")]), cex=.6, 
-			xlab = "data row", ylab = "coverage estimate",main = "UFdata females period 1",
+	Range <- range(as.matrix(X[,c("ggb","bh1","bh2")]))
+	plot(X$x,X$ggb, pch = 19,col="#FFA155", ylim=Range, cex=.6, 
+			xlab = "data row", ylab = "coverage estimate",
+			main = "UFdata females period 1",
 			panel.first = list(
-					segments(X$x,apply(X[,1:3],1,min),X$x,apply(X[,1:3],1,max), lwd=.5,col=gray(.5))))
+					segments(X$x,
+							apply(X[,c("ggb","bh1","bh2")],1,min),
+							X$x,
+							apply(X[,c("ggb","bh1","bh2")],1,max), 
+							lwd=.5,
+							col=gray(.5))))
 	points(X$x,X$bh1,pch=19,col = "royalblue", cex=.6)
 	points(X$x,X$bh2,pch=19,col = "forestgreen", cex=.6)
 	#points(X$x, apply(X[,1:3],1,g.mean), col = "gray", cex = .6, pch = 19)
-	points(X$x, apply(X[,1:3],1,h.mean), col = "magenta", cex = .6, pch = 19)
+	points(X$x, apply(X[,c("ggb","bh1","bh2")],1,h.mean), col = "magenta", cex = .6, pch = 19)
 	legend("topright", col = c("#FFA155","royalblue","forestgreen","magenta"), 
 			pch = 19, cex=.6, legend = c("GGB","BH1","BH2","Hmean"),bty="n")
 	

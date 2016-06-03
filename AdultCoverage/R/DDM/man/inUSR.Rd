@@ -15,7 +15,7 @@ inUSR(USR, click)
 logical. \code{TRUE} if in the plot region.
 }
 \description{
-Check to see if a point clicked falls in the plot or outside it. This function is used by \code{plot.ggb()}.
+Check to see if a point clicked falls in the plot or outside it. This function is used by \code{ggbChooseAges()}.
 }
 \details{
 

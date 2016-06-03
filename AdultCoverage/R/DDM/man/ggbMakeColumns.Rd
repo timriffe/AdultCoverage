@@ -17,7 +17,7 @@ ggbMakeColumns(codi, minA = 15, maxA = 75)
 codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
 }
 \description{
-Called by \code{plot.ggb()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly.
+Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly.
 }
 \details{
 

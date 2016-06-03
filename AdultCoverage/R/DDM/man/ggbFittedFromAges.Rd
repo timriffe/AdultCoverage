@@ -17,7 +17,7 @@ ggbFittedFromAges(codi, agesfit)
 codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
 }
 \description{
-Called by \code{plot.ggb()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.
+Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.
 }
 \details{
 

@@ -19,7 +19,7 @@ guessage(xvec, yvec, click, age)
 the age corresponding to the x,y pair of \code{$rightterm}, \code{$lefttterm} closest to the point clicked.
 }
 \description{
-a utility function called by \code{plot.ggb()}.
+a utility function called by \code{ggbChooseAges()}.
 }
 \details{
 

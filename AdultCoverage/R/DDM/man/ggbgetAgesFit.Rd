@@ -21,6 +21,6 @@ Called by \code{ggbcoverageFromYear()} whenever \code{exact.ages} are not given.
 
 }
 \seealso{
-plot.ggb
+ggbChooseAges
 }
 

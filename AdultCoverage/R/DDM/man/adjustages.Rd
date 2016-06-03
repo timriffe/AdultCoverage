@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggb.R
 \name{adjustages}
 \alias{adjustages}
-\title{adjust the range of ages used by \code{plot.ggb()}}
+\title{adjust the range of ages used by \code{ggbChooseAges()}}
 \usage{
 adjustages(a, age, agesfit)
 }
@@ -17,7 +17,7 @@ adjustages(a, age, agesfit)
 the adjusted set of ages used for calculating the coverage coefficient
 }
 \description{
-a utility function called by \code{plot.ggb()}. After clicking a point, this function readjusts the age range
+a utility function called by \code{ggbChooseAges()}. After clicking a point, this function readjusts the age range
 }
 \details{
 
