@@ -143,6 +143,15 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75){
 	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
 	dif                    <- yint2(codi)
 	N                      <- nrow(codi)
+	
+	# a quick recheck of classes:
+	codi <- within(codi, {
+				deaths <- as.double(deaths)
+				pop1 <- as.double(pop1)
+				pop2 <- as.double(pop2)
+			})
+	
+	# now actual column creation
 	codi      <- within(codi, {
 			pop1cum        <- rev(cumsum(rev(pop1)))
 			pop2cum        <- rev(cumsum(rev(pop2))) 
