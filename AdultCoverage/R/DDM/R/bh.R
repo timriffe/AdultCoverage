@@ -59,6 +59,7 @@ eOpenCD <- function(codiaugmented){
 	stopifnot(OA %in% as.integer(colnames(ex)))
 	
 	eOpen     <- splinefun(ex[,as.character(OA)]~1:25)(CDlevel)
+	eOpen
 }
 
 
@@ -273,7 +274,7 @@ bh2MakeColumns <- function(
 		maxA = 75,  
 		agesFit, 
 		eOpen = NULL){
-	
+	N            <- nrow(codi)
 	AgeInt       <- detectAgeInterval(
 							Dat = codi, 
 							MinAge =  minA, 
@@ -289,7 +290,7 @@ bh2MakeColumns <- function(
 	# the only difference between this method and bh1 is that
 	# in the next couple lines we use pop1adj instead of pop1...
 	relcomp      <- exp(ab$a * dif)
-
+   	
 	codi <- within(codi,{
 				pop1adj   <- pop1 / relcomp
 				# birthdays, as in GGB
