@@ -65,13 +65,13 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 #' @return called for its graphical device side-effects.
 #' @export
 ddmplot <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
-	if (class(X) == "data.frame"){
-		X <- ddm(X, minA = minA, 
-				maxA = maxA, 
-				minAges = minAges, 
-				exact.ages = exact.ages, 
-				eOpen = eOpen)
-	} 
+#	if (class(X) == "data.frame"){
+#		X <- ddm(X, minA = minA, 
+#				maxA = maxA, 
+#				minAges = minAges, 
+#				exact.ages = exact.ages, 
+#				eOpen = eOpen)
+#	} 
 	
 	X$x <- 1:nrow(X)
 	
