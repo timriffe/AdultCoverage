@@ -392,6 +392,45 @@ guessDeathsColumn <- function(X){
 	X
 }
 
+#'
+#' @title chop down or group down the open age
+#' 
+#' @description These methods are not intended to be applied to ages greater than, say 90 or 95. Usually, we'd top out in the range 75 to 85. In any case, the Coale-Demeny lifetable implementation that we have only goes up to age 95, so there is a practical limitation to deriving a remaining life expectancy for the open age group. If a user tries to apply the Bennett-Horiuchi methods to data with higher open ages, stuff breaks for the time being. So this function chops the data off at \code{min(maxA,95)}, after having (optionally) grouped data down. This function needs to work with a single partition of data (intercensal period, sex, region, etc).
+#' 
+#' @param X data formatted per the requirements of \code{bh1()}, \code{bh2()}
+#' @param group logical. If \code{TRUE} we sum down to \code{min(maxA,95)}. If \code{FALSE}, we just chop off data above that age.
+#' 
+#' @return X, with the open age having been reduced either with or without aggregation.
+#' @export 
+#' 
+reduceOpen <- function(X, maxA = 75, group = TRUE){
+	ages   <- X$age
+	topper <- min(maxA,95)
+	if (max(ages) > min(maxA,95)){
+		if (group){
+			X[X$age == topper, c("pop1","pop2","deaths")] <- 
+					colSums(X[X$age >= topper, c("pop1","pop2","deaths")])
+		}
+		X <- X[X$age <= topper, ]
+	}
+	X
+}
 
-
-
+#'
+#' @title group down standard abridged data in child mort group
+#' @description We want 5-year age groups starting from 0. Standard abridged data has 0i,1,5. So we need to group together 0 and 1. Just for the sake of getting comparable results.
+#' 
+#' @param X standard input as required by \code{ddm()}, \code{ggb()}, \code{bh1()}, or \code{bh2()}
+#' @return X, with child ages grouped as necessary (or not)
+#' 
+#' @export
+group01 <- function(X){
+	ages  <- X$age
+	if (1 %in% ages){
+		ind0 <- ages == 0
+		ind1 <- ages == 1
+		X[ind0,c("pop1","pop2","deaths")] <- colSums(X[ ind0 | ind1, c("pop1","pop2","deaths")])
+		X <- X[!ind1, ]
+	}
+    X
+}

@@ -106,7 +106,11 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL){
 	# ages better be unique! I expect this will work unless $cod is mis-specified. 
 	# This is a good catch for that
     stopifnot(length(ages) == length(unique(ages)))
-	
+
+	# reduce open age to desired range
+	codi                   <- reduceOpen(codi, maxA = maxA, group = FALSE)
+	# group inf if necessary
+	codi                   <- group01(codi)
 	# codi can use date columns, or year, month, day columns...
 	dif                    <- yint2(X = codi)
 	N                      <- nrow(codi)
@@ -131,8 +135,8 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL){
 	eON   <- eOpen * codi$growth[N]
 
 	codi <- within(codi, {
-				pop_a <- 0
-				pop_a[N] <- deaths[N] * exp(eON) - (eON ^ (2/6))
+				pop_a <- 0                         # TR: test this to see if more robust
+				pop_a[N] <- deaths[N] * exp(eON) - Re((eON+0i ^ 2) ^ (1/6))
 				for(j in N:2){
 					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
 							deaths[j - 1] * exp(AgeInt / 2 * growth[j - 1])
@@ -283,6 +287,15 @@ bh2MakeColumns <- function(
 							MaxAge = maxA, 
 							ageColumn = "age")
 	ages         <- codi$age
+	# ages better be unique! I expect this will work unless $cod is mis-specified. 
+	# This is a good catch for that
+	stopifnot(length(ages) == length(unique(ages)))
+	
+	# reduce open age to desired range
+	codi         <- reduceOpen(codi, maxA = maxA, group = FALSE)
+	# group inf if necessary
+	codi                   <- group01(codi)
+	
 	dif          <- yint2(X = codi)
 	
 	# just get left term / right term
@@ -315,7 +328,7 @@ bh2MakeColumns <- function(
 	
 	codi <- within(codi, {
 				pop_a    <- 0
-				pop_a[N] <- deaths[N] * exp(eON) - (eON ^ (2/6))
+				pop_a[N] <- deaths[N] * exp(eON) - ((eON ^ 2)^(1/6))
 				for(j in N:2){
 					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
 							deaths[j - 1] * exp(AgeInt / 2 * growth[j - 1])
