@@ -26,7 +26,7 @@ library(devtools)
 install_github("timriffe/AdultCoverage/AdultCoverage/R/DDM")
 ```
 
-Then youy can load the package using:
+Then you can load the package using:
 
 ```r
 library(DDM)
@@ -57,7 +57,7 @@ cod    pop1    pop2 death Age Sex      date1      date2
   1  654465  841416  7212  25   f 1997-08-01 2007-08-01
 ```
 
-Results are contingent on evaluating results for paritcular age ranges. In spreadsheets this was typically done visually, which a plot referenced to some cell range that the user could manipulate. Here, we have a function that works similarly, but you need to use it just for one data grouping at a time (`cod`):
+Results are contingent on evaluating results for particular age ranges. In spreadsheets this was typically done visually, which a plot referenced to some cell range that the user could manipulate. Here, we have a function that works similarly, but you need to use it just for one data grouping at a time (`cod`):
 
 ```r
 my_ages <- ggbChooseAges(x[x$cod==1,])
@@ -91,4 +91,4 @@ This overview plot also gives the harmonic mean of the coverage estimate given f
 What's missing?
 ==============
 
-Testing. More documentation. A dataset to provide with the package. A proper vignette. References to the papers where these methods come from (Brass, Bennet-Horiuchi, Hill, etc). We aim to provide a manuscript as an overview of the methods provided here, and once-tested, we'll upload the `DDM` package to CRAN. 
+Testing. More documentation. A dataset to provide with the package. A proper vignette. References to the papers where these methods come from (Brass, Bennett-Horiuchi, Hill, etc). We aim to provide a manuscript as an overview of the methods provided here, and once-tested, we'll upload the `DDM` package to CRAN. 
