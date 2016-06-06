@@ -1,11 +1,17 @@
 setwd("/home/tim/git/AdultCoverage/AdultCoverage")
 
-library(devtools)
-load_all("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
-# library(DDM)
-x <- read.csv("Data/Mozambique.csv", stringsAsFactors = FALSE)
-X<-x
 
+library(DDM)
+x <- read.csv("Data/Mozambique.csv", stringsAsFactors = FALSE)
+x <- addcod(x)
+x <- x[,c("cod", "pop1", "pop2", "death", "Age", "Sex", "year1", "year2")]
+head(x)
+x$year1 <- NULL
+x$year2 <- NULL
+x$date1 <- as.Date("1997-08-01")
+x$date2 <- as.Date("2007-08-01")
+x <- x[,c("cod", "pop1", "pop2", "death", "Age", "Sex", "date1", "date2")]
+head(x)
 
 ggb(x, exact.ages = seq(15,50,by=5))
 ggb(x, exact.ages = seq(30,75,by=5))
