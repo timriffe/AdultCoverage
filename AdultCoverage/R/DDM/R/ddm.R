@@ -63,7 +63,6 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @return called for its graphical device side-effects.
-#' @method plot ddm
 #' @export
 ddmplot <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
 	if (class(X) == "data.frame"){
