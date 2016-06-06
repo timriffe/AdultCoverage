@@ -32,6 +32,8 @@ Then you can load the package using:
 library(DDM)
 ```
 
+Be aware that if you report a bug and we fix it, then you'll need to reinstall to get the changes. 
+
 Your data need to be in this kind of shape:
 
 ```r
@@ -92,3 +94,5 @@ What's missing?
 ==============
 
 Testing. More documentation. A dataset to provide with the package. A proper vignette. References to the papers where these methods come from (Brass, Bennett-Horiuchi, Hill, etc). We aim to provide a manuscript as an overview of the methods provided here, and once-tested, we'll upload the `DDM` package to CRAN. 
+
+
