@@ -20,6 +20,10 @@ bh2(x,exact.ages=seq(15,55,by=5), eOpen = 5)
 #
 library(devtools)
 load_all("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
+
+install_github("timriffe/AdultCoverage/AdultCoverage/R/DDM")
+library(DDM)
+
 x <- read.table("/home/tim/Dropbox/paper Lima Riffe and Queiroz/results/UF_estimates/UFdata_females_period1.txt",
 		header=TRUE,sep="\t")
 
