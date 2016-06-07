@@ -149,10 +149,10 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75){
 				pop1 <- as.double(pop1)
 				pop2 <- as.double(pop2)
 			})
-	N                      <- nrow(codi)
+	
 	# group inf if necessary
 	codi                   <- group01(codi)
-	
+	N                      <- nrow(codi)
 	# now actual column creation
 	codi      <- within(codi, {
 			pop1cum        <- rev(cumsum(rev(pop1)))
