@@ -420,11 +420,11 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 			sub = "(optimized age range)")
 	# automatically fit line (RMS of ggb)
 	abline(a = si$a, b = si$b, col = "blue")
-	abline(lm(rightt[age %in% agesfit]~ 
-			leftt[age %in% agesfit]),col="red")
+	abline(lm(leftt[age %in% agesfit]~ 
+			rightt[age %in% agesfit]),col="red")
 	# shows points used to fit line
-	points(leftt[age %in% agesfit], 
-			rightt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
+	points(rightt[age %in% agesfit], 
+			leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
 	text(rightt, leftt, age, cex = .6)
 	legend("bottomright",lty=1,col="blue",legend="fitted line",bty="n")
 	# message to user
