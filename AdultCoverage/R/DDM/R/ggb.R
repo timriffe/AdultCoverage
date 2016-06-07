@@ -123,7 +123,8 @@ ggbcoverageFromAges <- function(codi, agesfit){
 		codi <- ggbMakeColumns(codi = codi, minA = min(agesfit), maxA = max(agesfit))
 	}
 	# this is the coverage estimate
-	with(codi, sd(rightterm[age %in% agesfit])/ sd(leftterm[age %in% agesfit]))
+	#with(codi, sd(rightterm[age %in% agesfit])/ sd(leftterm[age %in% agesfit]))
+	1 / slopeint(codi = codi, agesfit = agesfit)$b
 }
 
 
@@ -405,8 +406,8 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 	si       <- slopeint(codi, agesfit)
 	
 	# this is the basic formula
-	coverage <- ggbcoverageFromAges(codi, agesfit)
-	
+	#coverage <- ggbcoverageFromAges(codi, agesfit)
+	coverage <- 1/si$b
 	# some objects used throughout
 	age     <- codi$age
 	leftt   <- codi$leftterm
@@ -450,7 +451,7 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 			amax     <- max(agesfit)
 			
 			# an estimate of the resulting coverage
-			coverage <- ggbcoverageFromAges(codi, agesfit)
+			coverage <- 1/si$b
 			# get params for abline..
 			si       <- slopeint(codi, agesfit)
 			
@@ -464,11 +465,10 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 					xlab = "right term",
 					ylab = "left term",
 					main = paste0("Age range [", amin,
-							",", amax, "], est. coverage = ",round(coverage * 100, 1)),
+							",", amax, "], est. coverage = %",round(coverage * 100, 1)),
 					sub = "(optimized age range)")
 			# new fitted slope, intercept
 			abline(a = si$a, b = si$b, col = "blue")
-			abline(lm(rightt[age %in% agesfit]~leftt[age %in% agesfit]),col="red")
 			# indicate which points used with color
 			points(rightt[age %in% agesfit], 
 					leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
