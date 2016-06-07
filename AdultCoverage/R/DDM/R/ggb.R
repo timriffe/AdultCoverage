@@ -351,7 +351,7 @@ slopeint <- function(codi, agesfit){
 	intercept   <- mean(codi$leftterm[age %in% agesfit]) * (1/slope) - 
 			            mean(codi$rightterm[age %in% agesfit])
 	
-	list(a = intercept, b = (1/slope))
+	list(a = intercept, b = slope)
 }
 
 
@@ -466,6 +466,7 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 					sub = "(optimized age range)")
 			# new fitted slope, intercept
 			abline(a = si$a, b = si$b, col = "blue")
+			abline(lm(rightt[age %in% agesfit]~leftt[age %in% agesfit]),col="red")
 			# indicate which points used with color
 			points(rightt[age %in% agesfit], 
 					leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
