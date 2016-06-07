@@ -348,10 +348,10 @@ slopeint <- function(codi, agesfit){
 	slope       <- 	sd(codi$leftterm[age %in% agesfit]) /  
 						sd(codi$rightterm[age %in% agesfit])
 	
-	intercept   <- mean(codi$leftterm[age %in% agesfit]) * slope - 
+	intercept   <- mean(codi$leftterm[age %in% agesfit]) * (1/slope) - 
 			            mean(codi$rightterm[age %in% agesfit])
 	
-	list(a = intercept, b = slope)
+	list(a = intercept, b = (1/slope))
 }
 
 
