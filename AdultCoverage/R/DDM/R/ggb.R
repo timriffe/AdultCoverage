@@ -348,7 +348,7 @@ slopeint <- function(codi, agesfit){
 	slope       <- 	sd(codi$leftterm[age %in% agesfit]) /  
 						sd(codi$rightterm[age %in% agesfit])
 	
-	intercept   <- mean(codi$leftterm[age %in% agesfit]) * (1/slope) - 
+	intercept   <- mean(codi$leftterm[age %in% agesfit]) * slope - 
 			            mean(codi$rightterm[age %in% agesfit])
 	
 	list(a = intercept, b = slope)
@@ -409,7 +409,7 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 	age     <- codi$age
 	leftt   <- codi$leftterm
 	rightt  <- codi$rightterm
-	fitd    <- codi$fitted
+	
 	# age ranges used for fitting
 	amin    <- min(agesfit); amax <- max(agesfit)
 	plot(rightt, leftt, asp = 1, pch = 19, col = "#00000050", cex = 1.6,
@@ -420,7 +420,6 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 			sub = "(optimized age range)")
 	# automatically fit line (RMS of ggb)
 	abline(a = si$a, b = si$b, col = "blue")
-    lines(rightt,fitd,col="blue")
 	# shows points used to fit line
 	points(rightt[age %in% agesfit], 
 			leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
