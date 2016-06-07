@@ -343,15 +343,17 @@ slopeint <- function(codi, agesfit){
 	if (! "leftterm" %in% colnames(codi)){
 		codi <- ggbMakeColumns(codi, minA = min(agesfit), maxA = max(agesfit))
 	}
-	age <- codi$age
+	#age <- codi$age
 	# TODO: find eq numbers to cite here
-	slope       <- 	sd(codi$leftterm[age %in% agesfit]) /  
-						sd(codi$rightterm[age %in% agesfit])
+#	slope       <- 	sd(codi$leftterm[age %in% agesfit]) /  
+#						sd(codi$rightterm[age %in% agesfit])
+#	
+#	intercept   <- mean(codi$leftterm[age %in% agesfit]) * (1/slope) - 
+#			            mean(codi$rightterm[age %in% agesfit])
+#	
+	coefs <- with(codi,lm(leftterm[age %in% agesfit]~rightterm[age %in% agesfit]))$coef
 	
-	intercept   <- mean(codi$leftterm[age %in% agesfit]) * (1/slope) - 
-			            mean(codi$rightterm[age %in% agesfit])
-	
-	list(a = intercept, b = slope)
+	list(a = coefs[1], b = coefs[2])
 }
 
 
@@ -420,8 +422,8 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 			sub = "(optimized age range)")
 	# automatically fit line (RMS of ggb)
 	abline(a = si$a, b = si$b, col = "blue")
-	abline(lm(leftt[age %in% agesfit]~ 
-			rightt[age %in% agesfit]),col="red")
+#	abline(lm(leftt[age %in% agesfit]~ 
+#			rightt[age %in% agesfit]),col="red")
 	# shows points used to fit line
 	points(rightt[age %in% agesfit], 
 			leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
