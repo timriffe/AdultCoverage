@@ -123,7 +123,7 @@ ggbcoverageFromAges <- function(codi, agesfit){
 		codi <- ggbMakeColumns(codi = codi, minA = min(agesfit), maxA = max(agesfit))
 	}
 	# this is the coverage estimate
-	1 / with(codi, sd(leftterm[age %in% agesfit]) / sd(rightterm[age %in% agesfit]))
+	with(codi, sd(rightterm[age %in% agesfit])/ sd(leftterm[age %in% agesfit]))
 }
 
 
@@ -343,13 +343,14 @@ slopeint <- function(codi, agesfit){
 	if (! "leftterm" %in% colnames(codi)){
 		codi <- ggbMakeColumns(codi, minA = min(agesfit), maxA = max(agesfit))
 	}
+	age <- codi$age
 	# TODO: find eq numbers to cite here
-	slope       <- with(codi, 
-			sd(leftterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
-	)
-	intercept   <-  with(codi, 
-			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
-	) 
+	slope       <- 	sd(codi$leftterm[age %in% agesfit]) /  
+						sd(codi$rightterm[age %in% agesfit])
+	
+	intercept   <- mean(codi$leftterm[age %in% agesfit]) * (1/slope) - 
+			            mean(codi$rightterm[age %in% agesfit])
+	
 	list(a = intercept, b = slope)
 }
 
@@ -397,9 +398,10 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 	} else {
 		agesfit <- ggbgetAgesFit(codi, minAges)
 	}
-	
+	codi <- ggbFittedFromAges(codi=codi, agesfit=agesfit)
 	# starting values for abline
 	si       <- slopeint(codi, agesfit)
+	
 	# this is the basic formula
 	coverage <- ggbcoverageFromAges(codi, agesfit)
 	
@@ -407,7 +409,7 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 	age     <- codi$age
 	leftt   <- codi$leftterm
 	rightt  <- codi$rightterm
-	
+	fitd    <- codi$fitted
 	# age ranges used for fitting
 	amin    <- min(agesfit); amax <- max(agesfit)
 	plot(rightt, leftt, asp = 1, pch = 19, col = "#00000050", cex = 1.6,
@@ -418,6 +420,7 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 			sub = "(optimized age range)")
 	# automatically fit line (RMS of ggb)
 	abline(a = si$a, b = si$b, col = "blue")
+    lines(rightt,fitd,col="blue")
 	# shows points used to fit line
 	points(rightt[age %in% agesfit], 
 			leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
