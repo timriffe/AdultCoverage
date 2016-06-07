@@ -1,12 +1,15 @@
 setwd("/home/tim/git/AdultCoverage/AdultCoverage")
 
+devtools::load_all("R/DDM")
 
-library(DDM)
 x <- read.csv("Data/Mozambique.csv", stringsAsFactors = FALSE)
-x <- addcod(x)
-X <- x
-ggb(x)
+colnames(x) <- tolower(colnames(x))
+colnames(x)[grepl("death",colnames(x))] <- "deaths"
 
+ggbMakeColumns(x[x$sex == "f",])
+ggb(x)
+ggb(x,exact.ages = seq(25,55,by=5)) # reproduced!
+ggbChooseAges(x[x$cod==1,])
 x <- x[,c("cod", "pop1", "pop2", "death", "Age", "Sex", "year1", "year2")]
 head(x)
 x$year1 <- NULL
@@ -53,7 +56,7 @@ x$sex <- "f"
 # age-determination
 ggbChooseAges(x[x$cod==53,])
 allddm <- ddm(x)
-ddmplot(allddm)
+ddmplot(allddm, ylim =)
 #or
 ddm(x)
 

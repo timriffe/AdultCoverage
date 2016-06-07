@@ -204,6 +204,7 @@ plot.ggb <- function(codi, minA. = 10, AgeInt. = 5, minAges. = 8,maxit=15){
 	agesfit  <- ggbgetAgesFit(codi, ages., minAges.)
 	si       <- slopeint(codi, agesfit)
 	codi     <- ggbColumnsFromAges(codi, agesfit)
+	
 	# this is the basic formula
 	coverage <- ggbcoverageFromAges(codi, agesfit)
 	
@@ -211,7 +212,7 @@ plot.ggb <- function(codi, minA. = 10, AgeInt. = 5, minAges. = 8,maxit=15){
 	age     <- codi$age
 	leftt   <- codi$lefterm
 	rightt  <- codi$rightterm
-	
+	fitd    <- codi$fitted
 	# age ranges used for fitting
 	amin    <- min(agesfit); amax <- max(agesfit)
 	plot(rightt, leftt, asp = 1, pch = 19, col = "#00000050", cex = 1.6,
