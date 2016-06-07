@@ -480,7 +480,9 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 	}
 	
 	# click outside the margin to return results
-    data.frame(coverage = coverage, lower = min(agesfit), upper = max(agesfit))
+    out <- data.frame(coverage = coverage, lower = min(agesfit), upper = max(agesfit))
+	rownames(out) <- NULL
+	out
 }
 
 # end

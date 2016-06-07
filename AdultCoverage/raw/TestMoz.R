@@ -5,8 +5,7 @@ devtools::load_all("R/DDM")
 x <- read.csv("Data/Mozambique.csv", stringsAsFactors = FALSE)
 colnames(x) <- tolower(colnames(x))
 colnames(x)[grepl("death",colnames(x))] <- "deaths"
-
-ggbMakeColumns(x[x$sex == "f",])
+x$cod <- ifelse(x$sex=="f",1,2)
 ggb(x)
 ggb(x,exact.ages = seq(25,55,by=5)) # reproduced!
 ggbChooseAges(x[x$cod==1,])

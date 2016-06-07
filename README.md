@@ -38,25 +38,25 @@ Your data need to be in this kind of shape:
 
 ```r
 head(Moz)
-cod    pop1    pop2 death Age Sex year1 year2
-  1 1388350 1963660 88248   0   f  1997  2007
-  1 1113675 1615244 11424   5   f  1997  2007
-  1  878429 1183939  5677  10   f  1997  2007
-  1  854078  991323  6123  15   f  1997  2007
-  1  827614  986526  7280  20   f  1997  2007
-  1  654465  841416  7212  25   f  1997  2007
+cod    pop1   pop2  deaths age sex year1 year2
+  1 1388350  1963660 88248   0   f  1997  2007
+  1 1113675  1615244 11424   5   f  1997  2007
+  1  878429  1183939  5677  10   f  1997  2007
+  1  854078   991323  6123  15   f  1997  2007
+  1  827614   986526  7280  20   f  1997  2007
+  1  654465   841416  7212  25   f  1997  2007
 ```
 
 Here `cod` indicates the group, a single year, sex, region of data that is to be tested. `pop1` and `pop2` are the first and second census, respectively. `deaths` should contain the average number of deaths in each age group in the intercensal period. This could be a straight arithmetic average, or simply the average of the deaths observed around census 1 or census 2. `Age` should be the lower bound of five-year age groups (incl. age 0-4!). `Sex` is character, either `"f"` or `"m"`. Census dates can be conveyed in a variety of ways. If only `year1` and  `year2` are given, we assume Jan 1. It is best to specify proper date classes and use `date1`, `date2` as column names instead:
 
 ```r
-cod    pop1    pop2 death Age Sex      date1      date2
-  1 1388350 1963660 88248   0   f 1997-08-01 2007-08-01
-  1 1113675 1615244 11424   5   f 1997-08-01 2007-08-01
-  1  878429 1183939  5677  10   f 1997-08-01 2007-08-01
-  1  854078  991323  6123  15   f 1997-08-01 2007-08-01
-  1  827614  986526  7280  20   f 1997-08-01 2007-08-01
-  1  654465  841416  7212  25   f 1997-08-01 2007-08-01
+cod    pop1    pop2 deaths age sex      date1      date2
+  1 1388350 1963660  88248   0   f 1997-08-01 2007-08-01
+  1 1113675 1615244  11424   5   f 1997-08-01 2007-08-01
+  1  878429 1183939   5677  10   f 1997-08-01 2007-08-01
+  1  854078  991323   6123  15   f 1997-08-01 2007-08-01
+  1  827614  986526   7280  20   f 1997-08-01 2007-08-01
+  1  654465  841416   7212  25   f 1997-08-01 2007-08-01
 ```
 
 Results are contingent on evaluating results for particular age ranges. In spreadsheets this was typically done visually, which a plot referenced to some cell range that the user could manipulate. Here, we have a function that works similarly, but you need to use it just for one data grouping at a time (`cod`):
