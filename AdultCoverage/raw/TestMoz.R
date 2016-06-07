@@ -4,6 +4,9 @@ setwd("/home/tim/git/AdultCoverage/AdultCoverage")
 library(DDM)
 x <- read.csv("Data/Mozambique.csv", stringsAsFactors = FALSE)
 x <- addcod(x)
+X <- x
+ggb(x)
+
 x <- x[,c("cod", "pop1", "pop2", "death", "Age", "Sex", "year1", "year2")]
 head(x)
 x$year1 <- NULL
@@ -24,11 +27,16 @@ bh2(x,exact.ages=seq(15,55,by=5), eOpen = 5)
 #library(devtools)
 #install_github("timriffe/AdultCoverage/AdultCoverage/R/DDM")
 #
+sort(rownames(installed.packages()))
+install.packages("devtools")
 library(devtools)
 load_all("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
-
-install_github("timriffe/AdultCoverage/AdultCoverage/R/DDM")
-library(DDM)
+#options("download.file.method")
+#library(httr)
+#with_config(use_proxy(...), install_github(...))
+#install_github("timriffe/AdultCoverage/AdultCoverage/R/DDM")
+#devtools::install_github("hadley/devtools")
+#library(DDM)
 
 x <- read.table("/home/tim/Dropbox/paper Lima Riffe and Queiroz/results/UF_estimates/UFdata_females_period1.txt",
 		header=TRUE,sep="\t")
@@ -108,3 +116,13 @@ library(devtools)
 install_github("timriffe/AdultCoverage/AdultCoverage/R/DDM")
 document()
 library(DDM)
+
+
+x <- read.table("/home/tim/Dropbox/paper Lima Riffe and Queiroz/results/Data Sweden/Sweden_HMD_females.txt",
+		header=TRUE,sep="\t")
+x$sex <- "f"
+load_all("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
+group01(x[x$cod == 2000,])
+reduceOpen(x[x$cod==2000,])
+bh1(x)
+
