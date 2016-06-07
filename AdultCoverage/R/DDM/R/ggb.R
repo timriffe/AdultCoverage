@@ -466,8 +466,11 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 					ylab = "left term",
 					main = paste0("Age range [", amin,
 							",", amax, "], est. coverage = %",round(coverage * 100, 1)),
-					sub = "(optimized age range)")
+					sub = "(optimized age range)",
+					asp = 1)
 			# new fitted slope, intercept
+		    abine(a=0,b=1,col=gray(.8)) # line of perfection
+			#
 			abline(a = si$a, b = si$b, col = "blue")
 			# indicate which points used with color
 			points(rightt[age %in% agesfit], 
