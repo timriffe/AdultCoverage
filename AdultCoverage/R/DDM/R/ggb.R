@@ -348,8 +348,8 @@ slopeint <- function(codi, agesfit){
 	slope       <- 	sd(codi$leftterm[age %in% agesfit]) /  
 						sd(codi$rightterm[age %in% agesfit])
 	
-	intercept   <- mean(codi$rightterm[age %in% agesfit]) * slope - 
-			            mean(codi$leftterm[age %in% agesfit])
+	intercept   <- mean(codi$leftterm[age %in% agesfit]) * (1/slope) - 
+			            mean(codi$rightterm[age %in% agesfit])
 	
 	list(a = intercept, b = slope)
 }
@@ -423,8 +423,8 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 	abline(lm(rightt[age %in% agesfit]~ 
 			leftt[age %in% agesfit]),col="red")
 	# shows points used to fit line
-	points(rightt[age %in% agesfit], 
-			leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
+	points(leftt[age %in% agesfit], 
+			rightt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
 	text(rightt, leftt, age, cex = .6)
 	legend("bottomright",lty=1,col="blue",legend="fitted line",bty="n")
 	# message to user
