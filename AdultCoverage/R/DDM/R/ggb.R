@@ -466,8 +466,7 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 					ylab = "left term",
 					main = paste0("Age range [", amin,
 							",", amax, "], est. coverage = %",round(coverage * 100, 1)),
-					sub = "(optimized age range)",
-					asp = 1)
+					sub = "(optimized age range)")
 			# new fitted slope, intercept
 		    abine(a=0,b=1,col=gray(.8)) # line of perfection
 			#
