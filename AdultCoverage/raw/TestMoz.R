@@ -121,8 +121,10 @@ library(DDM)
 x <- read.table("/home/tim/Dropbox/paper Lima Riffe and Queiroz/results/Data Sweden/Sweden_HMD_females.txt",
 		header=TRUE,sep="\t")
 x$sex <- "f"
-load_all("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
-group01(x[x$cod == 2000,])
-reduceOpen(x[x$cod==2000,])
-bh1(x)
 
+
+X2 <- x[x$cod == 2000, ]
+X2$pop2 <- x$pop2[x$cod == 2009]
+X2$deaths <- tapply(x$deaths,x$age,mean)
+X2$year2 <- 2010
+ddm(X2)
