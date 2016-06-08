@@ -18,28 +18,32 @@
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' @return data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}. 
 #' @references Need to cite stuff here.
 #' @export
-ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
+ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL, deaths.summed = FALSE){
 	ggbres <- ggb(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
-					exact.ages = exact.ages)
+					exact.ages = exact.ages,
+					deaths.summed = deaths.summed)
 	bh1res <- bh1(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
 					exact.ages = exact.ages, 
-					eOpen = eOpen)
+					eOpen = eOpen,
+					deaths.summed = deaths.summed)
 	bh2res <- bh2(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
 					exact.ages = exact.ages, 
-					eOpen = eOpen)
+					eOpen = eOpen,
+					deaths.summed = deaths.summed)
 	# return all results
 	results <- data.frame(	cod = ggbres$cod,
 				ggb = ggbres$coverage,
@@ -54,17 +58,13 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 
 #'
 #' @title get a quick overview of the different estimates produced
-#' @description produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. You can either feed this function the output of \code{ddm()} or feed it the data that you would otherwise give to \code{ddm()}. In the second case, you need to spell out \code{plot.ddm()}, and in the first case it will recognize that the data is of class \code{ddm}, so \code{plot()} is enough.
+#' @description produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. Feed this function the output of \code{ddm()}.
 #' 
-#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
-#' @param minA the lowest age to be included in search
-#' @param maxA the highest age to be included in search (the lower bound thereof)
-#' @param minAges the minimum number of adjacent ages to be used in estimating
-#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
-#' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param X output of \code{ddm()}.
+#' 
 #' @return called for its graphical device side-effects.
 #' @export
-ddmplot <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
+ddmplot <- function(X){
 #	if (class(X) == "data.frame"){
 #		X <- ddm(X, minA = minA, 
 #				maxA = maxA, 

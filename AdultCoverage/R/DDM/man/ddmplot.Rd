@@ -4,26 +4,15 @@
 \alias{ddmplot}
 \title{get a quick overview of the different estimates produced}
 \usage{
-ddmplot(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
-  eOpen = NULL)
+ddmplot(X)
 }
 \arguments{
-\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}
-
-\item{minA}{the lowest age to be included in search}
-
-\item{maxA}{the highest age to be included in search (the lower bound thereof)}
-
-\item{minAges}{the minimum number of adjacent ages to be used in estimating}
-
-\item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
-
-\item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
+\item{X}{output of \code{ddm()}.}
 }
 \value{
 called for its graphical device side-effects.
 }
 \description{
-produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. You can either feed this function the output of \code{ddm()} or feed it the data that you would otherwise give to \code{ddm()}. In the second case, you need to spell out \code{plot.ddm()}, and in the first case it will recognize that the data is of class \code{ddm}, so \code{plot()} is enough.
+produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. Feed this function the output of \code{ddm()}.
 }
 

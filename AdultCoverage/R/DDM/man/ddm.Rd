@@ -5,7 +5,7 @@
 \title{run all three deaths registration coverage estimation methods}
 \usage{
 ddm(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
-  eOpen = NULL)
+  eOpen = NULL, deaths.summed = FALSE)
 }
 \arguments{
 \item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}
@@ -19,6 +19,8 @@ ddm(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
 \item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
 
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
+
+\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
 data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}.
