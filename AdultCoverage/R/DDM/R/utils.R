@@ -451,7 +451,7 @@ avgDeaths <- function(codi, deaths.summed = FALSE){
 			dif                    <- yint2(codi)
 			codi$deathsAvg         <- codi$deaths / dif
 		} else {
-			codi$deathsAvg <- codi$deathsAvg
+			codi$deathsAvg <- codi$death
 		}
 	}
 	codi
