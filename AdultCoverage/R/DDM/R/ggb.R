@@ -43,13 +43,18 @@ ggbgetRMS <- function(agesi, codi){
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
-#' 
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
 #' @export
 
-ggbcoverageFromYear <- function(codi, exact.ages = NULL, minA = 15, maxA = 75, minAges = 8){
+ggbcoverageFromYear <- function(codi, 
+								exact.ages = NULL, 
+								minA = 15, 
+								maxA = 75, 
+								minAges = 8, 
+								deaths.summed = FALSE){
 	
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
@@ -67,12 +72,19 @@ ggbcoverageFromYear <- function(codi, exact.ages = NULL, minA = 15, maxA = 75, m
 	# TR: test add this step, just in case
 	codi    <- codi[with(codi, order(age)), ]
 	
-	codi    <- ggbMakeColumns(codi = codi, minA = minA, maxA = maxA)
+	codi    <- ggbMakeColumns(codi = codi, 
+							  minA = minA, 
+							  maxA = maxA, 
+							  deaths.summed = deaths.summed)
 	
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		agesfit <- exact.ages
 	} else {                          
-		agesfit <- ggbgetAgesFit(codi = codi, minA = minA, maxA = maxA, minAges = minAges)
+		agesfit <- ggbgetAgesFit(codi = codi, 
+								 minA = minA, 
+								 maxA = maxA, 
+								 minAges = minAges, 
+								 deaths.summed = deaths.summed)
 	}
 		
 	# this is the basic formula
@@ -89,15 +101,16 @@ ggbcoverageFromYear <- function(codi, exact.ages = NULL, minA = 15, maxA = 75, m
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
 #' 
 #' @export
 
-ggbFittedFromAges <- function(codi, agesfit){
+ggbFittedFromAges <- function(codi, agesfit, deaths.summed = FALSE){
 	
 	if (! "leftterm" %in% colnames(codi)){
-		codi <- ggbMakeColumns(codi=codi)
+		codi <- ggbMakeColumns(codi=codi, deaths.summed = deaths.summed)
 	}
 	# assumes ggbMakeColumns() has been run.
 #	slope       <- with(codi, 
@@ -117,10 +130,15 @@ ggbFittedFromAges <- function(codi, agesfit){
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param agesfit an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.
 #' @return numeric. the estimated level of coverage.
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+
 #' @export
-ggbcoverageFromAges <- function(codi, agesfit){
+ggbcoverageFromAges <- function(codi, agesfit, deaths.summed = FALSE){
 	if (! "leftterm" %in% colnames(codi)){
-		codi <- ggbMakeColumns(codi = codi, minA = min(agesfit), maxA = max(agesfit))
+		codi <- ggbMakeColumns(codi = codi, 
+				               minA = min(agesfit), 
+							   maxA = max(agesfit), 
+							   deaths.summed = deaths.summed)
 	}
 	# this is the coverage estimate
 	#with(codi, sd(rightterm[age %in% agesfit])/ sd(leftterm[age %in% agesfit]))
@@ -136,17 +154,19 @@ ggbcoverageFromAges <- function(codi, agesfit){
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
 #' 
 #' @export
-ggbMakeColumns <- function(codi, minA = 15, maxA = 75){
+ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
+	codi                   <- avgDeaths(codi = codi, deaths.summed = deaths.summed)
 	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
 	dif                    <- yint2(codi)
 		
 		# a quick recheck of classes:
 	codi <- within(codi, {
-				deaths <- as.double(deaths)
+				deathsAvg <- as.double(deathsAvg)
 				pop1 <- as.double(pop1)
 				pop2 <- as.double(pop2)
 			})
@@ -158,7 +178,7 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75){
 	codi      <- within(codi, {
 			pop1cum        <- rev(cumsum(rev(pop1)))
 			pop2cum        <- rev(cumsum(rev(pop2))) 
-			deathcum       <- rev(cumsum(rev(deaths)))
+			deathcum       <- rev(cumsum(rev(deathsAvg)))
 			birthdays      <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
 			Tx             <- sqrt(pop1cum * pop2cum)
 			cumgrowth      <- log(pop2cum / pop1cum) / dif
@@ -178,15 +198,19 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75){
 #' 
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param minAges the minimum number of adjacent ages to be used in estimating
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' @return a vector of ages that minimizes the RMSE
 #' 
 #' @export
 
-ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8){
+ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed = FALSE){
 		
 	if (!"leftterm" %in% colnames(codi)){
-		codi <- ggbMakeColumns(codi=codi, minA = minA, maxA = maxA)
+		codi <- ggbMakeColumns(codi = codi, 
+				               minA = minA, 
+							   maxA = maxA, 
+							   deaths.summed = deaths.summed)
 	}
 	
 	maxAges   <- sum(codi$exclude)
@@ -224,13 +248,14 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8){
 #' @param maxA the highest age to be included in search (the lower bound thereof)
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
 #' @references Need to cite stuff here.
 
-ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){         ##  Data
+ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, deaths.summed = FALSE){         ##  Data
 	##  Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
@@ -258,7 +283,8 @@ ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL){       
 					    exact.ages = exact.ages,
 						minA = minA, 
 						maxA= maxA,
-						minAges = minAges
+						minAges = minAges,
+						deaths.summed = deaths.summed
 					)))
 	
 	# this has cod as a column, but no year, sex. 
@@ -337,12 +363,14 @@ adjustages <- function(a, age, agesfit){
 #' @description Called by \code{ggbFittedFromAges()} and \code{ggbChooseAges()}
 #' @param codi \code{data.frame} as produced by \code{ggbMakeColumns()}
 #' @param agesfit a set of ages to estimate coverage from 
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' 
 #' @return a pairlist with elements \code{$a} for the intercept and \code{$b} for the slope
 #' @export
-slopeint <- function(codi, agesfit){
+slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 	# a robustness measure
 	if (! "leftterm" %in% colnames(codi)){
-		codi <- ggbMakeColumns(codi, minA = min(agesfit), maxA = max(agesfit))
+		codi <- ggbMakeColumns(codi, minA = min(agesfit), maxA = max(agesfit), deaths.summed = deaths.summed)
 	}
 	#age <- codi$age
 	# TODO: find eq numbers to cite here
@@ -369,11 +397,19 @@ slopeint <- function(codi, agesfit){
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation. 
 #' @param maxit the maximum number of clicks you can take. Default 15.
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' 
 #' 
 #' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, and \code{$upper}.
 #' @export
 #' 
-ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, maxit = 15){
+ggbChooseAges <- function(codi, 
+		                  minA = 15, 
+						  maxA = 75, 
+						  minAges = 8, 
+						  exact.ages = NULL, 
+						  maxit = 15, 
+						  deaths.summed = FALSE){
 	# this is the automatic age selection.
 	
 	# only run if in anteractive r session...
@@ -393,15 +429,15 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 	}
 	
 	# start GGB stuff
-	codi    <- ggbMakeColumns(codi, minA, maxA)
+	codi    <- ggbMakeColumns(codi, minA, maxA, deaths.summed = deaths.summed)
 	
 	# some potential starting ages. either auto or self-supplied
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		agesfit <- exact.ages
 	} else {
-		agesfit <- ggbgetAgesFit(codi, minAges)
+		agesfit <- ggbgetAgesFit(codi, minAges, deaths.summed = deaths.summed)
 	}
-	codi <- ggbFittedFromAges(codi=codi, agesfit=agesfit)
+	codi     <- ggbFittedFromAges(codi=codi, agesfit=agesfit, deaths.summed = deaths.summed)
 	# starting values for abline
 	si       <- slopeint(codi, agesfit)
 	
@@ -409,9 +445,9 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 	#coverage <- ggbcoverageFromAges(codi, agesfit)
 	coverage <- 1/si$b
 	# some objects used throughout
-	age     <- codi$age
-	leftt   <- codi$leftterm
-	rightt  <- codi$rightterm
+	age      <- codi$age
+	leftt    <- codi$leftterm
+	rightt   <- codi$rightterm
 	
 	# age ranges used for fitting
 	amin    <- min(agesfit); amax <- max(agesfit)
@@ -445,7 +481,7 @@ ggbChooseAges <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = 
 			# if it's inside the plot, then which is the closest age?
 			a        <- guessage(rightt,leftt,clicki,age)
 			# guess how to adjust ages based on which age was clicked
-			agesfit <- adjustages(a, age, agesfit)
+			agesfit  <- adjustages(a, age, agesfit)
 			# new range of ages used for fitting
 			amin     <- min(agesfit)
 			amax     <- max(agesfit)

@@ -91,14 +91,15 @@ bhCoverageFromAges <- function(codi, agesFit){
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param eOpen optional. A value for remaining life expectancy in the open age group.
-#' 
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#'
 #' @return codi, with many columns added, most importantly \code{$Cx}.
 #' 
 #' @export
 
-bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL){
+bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE){
+	codi                   <- avgDeaths(codi = codi, deaths.summed = deaths.summed)
 	
-
 	# attempt to detect AgeInterval, should be obvious. And really, we only consider 5-yr intervals.
 	# if this were done w single ages minAges would need to increase to at least 35 I guess.
 	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
@@ -123,7 +124,7 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL){
 				growth[is.infinite(growth) | is.nan(growth)] <- 0
 				# cumulative growth
 				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
-				deathLT   <- deaths * exp(cumgrowth)
+				deathLT   <- deathsAvg * exp(cumgrowth)
 			})
 	
 	if (is.null(eOpen)){
@@ -136,10 +137,10 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL){
 
 	codi <- within(codi, {
 				pop_a <- 0                         # TR: test this to see if more robust
-				pop_a[N] <- deaths[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
+				pop_a[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
 				for(j in N:2){
 					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
-							deaths[j - 1] * exp(AgeInt / 2 * growth[j - 1])
+							deathsAvg[j - 1] * exp(AgeInt / 2 * growth[j - 1])
 				}
 				rm(j)
 				Cx <- pop_a / birthdays
@@ -162,13 +163,20 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL){
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
 #' @export
 
 
-bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){        ##  Data
+bh1CoverageFromYear <-  function(codi, 
+								 minA = 15, 
+								 maxA = 75, 
+								 minAges = 8, 
+								 exact.ages = NULL, 
+								 eOpen = NULL, 
+								 deaths.summed = FALSE){       
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		if (min(exact.ages) < minA){
@@ -184,7 +192,11 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 	
 	# outsource automatic age selection to GGB method.
 	if (is.null(exact.ages)){
-		agesFit <- ggbgetAgesFit(codi = codi, minA = minA, maxA = maxA, minAges = minAges)
+		agesFit <- ggbgetAgesFit(codi = codi, 
+								 minA = minA, 
+								 maxA = maxA, 
+								 minAges = minAges, 
+								 deaths.summed = deaths.summed)
 	} else {
 		agesFit <- exact.ages
 	}
@@ -192,7 +204,8 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 	codi     <- bh1MakeColumns(	codi = codi, 
 								minA = minA, 
 								maxA = maxA,
-								eOpen = eOpen )
+								eOpen = eOpen,
+								deaths.summed = deaths.summed)
 	
 	coverage <- bhCoverageFromAges(codi = codi, agesFit = agesFit)
 
@@ -212,13 +225,20 @@ bh1CoverageFromYear <-  function(codi, minA = 15, maxA = 75, minAges = 8, exact.
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
-#' 
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#'
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
 #' 
 #' @references Need to cite stuff here.
-bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
+bh1 <- function(X, 
+				minA = 15, 
+				maxA = 75, 
+				minAges = 8, 
+				exact.ages = NULL, 
+				eOpen = NULL, 
+				deaths.summed = FALSE){
 	
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
@@ -244,7 +264,8 @@ bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 							maxA = maxA,
 							minAges = minAges,  
 							exact.ages = exact.ages,
-							eOpen = eOpen
+							eOpen = eOpen,
+							deaths.summed = deaths.summed
             )))
 	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
 	
@@ -270,6 +291,8 @@ bh1 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param eOpen optional. A value for remaining life expectancy in the open age group.
 #' @param agesFit vector of ages as passed in by \code{bh2coverageFromYear)} 
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#'
 #' @return codi, with many columns added, most importantly \code{$Cx}.
 #' 
 #' @export
@@ -279,7 +302,9 @@ bh2MakeColumns <- function(
 		minA = 15, 
 		maxA = 75,  
 		agesFit, 
-		eOpen = NULL){
+		eOpen = NULL,
+		deaths.summed = FALSE){
+	codi         <- avgDeaths(codi = codi, deaths.summed = deaths.summed)
 	
 	AgeInt       <- detectAgeInterval(
 							Dat = codi, 
@@ -316,7 +341,7 @@ bh2MakeColumns <- function(
 				growth[is.infinite(growth) | is.nan(growth)] <- 0
 				# cumulative growth
 				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
-				deathLT   <- deaths * exp(cumgrowth)
+				deathLT   <- deathsAvg * exp(cumgrowth)
 			})
 	
 	if (is.null(eOpen)){
@@ -329,10 +354,10 @@ bh2MakeColumns <- function(
 	
 	codi <- within(codi, {
 				pop_a    <- 0
-				pop_a[N] <- deaths[N] * exp(eON) - ((eON ^ 2)^(1/6))
+				pop_a[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2)^(1/6))
 				for(j in N:2){
 					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
-							deaths[j - 1] * exp(AgeInt / 2 * growth[j - 1])
+							deathsAvg[j - 1] * exp(AgeInt / 2 * growth[j - 1])
 				}
 				rm(j)
 				Cx <- pop_a / birthdays
@@ -355,20 +380,32 @@ bh2MakeColumns <- function(
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#'
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
 #' @export
 
 
-bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
-	codiggb      <- ggbMakeColumns(codi = codi, minA = minA, maxA = maxA)
+bh2coverageFromYear <- function(codi, 
+								minA = 15, 
+								maxA = 75, 
+								minAges = 8, 
+								exact.ages = NULL, 
+								eOpen = NULL, 
+								deaths.summed = FALSE){
+	codiggb      <- ggbMakeColumns(codi = codi, 
+								   minA = minA, 
+								   maxA = maxA, 
+								   deaths.summed = deaths.summed)
 	# Get age range using the GGB auto fitting
 	if (is.null(exact.ages)){
 		agesFit <- ggbgetAgesFit(codi = codiggb, 
 								minA = minA, 
 								maxA = maxA, 
-								minAges = minAges)
+								minAges = minAges,
+								deaths.summed = deaths.summed)
 	} else {
 		agesFit <- exact.ages
 	}
@@ -378,8 +415,9 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.a
 								minA = minA, 
 								maxA = maxA, 	
 								agesFit = agesFit,
-								eOpen = eOpen)
-	coverage <- bhCoverageFromAges(codi = codi, agesFit = agesFit )
+								eOpen = eOpen,
+								deaths.summed = deaths.summed)
+	coverage     <- bhCoverageFromAges(codi = codi, agesFit = agesFit )
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
 
@@ -397,13 +435,21 @@ bh2coverageFromYear <- function(codi, minA = 15, maxA = 75, minAges = 8, exact.a
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#'
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
 #' @references Need to cite stuff here.
 
-bh2 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL){
+bh2 <- function(X, 
+				minA = 15, 
+				maxA = 75, 
+				minAges = 8, 
+				exact.ages = NULL, 
+				eOpen = NULL, 
+				deaths.summed = FALSE){
 
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
@@ -430,7 +476,8 @@ bh2 <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 						maxA = maxA,
 						minAges = minAges,  	
 						exact.ages = exact.ages,
-						eOpen = eOpen
+						eOpen = eOpen,
+						deaths.summed = deaths.summed
                   )))
 	coverages
 }

@@ -164,7 +164,7 @@ addcod <- function(X){
 }
 
 #'
-#' @title a function to determine whether a year is a leap year. 
+#' @title determine whether a year is a leap year. 
 #' 
 #' @description In order to remove lubridate dependency, we self-detect leap years and adjust February accordingly.
 #' 
@@ -182,7 +182,7 @@ isLeapYear <- function (Year){      # CB: mostly good algorithm from wikipedia
 }
 
 #'
-#' @title ypart function to determine the proportion of a year passed as of a particular date
+#' @title determine the proportion of a year passed as of a particular date
 #' 
 #' @description The fraction returned by this is used e.g. for intercensal estimates. Function uses 'lubridate' package to handle dates elegantly.
 #' 
@@ -250,7 +250,7 @@ ypart <- function(Year, Month, Day, reproduce.matlab = TRUE, detect.mid.year = F
 
 
 #'
-#' @title yint get interval as fraction of full years
+#' @title get interval as fraction of full years
 #' 
 #' @description Either assume 365 days in the year, or get the precise duration.
 #' 
@@ -433,4 +433,26 @@ group01 <- function(X){
 		X <- X[!ind1, ]
 	}
     X
+}
+
+
+#'
+#' @title if necessary divide deaths by intercensal interval
+#' @description ideally \code{deaths} is the averag annual deaths in the intercensal period, but it is also common to give it as the sum. If this was the case, set \code{deaths.summed} to \code{TRUE} and we take care of it.
+#' @param codi the standard object as described in e.g. \code{ggb()}.
+#' @param deaths.summed logical. If \code{TRUE} then \code{deaths} was specified as the sum over the intercensal period. Otherwise it was the mean.
+#' @return codi a new column, \code{deathsAvg} will be appended.
+#' 
+#' @export
+
+avgDeaths <- function(codi, deaths.summed = FALSE){
+	if (!"deathsAvg" %in% colnames(codi)){
+		if (deaths.summed){
+			dif                    <- yint2(codi)
+			codi$deathsAvg         <- codi$deaths / dif
+		} else {
+			codi$deathsAvg <- codi$deathsAvg
+		}
+	}
+	codi
 }
