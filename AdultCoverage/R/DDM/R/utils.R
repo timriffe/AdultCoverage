@@ -429,7 +429,13 @@ group01 <- function(X){
 	if (1 %in% ages){
 		ind0 <- ages == 0
 		ind1 <- ages == 1
-		X[ind0,c("pop1","pop2","deaths")] <- colSums(X[ ind0 | ind1, c("pop1","pop2","deaths")])
+		cnames <- c("pop1","pop2","deaths")
+		if ("deathsAvg" %in% colnames(X)){
+			cnames <- c(cnames,"deathsAvg")
+		}
+		# TR: look for age interval column and do that too?
+		X[ind0,cnames] <- colSums(X[ ind0 | ind1, cnames])
+		
 		X <- X[!ind1, ]
 	}
     X

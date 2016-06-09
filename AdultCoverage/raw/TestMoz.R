@@ -130,3 +130,14 @@ X2$pop2 <- x$pop2[x$cod == 2009]
 X2$deaths <- tapply(x$deaths,x$age,mean)
 X2$year2 <- 2010
 ddm(X2)
+
+dat=read.table('...Dropbox\\paper Lima Riffe and Queiroz\\results\\Data Sweden\\Sweden_HMD_females.txt', sep='\t',header=T)
+x <- read.table("/home/tim/Dropbox/paper Lima Riffe and Queiroz/results/Data Sweden/Sweden_HMD_females.txt",
+		header=TRUE,sep="\t")
+x$sex <- "f"
+try.this <- ggb(x)
+plot(NULL, xlim = range(try.this$cod)+c(0,1),ylim=c(0,90))
+rect(try.this$cod,try.this$lower,try.this$cod+1,try.this$upper)
+
+#install.packages("MethComp")
+library(MethComp)
