@@ -47,7 +47,9 @@ cod    pop1   pop2  deaths age sex year1 year2
   1  654465   841416  7212  25   f  1997  2007
 ```
 
-Here `cod` indicates the group, a single year, sex, region of data that is to be tested. `pop1` and `pop2` are the first and second census, respectively. `deaths` should contain the average number of deaths in each age group in the intercensal period. This could be a straight arithmetic average, or simply the average of the deaths observed around census 1 or census 2. `Age` should be the lower bound of five-year age groups (incl. age 0-4!). `Sex` is character, either `"f"` or `"m"`. Census dates can be conveyed in a variety of ways. If only `year1` and  `year2` are given, we assume Jan 1. It is best to specify proper date classes and use `date1`, `date2` as column names instead:
+Here `cod` indicates the group, a single year, sex, region of data that is to be tested. `pop1` and `pop2` are the first and second census, respectively. `deaths` can contain the average number of deaths in each age group in the intercensal period or it can contain the sum of the deaths in each age in the intercensal period. If you give the sum, then specify `deaths.summed = TRUE` in the arguments to any of the estimation functions. Otherwise the default is to treat deaths as the average. This could be a straight arithmetic average, or simply the average of the deaths observed around census 1 or census 2. For this later case, you'll need to average yourself beforehand, as `deaths.summed = TRUE` will only do the right thing if deaths over the whole intercensal period are given. 
+
+`Age` should be the lower bound of five-year age groups (incl. age 0-4!). If you give standard abridged data (0,1,5), then the `pop1`, `pop2`, and `deaths` from ages 0 and 1 are automatically summed together into the infant category. Don't give single-age data at this time. We hope to add an abridgement function soon, though, to handle such data automatically. `Sex` is character, either `"f"` or `"m"`. Census dates can be conveyed in a variety of ways. If only `year1` and  `year2` are given, we assume Jan 1. It is best to specify proper date classes and use `date1`, `date2` as column names instead:
 
 ```r
 cod    pop1    pop2 deaths age sex      date1      date2
@@ -59,7 +61,7 @@ cod    pop1    pop2 deaths age sex      date1      date2
   1  654465  841416   7212  25   f 1997-08-01 2007-08-01
 ```
 
-Results are contingent on evaluating results for particular age ranges. In spreadsheets this was typically done visually, which a plot referenced to some cell range that the user could manipulate. Here, we have a function that works similarly, but you need to use it just for one data grouping at a time (`cod`):
+Results are contingent on evaluating results for particular age ranges. In spreadsheets this is typically done visually, which a plot referenced to some cell range that the user could manipulate. Here, we have a function that works similarly, but you need to use it just for one data grouping at a time (`cod`):
 
 ```r
 my_ages <- ggbChooseAges(x[x$cod==1,])
