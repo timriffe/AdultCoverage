@@ -427,6 +427,11 @@ ggbChooseAges <- function(codi,
 			minAges <- length(exact.ages)
 		}
 	}
+	codi    <- data.frame(codi)           
+	colnames(codi) <- tolower(colnames(codi))
+
+	# guess which column is the deaths column, rename it deaths
+	codi    <- guessDeathsColumn(codi)
 	
 	# start GGB stuff
 	codi    <- ggbMakeColumns(codi, minA, maxA, deaths.summed = deaths.summed)
