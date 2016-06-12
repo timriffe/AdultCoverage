@@ -141,3 +141,17 @@ rect(try.this$cod,try.this$lower,try.this$cod+1,try.this$upper)
 
 #install.packages("MethComp")
 library(MethComp)
+
+
+
+## Meso regions Brazil ##
+dat=read.table('Dropbox/paper Lima Riffe and Queiroz/results/mesos_estimates/mesos_females.txt',
+		sep='\t',header=T)
+
+dat=dat[,c('Meso','POP_91','POP_00','MORT_91','MORT_00','Idade')]
+dat$deaths=(dat$MORT_91+dat$MORT_00)/2
+dat$year1=rep(1991,2466); dat$year2=rep(2000,2466)
+dat=dat[,c('Meso','POP_91','POP_00','deaths','year1','year2','Idade')]
+
+colnames(dat)=c('cod','pop1','pop2','deaths','year1','year2','age')
+dat$sex<-"F"
