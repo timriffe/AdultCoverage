@@ -11,7 +11,7 @@
 #' 
 #' All three methods require time points of the two censuses. Census dates can be given in a variety of ways: 1) (preferred) using \code{Date} classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing respective integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.  Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. 
 #' 
-#' The Bennett-Horiuchi methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. That is a place where things can be improved.
+#' Thesynthetic extinct generation methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. That is a place where things can be improved.
 #' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
@@ -30,14 +30,14 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 					minAges = minAges, 
 					exact.ages = exact.ages,
 					deaths.summed = deaths.summed)
-	bh1res <- bh1(X = X, 
+	segres <- seg(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
 					exact.ages = exact.ages, 
 					eOpen = eOpen,
 					deaths.summed = deaths.summed)
-	bh2res <- bh2(X = X, 
+	ggbsegres <- ggbseg(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
@@ -47,8 +47,8 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 	# return all results
 	results <- data.frame(	cod = ggbres$cod,
 				ggb = ggbres$coverage,
-				bh1 = bh1res$coverage,
-				bh2 = bh2res$coverage,
+				seg = segres$coverage,
+				ggbseg = ggbsegres$coverage,
 				lower = ggbres$lower,
 				upper = ggbres$upper
 			)
