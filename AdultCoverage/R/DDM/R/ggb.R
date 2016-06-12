@@ -374,15 +374,15 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 	}
 	#age <- codi$age
 	# TODO: find eq numbers to cite here
-#	slope       <- 	sd(codi$leftterm[age %in% agesfit]) /  
-#						sd(codi$rightterm[age %in% agesfit])
+	slope       <- 	with(codi,sd(leftterm[age %in% agesfit]) /  
+						sd(rightterm[age %in% agesfit]))
 #	
-#	intercept   <- mean(codi$leftterm[age %in% agesfit]) * (1/slope) - 
-#			            mean(codi$rightterm[age %in% agesfit])
+	intercept   <- 	with(codi,mean(leftterm[age %in% agesfit]) * (1/slope) - 
+			            mean(rightterm[age %in% agesfit]))
 #	
-	coefs <- with(codi,lm(leftterm[age %in% agesfit]~rightterm[age %in% agesfit]))$coef
+	#coefs <- with(codi,lm(leftterm[age %in% agesfit]~rightterm[age %in% agesfit]))$coef
 	
-	list(a = coefs[1], b = coefs[2])
+	list(a = intercept, b = slope)
 }
 
 
