@@ -5,9 +5,9 @@
 
 #'
 #' @title estimate remaining life expectancy in the open age group
-#' @description This calculation is based on an indirect method to reference the Coale-Demeny West model lifetable. First one makes a psuedo lifetable deaths column using some stable pop assumptions (different in BH1 vs BH2). Then take the ratio of the sum of ages 10-39 to 40-59. These ratios have been worked out for each model lifetable level, so we can pick the level based on the ratio we produce from the data. From there, we just pick out the remaining life expectancy that corresponds to the top age in our data, which for now hopefully isn't higher than 95. The model lifetables don't go higher than 95 for now, but that's well beyond the range for this method family. If your data go beyong 85 or so, then just group down to 85, say, and estimate using that instead of keeping a high open age. Called by \code{bh1MakeColumns()} and \code{bh2MakeColumns()}, and not intended for direct user interface, because you need to produce the \code{$deathsLT} column. You can skip calling this function by specifying \code{eOpen} in the top call to \code{bh1()} or \code{bh2()}.
+#' @description This calculation is based on an indirect method to reference the Coale-Demeny West model lifetable. First one makes a psuedo lifetable deaths column using some stable pop assumptions (different in seg vs ggbseg). Then take the ratio of the sum of ages 10-39 to 40-59. These ratios have been worked out for each model lifetable level, so we can pick the level based on the ratio we produce from the data. From there, we just pick out the remaining life expectancy that corresponds to the top age in our data, which for now hopefully isn't higher than 95. The model lifetables don't go higher than 95 for now, but that's well beyond the range for this method family. If your data go beyong 85 or so, then just group down to 85, say, and estimate using that instead of keeping a high open age. Called by \code{segMakeColumns()} and \code{ggbsegMakeColumns()}, and not intended for direct user interface, because you need to produce the \code{$deathsLT} column. You can skip calling this function by specifying \code{eOpen} in the top call to \code{seg()} or \code{ggbseg()}.
 #' 
-#' @param codiaugmented the standard codi object being passed through the chain, but having been pre-processed in the course of \code{bh1MakeColumns()} or \code{bh2MakeColumns()}
+#' @param codiaugmented the standard codi object being passed through the chain, but having been pre-processed in the course of \code{segMakeColumns()} or \code{ggbsegMakeColumns()}
 #' 
 #' @return numeric an estimate of remaining life expectancy in the open age group
 #' 
@@ -15,7 +15,7 @@
 
 eOpenCD <- function(codiaugmented){
 	# this needs to have the column deathsLT, as passed in 
-	# by either bh1MakeColumns() or bh2MakeColumns(). These
+	# by either segMakeColumns() or ggbsegMakeColumns(). These
 	# are slightly different, but this piece of code is identical and therefore 
 	# modularized.
 	# this throws an error if sex isn't coded as expected
@@ -65,7 +65,7 @@ eOpenCD <- function(codiaugmented){
 
 #' @title given a set of ages, what is the implied death registration coverage?
 #' 
-#' @description For a single year/sex/region of data (formatted as required by \code{bh1()}, \code{bh2()}), what is the registration coverage implied by a given age range? Called by \code{bh1CoverageFromYear()} and  \code{bh2CoverageFromYear()}. Here, the function simply takes the arithmetic mean of a given age range of \code{$Cx}, as returned by \code{bh1MakeColumns()} or \code{bh2MakeColumns()}. Not intended for top-level use.
+#' @description For a single year/sex/region of data (formatted as required by \code{seg()}, \code{ggbseg()}), what is the registration coverage implied by a given age range? Called by \code{segCoverageFromYear()} and  \code{ggbsegCoverageFromYear()}. Here, the function simply takes the arithmetic mean of a given age range of \code{$Cx}, as returned by \code{segMakeColumns()} or \code{ggbsegMakeColumns()}. Not intended for top-level use.
 #' 
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param agesFit an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.
@@ -76,7 +76,7 @@ eOpenCD <- function(codiaugmented){
 #' @return numeric. the estimated level of coverage.
 #' @export
 
-bhCoverageFromAges <- function(codi, agesFit){
+segCoverageFromAges <- function(codi, agesFit){
 	stopifnot("Cx" %in% colnames(codi))
 	inds    <- codi$age %in% agesFit
 	sum(codi$Cx[inds]) / length(agesFit)
@@ -85,9 +85,9 @@ bhCoverageFromAges <- function(codi, agesFit){
 #'
 #' @title make the Bennett-Horiuchi quasi lifetable columns required by the estimation method
 #' 
-#' @description Called by \code{bh1CoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
+#' @description Called by \code{segCoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
 #' 
-#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{bh1()}
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{seg()}
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param eOpen optional. A value for remaining life expectancy in the open age group.
@@ -97,7 +97,7 @@ bhCoverageFromAges <- function(codi, agesFit){
 #' 
 #' @export
 
-bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE){
+segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE){
 	codi                   <- avgDeaths(codi = codi, deaths.summed = deaths.summed)
 	
 	# attempt to detect AgeInterval, should be obvious. And really, we only consider 5-yr intervals.
@@ -153,7 +153,7 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 #'
 #' @title estimate death registration coverage for a single year/sex/region using the Bennet-Horiuchi method
 #' 
-#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. Called by \code{bh1()}. Users probably do not need to use this function directly.
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. Called by \code{seg()}. Users probably do not need to use this function directly.
 #' 
 #' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. 
 #' 
@@ -170,7 +170,7 @@ bh1MakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 #' @export
 
 
-bh1CoverageFromYear <-  function(codi, 
+segCoverageFromYear <-  function(codi, 
 								 minA = 15, 
 								 maxA = 75, 
 								 minAges = 8, 
@@ -201,19 +201,19 @@ bh1CoverageFromYear <-  function(codi,
 		agesFit <- exact.ages
 	}
 	
-	codi     <- bh1MakeColumns(	codi = codi, 
+	codi     <- segMakeColumns(	codi = codi, 
 								minA = minA, 
 								maxA = maxA,
 								eOpen = eOpen,
 								deaths.summed = deaths.summed)
 	
-	coverage <- bhCoverageFromAges(codi = codi, agesFit = agesFit)
+	coverage <- segCoverageFromAges(codi = codi, agesFit = agesFit)
 
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
 
 #'
-#' @title estimate death registration coverage using the Bennet-Horiuchi method 
+#' @title estimate death registration coverage using the synthetic extinct generation method 
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value.
 #' 
@@ -232,7 +232,7 @@ bh1CoverageFromYear <-  function(codi,
 #' @export
 #' 
 #' @references Need to cite stuff here.
-bh1 <- function(X, 
+seg <- function(X, 
 				minA = 15, 
 				maxA = 75, 
 				minAges = 8, 
@@ -259,7 +259,7 @@ bh1 <- function(X,
 						rbind,
 						lapply(
 							tab1, 
-							bh1CoverageFromYear, 
+							segCoverageFromYear, 
 							minA = minA, 
 							maxA = maxA,
 							minAges = minAges,  
@@ -273,9 +273,9 @@ bh1 <- function(X,
 }
 
 ###################################################################################
-# End BH1 functions
+# End seg functions
 ###################################################################################
-# Start BH2 functions
+# Start ggbseg functions
 ###################################################################################
 
 
@@ -283,21 +283,21 @@ bh1 <- function(X,
 #'
 #' @title make the Bennett-Horiuchi quasi lifetable columns required by the second estimation method
 #' 
-#' @description Called by \code{bh2CoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
-#' @details \code{agesFit} is a vector passed in from \code{bh2MakeColumns()}, and it was either estimated using the GGB automatic method there, or simply came from the argument \code{exact.ages} specified in \code{bh2()}. By default we just automatically estimate these. \code{eOpen} can be either user-specified, or it will be estimated automatically using \code{eOpenCD()}.
+#' @description Called by \code{ggbsegCoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
+#' @details \code{agesFit} is a vector passed in from \code{ggbsegMakeColumns()}, and it was either estimated using the GGB automatic method there, or simply came from the argument \code{exact.ages} specified in \code{ggbseg()}. By default we just automatically estimate these. \code{eOpen} can be either user-specified, or it will be estimated automatically using \code{eOpenCD()}.
 #' 
-#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{bh2()}
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggbseg()}
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param eOpen optional. A value for remaining life expectancy in the open age group.
-#' @param agesFit vector of ages as passed in by \code{bh2coverageFromYear)} 
+#' @param agesFit vector of ages as passed in by \code{ggbsegCoverageFromYear)} 
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'
 #' @return codi, with many columns added, most importantly \code{$Cx}.
 #' 
 #' @export
 
-bh2MakeColumns <- function(
+ggbsegMakeColumns <- function(
 		codi, 
 		minA = 15, 
 		maxA = 75,  
@@ -328,7 +328,7 @@ bh2MakeColumns <- function(
 	# slopeint() is in the ggb() family
 	ab           <- slopeint(codi = codi, agesfit = agesFit)
 	
-	# the only difference between this method and bh1 is that
+	# the only difference between this method and seg is that
 	# in the next couple lines we use pop1adj instead of pop1...
 	relcomp      <- exp(ab$a * dif)
    	
@@ -370,7 +370,7 @@ bh2MakeColumns <- function(
 #'
 #' @title estimate death registration coverage for a single year/sex/region using the modified Bennet-Horiuchi method
 #' 
-#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. The difference between this method and \code{bh1()} is that here we adjust census 1 part way through processing, based on some calcs similar to GGB. Called by \code{bh2()}. Users probably do not need to use this function directly.
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. The difference between this method and \code{seg()} is that here we adjust census 1 part way through processing, based on some calcs similar to GGB. Called by \code{ggbseg()}. Users probably do not need to use this function directly.
 #' 
 #' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. 
 #' 
@@ -388,7 +388,7 @@ bh2MakeColumns <- function(
 #' @export
 
 
-bh2coverageFromYear <- function(codi, 
+ggbsegCoverageFromYear <- function(codi, 
 								minA = 15, 
 								maxA = 75, 
 								minAges = 8, 
@@ -410,22 +410,22 @@ bh2coverageFromYear <- function(codi,
 		agesFit <- exact.ages
 	}
 	
-	codi         <- bh2MakeColumns(
+	codi         <- ggbsegMakeColumns(
 								codi = codiggb, 
 								minA = minA, 
 								maxA = maxA, 	
 								agesFit = agesFit,
 								eOpen = eOpen,
 								deaths.summed = deaths.summed)
-	coverage     <- bhCoverageFromAges(codi = codi, agesFit = agesFit )
+	coverage     <- segCoverageFromAges(codi = codi, agesFit = agesFit )
 	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
 }
 
 
 #'
-#' @title estimate death registration coverage using the adjusted Bennet-Horiuchi method 
+#' @title estimate death registration coverage using the hybrid ggb synthetic extinct generation
 #' 
-#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. The difference between this method and \code{bh1()} is that here we adjust census 1 part way through processing, based on some calcs similar to GGB.
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. The difference between this method and \code{seg()} is that here we adjust census 1 part way through processing, based on some calcs similar to GGB.
 #' 
 #' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOpen} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
 #' 
@@ -443,7 +443,7 @@ bh2coverageFromYear <- function(codi,
 #' @export
 #' @references Need to cite stuff here.
 
-bh2 <- function(X, 
+ggbseg <- function(X, 
 				minA = 15, 
 				maxA = 75, 
 				minAges = 8, 
@@ -471,7 +471,7 @@ bh2 <- function(X,
 					rbind,
 					lapply(
 						tab1, 
-						bh2coverageFromYear, 
+						ggbsegCoverageFromYear, 
 						minA = minA,  
 						maxA = maxA,
 						minAges = minAges,  	
