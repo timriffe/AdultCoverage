@@ -114,8 +114,8 @@ bh2MakeColumns(tab1[[2]],agesFit = ggbgetAgesFit(tab1[[2]]),eOpen = 2.3717366136
 x <- read.csv("Data/testData53.csv", stringsAsFactors = FALSE)
 
 library(devtools)
-install_github("timriffe/AdultCoverage/AdultCoverage/R/DDM")
-document()
+install_local("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
+
 library(DDM)
 
 
@@ -144,7 +144,7 @@ library(MethComp)
 
 
 ## Meso regions Brazil ##
-dat=read.table('Dropbox/paper Lima Riffe and Queiroz/results/mesos_estimates/mesos_females.txt',
+dat=read.table('/home/tim/Dropbox/paper Lima Riffe and Queiroz/results/mesos_estimates/mesos_females.txt',
 		sep='\t',header=T)
 
 dat=dat[,c('Meso','POP_91','POP_00','MORT_91','MORT_00','Idade')]
@@ -153,4 +153,11 @@ dat$year1=rep(1991,2466); dat$year2=rep(2000,2466)
 dat=dat[,c('Meso','POP_91','POP_00','deaths','year1','year2','Idade')]
 
 colnames(dat)=c('cod','pop1','pop2','deaths','year1','year2','age')
+head(dat)
 dat$sex<-"F"
+
+res <- ddm(dat)
+ddmplot(res)
+
+range(res[,"ggbseg"])
+head(res)
