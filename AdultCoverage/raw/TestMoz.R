@@ -43,20 +43,19 @@ load_all("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
 x <- read.table("/home/tim/Dropbox/paper Lima Riffe and Queiroz/results/UF_estimates/UFdata_females_period1.txt",
 		header=TRUE,sep="\t")
 
-group01 <- function(X){
-	X[1,c("pop1","pop2","deaths")] <- colSums(X[1:2, c("pop1","pop2","deaths")])
-	X <- X[-2, ]
-	X
-}
-
-x <- do.call(rbind,lapply(split(x,x$cod),group01))
+#group01 <- function(X){
+#	X[1,c("pop1","pop2","deaths")] <- colSums(X[1:2, c("pop1","pop2","deaths")])
+#	X <- X[-2, ]
+#	X
+#}
+#
+#x <- do.call(rbind,lapply(split(x,x$cod),group01))
 x$sex <- "f"
 
 # age-determination
 ggbChooseAges(x[x$cod==53,])
 allddm <- ddm(x)
-ddmplot(allddm, ylim =)
-#or
+ddmplot(allddm)
 ddm(x)
 
 #or

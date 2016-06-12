@@ -83,23 +83,23 @@ ddmplot <- function(X){
 		n <- length(x)
 		prod(x)^(1/n)
 	}
-	Range <- range(as.matrix(X[,c("ggb","bh1","bh2")]))
+	Range <- range(as.matrix(X[,c("ggb","seg","ggbseg")]))
 	plot(X$x,X$ggb, pch = 19,col="#FFA155", ylim=Range, cex=.6, 
 			xlab = "data row", ylab = "coverage estimate",
 			main = "UFdata females period 1",
 			panel.first = list(
 					segments(X$x,
-							apply(X[,c("ggb","bh1","bh2")],1,min),
+							apply(X[,c("ggb","seg","ggbseg")],1,min),
 							X$x,
-							apply(X[,c("ggb","bh1","bh2")],1,max), 
+							apply(X[,c("ggb","seg","ggbseg")],1,max), 
 							lwd=.5,
 							col=gray(.5))))
-	points(X$x,X$bh1,pch=19,col = "royalblue", cex=.6)
-	points(X$x,X$bh2,pch=19,col = "forestgreen", cex=.6)
+	points(X$x,X$seg,pch=19,col = "royalblue", cex=.6)
+	points(X$x,X$ggbseg,pch=19,col = "forestgreen", cex=.6)
 	#points(X$x, apply(X[,1:3],1,g.mean), col = "gray", cex = .6, pch = 19)
-	points(X$x, apply(X[,c("ggb","bh1","bh2")],1,h.mean), col = "magenta", cex = .6, pch = 19)
+	points(X$x, apply(X[,c("ggb","seg","ggbseg")],1,h.mean), col = "magenta", cex = .6, pch = 19)
 	legend("topright", col = c("#FFA155","royalblue","forestgreen","magenta"), 
-			pch = 19, cex=.6, legend = c("GGB","BH1","BH2","Hmean"),bty="n")
+			pch = 19, cex=.6, legend = c("GGB","SEG","GGBSEG","Hmean"),bty="n")
 	
 	
 }
