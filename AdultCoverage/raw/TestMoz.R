@@ -159,5 +159,5 @@ dat$sex<-"F"
 res <- ddm(dat)
 ddmplot(res)
 
-range(res[,"ggbseg"])
+range(res[,"seg"])
 head(res)
