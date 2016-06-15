@@ -408,8 +408,13 @@ reduceOpen <- function(X, maxA = 75, group = TRUE){
 	topper <- min(maxA,95)
 	if (max(ages) > min(maxA,95)){
 		if (group){
-			X[X$age == topper, c("pop1","pop2","deaths")] <- 
-					colSums(X[X$age >= topper, c("pop1","pop2","deaths")])
+			colsgroup <- c("pop1","pop2","deaths")
+			if ("deathsAvg" %in% colnames(codi)){
+				colsgroup <- c(colsgroup, "deathsAvg")
+			}
+			X[X$age == topper, colsgroup] <- 
+					colSums(X[X$age >= topper, colsgroup])
+			
 		}
 		X <- X[X$age <= topper, ]
 	}

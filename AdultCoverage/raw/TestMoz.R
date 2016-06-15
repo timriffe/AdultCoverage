@@ -155,9 +155,16 @@ dat=dat[,c('Meso','POP_91','POP_00','deaths','year1','year2','Idade')]
 colnames(dat)=c('cod','pop1','pop2','deaths','year1','year2','age')
 head(dat)
 dat$sex<-"F"
+library(devtools)
+load_all("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
+ggbChooseAges(dat[dat$cod == 1304, ])
+
 
 res <- ddm(dat)
 ddmplot(res)
 
+
+range(res[,"ggbseg"])
+range(res[,"ggb"])
 range(res[,"seg"])
 head(res)

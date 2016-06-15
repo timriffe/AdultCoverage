@@ -105,7 +105,7 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
 	
 	# reduce open age to desired range
-	codi                   <- reduceOpen(codi, maxA = 95, group = FALSE)
+	codi                   <- reduceOpen(codi, maxA = 95, group = TRUE)
 	# group inf if necessary
 	codi                   <- group01(codi)
 	# codi can use date columns, or year, month, day columns...
@@ -313,7 +313,7 @@ ggbsegMakeColumns <- function(
 							ageColumn = "age")
 	
 	# reduce open age to desired range
-	codi         <- reduceOpen(codi, maxA = 95, group = FALSE)
+	codi         <- reduceOpen(codi, maxA = 95, group = TRUE)
 	# group inf if necessary
 	codi         <- group01(codi)
 	ages         <- codi$age
