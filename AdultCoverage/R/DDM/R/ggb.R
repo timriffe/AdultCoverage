@@ -44,6 +44,7 @@ ggbgetRMS <- function(agesi, codi){
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param delta logical. Do you want to return a correction factor for the first census?
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
@@ -54,7 +55,8 @@ ggbcoverageFromYear <- function(codi,
 								minA = 15, 
 								maxA = 75, 
 								minAges = 8, 
-								deaths.summed = FALSE){
+								deaths.summed = FALSE,
+								delta = FALSE){
 	
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
@@ -86,10 +88,23 @@ ggbcoverageFromYear <- function(codi,
 								 minAges = minAges, 
 								 deaths.summed = deaths.summed)
 	}
-		
+	
+	# TR: added 17 June, 2016. Get Lambda to adjust first census:
+	if (lambda){
+		coefs       <- slopeint(codi, agesfit)
+		dif         <- yint2(codi)
+		.delta      <- exp(coefs$a * dif)
+	} else {
+		.delta <- NULL
+	}
+	
 	# this is the basic formula
 	coverage <- ggbcoverageFromAges(codi = codi, agesfit = agesfit)
-	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesfit), upper = max(agesfit))
+	data.frame(cod = unique(codi$cod), 
+			   coverage = coverage, 
+			   lower = min(agesfit), 
+			   upper = max(agesfit),
+			   delta = .delta)
 }
 
 
@@ -249,13 +264,22 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' 
+#' @param delta logical. Do you want to return a correction factor for the first census?
+#'
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
 #' @references Need to cite stuff here.
 
-ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, deaths.summed = FALSE){         ##  Data
+ggb <- function(
+		X, 
+		minA = 15, 
+		maxA = 75, 
+		minAges = 8, 
+		exact.ages = NULL, 
+		deaths.summed = FALSE,
+		delta = FALSE){         
+	
 	##  Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))
@@ -284,7 +308,8 @@ ggb <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, deaths.
 						minA = minA, 
 						maxA= maxA,
 						minAges = minAges,
-						deaths.summed = deaths.summed
+						deaths.summed = deaths.summed,
+						delta = delta
 					)))
 	
 	# this has cod as a column, but no year, sex. 
