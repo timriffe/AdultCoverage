@@ -6,8 +6,10 @@ x <- read.csv("Data/Mozambique.csv", stringsAsFactors = FALSE)
 colnames(x) <- tolower(colnames(x))
 colnames(x)[grepl("death",colnames(x))] <- "deaths"
 x$cod <- ifelse(x$sex=="f",1,2)
-ggb(x)
-ggb(x,exact.ages = seq(25,55,by=5)) # reproduced!
+X <- x[x$cod==1,]
+
+ggb(x, delta=TRUE)
+ggb(x,exact.ages = seq(25,55,by=5), delta=TRUE) # reproduced!
 ggbChooseAges(x[x$cod==1,])
 x <- x[,c("cod", "pop1", "pop2", "death", "Age", "Sex", "year1", "year2")]
 head(x)

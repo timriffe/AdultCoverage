@@ -10,7 +10,7 @@ More instructions, and possibly a website, will be made available after publicat
 
 DDM R package
 =============
-This project has produced a small R package that implements three methods for indirect estimation of death registration coverage. It is still not fully documented, and the methods are still not beta tested. So please use and test away. Package test data coming soon.
+This project has produced a small R package that implements three methods for indirect estimation of death registration coverage (Generalized Growth Balance, Synthetic Extinct Generations, and a hybrid of the two). It is still not fully documented, and the methods are currently in beta testing. So please use and test away. Package test data coming soon.
 
 A short tutorial 
 ------------------
