@@ -100,11 +100,15 @@ ggbcoverageFromYear <- function(codi,
 	
 	# this is the basic formula
 	coverage <- ggbcoverageFromAges(codi = codi, agesfit = agesfit)
-	data.frame(cod = unique(codi$cod), 
+	result   <- data.frame(cod = unique(codi$cod), 
 			   coverage = coverage, 
 			   lower = min(agesfit), 
-			   upper = max(agesfit),
-			   delta = .delta)
+			   upper = max(agesfit))
+	# can't have NULL column...
+	if (delta){
+		result <- cbind(result, delta = .delta)
+	}
+	result
 }
 
 
