@@ -90,7 +90,7 @@ ggbcoverageFromYear <- function(codi,
 	}
 	
 	# TR: added 17 June, 2016. Get Lambda to adjust first census:
-	if (lambda){
+	if (delta){
 		coefs       <- slopeint(codi, agesfit)
 		dif         <- yint2(codi)
 		.delta      <- exp(coefs$a * dif)
