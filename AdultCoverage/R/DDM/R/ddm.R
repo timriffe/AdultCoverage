@@ -19,17 +19,27 @@
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param delta logical. Do you want to return a correction factor for the first census?
 #' 
 #' @return data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}. 
 #' @references Need to cite stuff here.
 #' @export
-ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen = NULL, deaths.summed = FALSE){
+ddm <- function(
+		X, 
+		minA = 15, 
+		maxA = 75, 
+		minAges = 8, 
+		exact.ages = NULL, 
+		eOpen = NULL, 
+		deaths.summed = FALSE,
+		delta = FALSE){
 	ggbres <- ggb(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
 					exact.ages = exact.ages,
-					deaths.summed = deaths.summed)
+					deaths.summed = deaths.summed,
+					delta = delta)
 	segres <- seg(X = X, 
 					minA = minA, 
 					maxA = maxA, 
@@ -37,7 +47,8 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 					exact.ages = exact.ages, 
 					eOpen = eOpen,
 					deaths.summed = deaths.summed)
-	ggbsegres <- ggbseg(X = X, 
+	ggbsegres <- ggbseg(
+			        X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
@@ -45,13 +56,16 @@ ddm <- function(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL, eOpen =
 					eOpen = eOpen,
 					deaths.summed = deaths.summed)
 	# return all results
-	results <- data.frame(	cod = ggbres$cod,
-				ggb = ggbres$coverage,
-				seg = segres$coverage,
-				ggbseg = ggbsegres$coverage,
-				lower = ggbres$lower,
-				upper = ggbres$upper
-			)
+	results <- data.frame(	
+			        cod = ggbres$cod,
+					ggb = ggbres$coverage,
+					seg = segres$coverage,
+					ggbseg = ggbsegres$coverage,
+					lower = ggbres$lower,
+					upper = ggbres$upper)
+	if (delta){
+		results <- cbind(results, delta = ggbres$delta)
+	}
 
 	results
 }
