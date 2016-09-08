@@ -17,7 +17,7 @@ A short tutorial
 
 To download the most recent version of DDM:
 
-Download the [zip ball](https://github.com/timriffe/LifeTable/zipball/master) or [tar ball](https://github.com/timriffe/LifeTable/tarball/master), decompress and run `R CMD INSTALL` on it in the terminal command line, or use the **devtools** package to install the development version:
+Download the [zip ball](https://github.com/timriffe/AdultCoverage/zipball/master) or [tar ball](https://github.com/timriffe/AdultCoverage/tarball/master), decompress and run `R CMD INSTALL` on the subfolder called `R/DDM` in the terminal command line, or (easier) use the **devtools** package to install the development version:
 
 ```r
 # install.packages("devtools")
