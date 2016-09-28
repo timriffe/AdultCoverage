@@ -429,7 +429,7 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' 
-#' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, and \code{$upper}.
+#' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, \code{$upper}, and \code{ages}.
 #' @export
 #' 
 ggbChooseAges <- function(codi, 

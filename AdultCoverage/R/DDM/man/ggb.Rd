@@ -5,7 +5,7 @@
 \title{estimate death registration coverage using the GGB method}
 \usage{
 ggb(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
-  deaths.summed = FALSE)
+  deaths.summed = FALSE, delta = FALSE)
 }
 \arguments{
 \item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}
@@ -19,6 +19,8 @@ ggb(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
 \item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{delta}{logical. Do you want to return a correction factor for the first census?}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
