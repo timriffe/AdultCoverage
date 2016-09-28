@@ -552,8 +552,7 @@ ggbChooseAges <- function(codi,
 	}
 	
 	# click outside the margin to return results
-    out <- data.frame(coverage = coverage, lower = min(agesfit), upper = max(agesfit))
-	rownames(out) <- NULL
+    out <- list(coverage = coverage, lower = min(agesfit), upper = max(agesfit), ages = agesfit)
 	out
 }
 
