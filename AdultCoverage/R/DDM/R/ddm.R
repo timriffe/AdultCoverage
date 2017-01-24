@@ -78,7 +78,7 @@ ddm <- function(
 #' 
 #' @return called for its graphical device side-effects.
 #' @export
-ddmplot <- function(X){
+ddmplot <- function(X,...){
 #	if (class(X) == "data.frame"){
 #		X <- ddm(X, minA = minA, 
 #				maxA = maxA, 
@@ -100,14 +100,14 @@ ddmplot <- function(X){
 	Range <- range(as.matrix(X[,c("ggb","seg","ggbseg")]))
 	plot(X$x,X$ggb, pch = 19,col="#FFA155", ylim=Range, cex=.6, 
 			xlab = "data row", ylab = "coverage estimate",
-			main = "UFdata females period 1",
 			panel.first = list(
 					segments(X$x,
 							apply(X[,c("ggb","seg","ggbseg")],1,min),
 							X$x,
 							apply(X[,c("ggb","seg","ggbseg")],1,max), 
 							lwd=.5,
-							col=gray(.5))))
+							col=gray(.5))),
+			...)
 	points(X$x,X$seg,pch=19,col = "royalblue", cex=.6)
 	points(X$x,X$ggbseg,pch=19,col = "forestgreen", cex=.6)
 	#points(X$x, apply(X[,1:3],1,g.mean), col = "gray", cex = .6, pch = 19)
