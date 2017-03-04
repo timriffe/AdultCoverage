@@ -209,7 +209,20 @@ segCoverageFromYear <-  function(codi,
 	
 	coverage <- segCoverageFromAges(codi = codi, agesFit = agesFit)
 
-	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
+	# TR: 4-3-2017 get IQR of coverage as well
+	# this could go out into a utility function too...
+	inds     <- codi$age %in% agesFit
+	IQR      <- quantile(codi$Cx[inds], c(.25,.75))
+
+	
+	data.frame(cod = unique(codi$cod), 
+			   coverage = coverage, 
+			   lower = min(agesFit), 
+			   upper = max(agesFit),
+			   # TR: added 3-4-2017
+			   l25 = IQR[1],
+	           u25 = IQR[2]
+			   )
 }
 
 #'

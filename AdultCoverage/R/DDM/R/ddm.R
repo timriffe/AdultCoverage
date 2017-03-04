@@ -19,7 +19,6 @@
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' @param delta logical. Do you want to return a correction factor for the first census?
 #' 
 #' @return data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}. 
 #' @references Need to cite stuff here.
@@ -31,15 +30,13 @@ ddm <- function(
 		minAges = 8, 
 		exact.ages = NULL, 
 		eOpen = NULL, 
-		deaths.summed = FALSE,
-		delta = FALSE){
+		deaths.summed = FALSE){
 	ggbres <- ggb(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
 					exact.ages = exact.ages,
-					deaths.summed = deaths.summed,
-					delta = delta)
+					deaths.summed = deaths.summed)
 	segres <- seg(X = X, 
 					minA = minA, 
 					maxA = maxA, 
