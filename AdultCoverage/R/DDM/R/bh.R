@@ -277,8 +277,8 @@ seg <- function(X,
 	
 	coverages
 }
-
-
+X <- local(get(load("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM/data/BrasilFemales.rda")))
+X$sex <- "f"
 plot.seg <- function(
 		X, 
 		minA = 15, 
@@ -288,9 +288,11 @@ plot.seg <- function(
 		eOpen = NULL, 
 		deaths.summed = FALSE){
 	tab1        <- headerPrep(X)
+	
 	if (length(tab1) > 1){
 		warning("codi was not unique, taking first element")
 	}
+	tab1 <- tab1[[1]]
 	goods <- segCoverageFromYear(tab1,
 			minA = minA, 
 			maxA = maxA,
@@ -300,8 +302,23 @@ plot.seg <- function(
 			deaths.summed = deaths.summed)
 	codi     <- goods$codi
 	coverage <- goods$coverages
+	keep 	 <- codi$age >= minA &  codi$age <= maxA
+	ages 	 <- codi$age[keep]
+	yvals 	 <- codi$Cx[keep]
+	keep2 	 <- codi$age >= coverage$lower & codi$age <= coverage$upper
+	ages2 	 <- codi$age[keep2]
+	yvals2 	 <- codi$Cx[keep2]
 	
+	# TODO: make yrange more flexible.
 	
+	plot(ages, yvals, pch = 16, ylim = c(.5,2), col = gray(.5),log='y', ylab="Cx")
+	rect(ages2[1]-2.5,coverage$l25,ages2[length(ages2)]+2.5,coverage$u25, 
+			border = NA, col = "#00000040")
+	points(ages2, yvals2, pch = 16, col = "black")
+	segments(ages2[1]-2.5,coverage$coverage,ages2[length(ages2)]+2.5,coverage$coverage,lwd=2)
+	
+	# TODO let user interactively select points similar to ggbplot, for purposes of
+	# refitting, etc. This would be a second age-range diagnostic.
 }
 
 
