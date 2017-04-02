@@ -282,23 +282,8 @@ ggb <- function(
 		exact.ages = NULL, 
 		deaths.summed = FALSE){         
 	
-	##  Data in frame : cod, age, pop1, year1, pop2, year2, death (mean of two periods)
-	tab         <- data.frame(X)           
-	colnames(tab) <- tolower(colnames(tab))
-	# in case there is no splitting var, this way we split anyway.
-	tab         <- addcod(tab)
-	
-	# guess which column is the deaths column, rename it deaths
-	tab         <- guessDeathsColumn(tab)
-	
-	# TR: account for decimal intervals
-	tab$pop1    <- as.double(tab$pop1)
-	tab$pop2    <- as.double(tab$pop2)
-	tab$deaths  <- as.double(tab$deaths)
-	
-	# this splitting variable, invented if necessary
-	tab1        <- split(tab, factor(tab$cod))
-
+	# TR: modularized Apr 2, 2017
+	tab1        <- headerPrep(X)
 	# iterate over whatever it happens to be: regions, years
 	coverages   <- as.data.frame(
 			      do.call(

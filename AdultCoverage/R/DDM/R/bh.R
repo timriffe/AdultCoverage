@@ -214,8 +214,7 @@ segCoverageFromYear <-  function(codi,
 	inds     <- codi$age %in% agesFit
 	IQR      <- quantile(codi$Cx[inds], c(.25,.75))
 
-	
-	data.frame(cod = unique(codi$cod), 
+	meta <- 	data.frame(cod = unique(codi$cod), 
 			   coverage = coverage, 
 			   lower = min(agesFit), 
 			   upper = max(agesFit),
@@ -223,7 +222,12 @@ segCoverageFromYear <-  function(codi,
 			   l25 = IQR[1],
 	           u25 = IQR[2]
 			   )
+	out <- list(coverages = meta, codi = codi)
+	out
 }
+
+
+
 
 #'
 #' @title estimate death registration coverage using the synthetic extinct generation method 
@@ -253,37 +257,53 @@ seg <- function(X,
 				eOpen = NULL, 
 				deaths.summed = FALSE){
 	
-	tab         <- data.frame(X)           
-	colnames(tab) <- tolower(colnames(tab))
-	# in case there is no splitting var, this way we split anyway.
-	tab         <- addcod(tab)
-	
-	# guess which column is the deaths column, rename it deaths
-	tab         <- guessDeathsColumn(tab)
-	# TR: account for decimal intervals
-	tab$pop1    <- as.double(tab$pop1)
-	tab$pop2    <- as.double(tab$pop2)
-	tab$deaths  <- as.double(tab$deaths)
-	
-	tab1        <- split(tab, tab$cod)
-	
+    # TR: modularized Apr 2, 2017
+	tab1        <- headerPrep(X)
 	coverages <- as.data.frame(
 					do.call(
 						rbind,
 						lapply(
-							tab1, 
-							segCoverageFromYear, 
-							minA = minA, 
-							maxA = maxA,
-							minAges = minAges,  
-							exact.ages = exact.ages,
-							eOpen = eOpen,
-							deaths.summed = deaths.summed
+							tab1,
+							function(X){
+								segCoverageFromYear(X,minA = minA, 
+										maxA = maxA,
+										minAges = minAges,  
+										exact.ages = exact.ages,
+										eOpen = eOpen,
+										deaths.summed = deaths.summed)$coverages	
+							}
             )))
 	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
 	
 	coverages
 }
+
+
+plot.seg <- function(
+		X, 
+		minA = 15, 
+		maxA = 75, 
+		minAges = 8, 
+		exact.ages = NULL, 
+		eOpen = NULL, 
+		deaths.summed = FALSE){
+	tab1        <- headerPrep(X)
+	if (length(tab1) > 1){
+		warning("codi was not unique, taking first element")
+	}
+	goods <- segCoverageFromYear(tab1,
+			minA = minA, 
+			maxA = maxA,
+			minAges = minAges,  
+			exact.ages = exact.ages,
+			eOpen = eOpen,
+			deaths.summed = deaths.summed)
+	codi     <- goods$codi
+	coverage <- goods$coverages
+	
+	
+}
+
 
 ###################################################################################
 # End seg functions
@@ -463,21 +483,8 @@ ggbseg <- function(X,
 				exact.ages = NULL, 
 				eOpen = NULL, 
 				deaths.summed = FALSE){
-
-	tab         <- data.frame(X)           
-	colnames(tab) <- tolower(colnames(tab))
-	# in case there is no splitting var, this way we split anyway.
-	tab         <- addcod(tab)
-	
-	# guess which column is the deaths column, rename it deaths
-	tab         <- guessDeathsColumn(tab)
-	# TR: account for decimal intervals
-	tab$pop1    <- as.double(tab$pop1)
-	tab$pop2    <- as.double(tab$pop2)
-	tab$deaths  <- as.double(tab$deaths)
-	
-	tab1        <- split(tab, tab$cod)
-	
+	# TR: modularized Apr 2, 2017
+    tab1        <- headerPrep(X)
 	
 	coverages <- as.data.frame(
 			do.call(

@@ -9,7 +9,7 @@
 #' @param x vector of single ages (lower bound) a.k.a. completed age.
 #' 
 #' @return vector of the same length indicating which abridged age group each single age belongs to (lower bound)
-#' 
+
 #' @export
 
 single2abr <- function(x){
