@@ -18,4 +18,3 @@ In order to remove lubridate dependency, we self-detect leap years and adjust Fe
 \author{
 Carl Boe
 }
-

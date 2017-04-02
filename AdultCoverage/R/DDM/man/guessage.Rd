@@ -21,4 +21,3 @@ the age corresponding to the x,y pair of \code{$rightterm}, \code{$lefttterm} cl
 \description{
 a utility function called by \code{ggbChooseAges()}.
 }
-

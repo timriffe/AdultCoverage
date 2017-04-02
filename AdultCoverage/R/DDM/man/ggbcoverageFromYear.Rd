@@ -5,7 +5,7 @@
 \title{estimate death registration coverage for a single year/sex/region using the GGB method}
 \usage{
 ggbcoverageFromYear(codi, exact.ages = NULL, minA = 15, maxA = 75,
-  minAges = 8, deaths.summed = FALSE, delta = FALSE)
+  minAges = 8, deaths.summed = FALSE)
 }
 \arguments{
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}
@@ -19,8 +19,6 @@ ggbcoverageFromYear(codi, exact.ages = NULL, minA = 15, maxA = 75,
 \item{minAges}{the minimum number of adjacent ages needed as points for fitting. Default 8}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
-
-\item{delta}{logical. Do you want to return a correction factor for the first census?}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.
@@ -30,4 +28,3 @@ Given two censuses and an average annual number of deaths in each age class betw
 
 Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.
 }
-

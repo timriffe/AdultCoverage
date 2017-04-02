@@ -15,4 +15,3 @@ vector of the same length indicating which abridged age group each single age be
 \description{
 convert ages of the form 0,1,2,3,4,5,... into 0,1,1,1,1,5,...
 }
-

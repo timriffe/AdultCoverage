@@ -17,4 +17,3 @@ the RMSE
 \description{
 Called by \code{ggbgetAgesFit()} whenever the user doesn't want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to \code{ggbcoverageFromYear()} where \code{ggbgetRMS} is called and add another condition or make it call something else.
 }
-

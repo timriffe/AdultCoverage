@@ -34,4 +34,3 @@ Census dates can be given in a variety of ways: 1) using Date classes, and colum
 \references{
 Need to cite stuff here.
 }
-

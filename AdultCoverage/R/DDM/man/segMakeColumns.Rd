@@ -24,4 +24,3 @@ codi, with many columns added, most importantly \code{$Cx}.
 \description{
 Called by \code{segCoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly.
 }
-

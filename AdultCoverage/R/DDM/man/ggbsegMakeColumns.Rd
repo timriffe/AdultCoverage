@@ -29,4 +29,3 @@ Called by \code{ggbsegCoverageFromYear()}. This simply modulates some code that 
 \details{
 \code{agesFit} is a vector passed in from \code{ggbsegMakeColumns()}, and it was either estimated using the GGB automatic method there, or simply came from the argument \code{exact.ages} specified in \code{ggbseg()}. By default we just automatically estimate these. \code{eOpen} can be either user-specified, or it will be estimated automatically using \code{eOpenCD()}.
 }
-

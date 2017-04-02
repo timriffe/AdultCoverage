@@ -21,4 +21,3 @@ codi, with many columns added, most importantly \code{$rightterm}, \code{$leftte
 \description{
 Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly.
 }
-

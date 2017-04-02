@@ -23,4 +23,3 @@ ypart(Year, Month, Day, reproduce.matlab = TRUE, detect.mid.year = FALSE,
 \description{
 The fraction returned by this is used e.g. for intercensal estimates. Function uses 'lubridate' package to handle dates elegantly.
 }
-

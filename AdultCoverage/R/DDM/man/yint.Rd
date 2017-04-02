@@ -32,4 +32,3 @@ decimal value of year fraction (can be greater than 1)
 \description{
 Either assume 365 days in the year, or get the precise duration.
 }
-

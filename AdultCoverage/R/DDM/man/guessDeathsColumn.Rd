@@ -15,4 +15,3 @@ The same \code{data.frame}, returned, with the deaths column renamed as \code{"d
 \description{
 This function will pick up \code{"death"}, \code{"deaths"}, \code{"Death"}, or \code{"Deaths"} (and maybe some others?) and rename it \code{"deaths"} for easier internal usage.
 }
-

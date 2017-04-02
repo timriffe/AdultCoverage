@@ -15,4 +15,3 @@ an decimal year value of the time between two dates.
 \description{
 We accept dates, and fake them otherwise. Dates must be unique. Iterate over data if necessary for multiple intervals.
 }
-

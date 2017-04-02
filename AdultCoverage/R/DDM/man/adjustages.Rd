@@ -19,4 +19,3 @@ the adjusted set of ages used for calculating the coverage coefficient
 \description{
 a utility function called by \code{ggbChooseAges()}. After clicking a point, this function readjusts the age range
 }
-

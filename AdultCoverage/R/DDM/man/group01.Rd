@@ -15,4 +15,3 @@ X, with child ages grouped as necessary (or not)
 \description{
 We want 5-year age groups starting from 0. Standard abridged data has 0i,1,5. So we need to group together 0 and 1. Just for the sake of getting comparable results.
 }
-

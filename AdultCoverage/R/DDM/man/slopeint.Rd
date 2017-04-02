@@ -19,4 +19,3 @@ a pairlist with elements \code{$a} for the intercept and \code{$b} for the slope
 \description{
 Called by \code{ggbFittedFromAges()} and \code{ggbChooseAges()}
 }
-
