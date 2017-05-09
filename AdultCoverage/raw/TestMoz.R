@@ -3,11 +3,33 @@ setwd("/home/tim/git/AdultCoverage/AdultCoverage")
 devtools::load_all("R/DDM")
 
 x <- read.csv("Data/Mozambique.csv", stringsAsFactors = FALSE)
+head(x)
+
+
 colnames(x) <- tolower(colnames(x))
 colnames(x)[grepl("death",colnames(x))] <- "deaths"
 x$cod <- ifelse(x$sex=="f",1,2)
 X <- x[x$cod==1,]
+X <- X[,c(ncol(X),1:(ncol(X)-1))]
+Moz <- X
+save(Moz, file = "/home/tim/git/AdultCoverage/AdultCoverage/R/DDM/data/Moz.rda")
+tail(Moz)
+devtools::document("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
+?devtools::document
+?create
+?use_data
+devtools::use_data(Moz, pkg="/home/tim/git/AdultCoverage/AdultCoverage/R/DDM",overwrite=TRUE)
+devtools::use_data(BrasilFemales, pkg="/home/tim/git/AdultCoverage/AdultCoverage/R/DDM",overwrite=TRUE)
+devtools::use_data(BrasilMales, pkg="/home/tim/git/AdultCoverage/AdultCoverage/R/DDM",overwrite=TRUE)
 
+BrasilFemales <- Brasilfemales
+
+load("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM/data/BrasilMales.rda")
+package_file("Abridge.R", path = "/home/tim/git/AdultCoverage/AdultCoverage/R/DDM/R")
+
+
+library(devtools)
+?use_data
 ggb(x)
 seg(x)
 
