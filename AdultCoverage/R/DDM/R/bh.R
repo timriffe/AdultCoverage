@@ -289,8 +289,7 @@ seg <- function(X,
 	
 	coverages
 }
-X <- local(get(load("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM/data/BrasilFemales.rda")))
-X$sex <- "f"
+
 plot.seg <- function(
 		X, 
 		minA = 15, 
