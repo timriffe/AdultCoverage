@@ -8,6 +8,8 @@ detectSex(Dat, sexColumn = "Sex")
 }
 \arguments{
 \item{Dat}{a \code{data.frame} containing a column called \code{Sex}, or code{sex}.}
+
+\item{sexColumn}{character string giving the name of the Sex column \code{"Sex"} assumed.}
 }
 \value{
 either \code{"f"} or \code{"m"}

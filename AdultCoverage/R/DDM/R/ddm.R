@@ -72,6 +72,7 @@ ddm <- function(
 #' @description produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. Feed this function the output of \code{ddm()}.
 #' 
 #' @param X output of \code{ddm()}.
+#' @param ... other arguments passed to \code{plot()}
 #' 
 #' @return called for its graphical device side-effects.
 #' @export

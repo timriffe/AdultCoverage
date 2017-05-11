@@ -8,6 +8,8 @@ ddmplot(X, ...)
 }
 \arguments{
 \item{X}{output of \code{ddm()}.}
+
+\item{...}{other arguments passed to \code{plot()}}
 }
 \value{
 called for its graphical device side-effects.

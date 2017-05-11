@@ -69,9 +69,6 @@ eOpenCD <- function(codiaugmented){
 #' 
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param agesFit an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.
-#' @param minA the minimum of the age range searched. Default 15
-#' @param maxA the maximum of the age range searched. Default 75
-#' @param eOpen optional. A value for remaining life expectancy in the open age group.
 #'
 #' @return numeric. the estimated level of coverage.
 #' @export

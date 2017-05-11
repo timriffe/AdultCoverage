@@ -7,7 +7,7 @@
 headerPrep(X)
 }
 \arguments{
-\item{X}{}
+\item{X}{this is any codi-style \code{data.frame}}
 }
 \value{
 a list of codi chunks (by intercensal period, region, etc), with standardized names, dates, etc.

@@ -11,7 +11,9 @@ detectAgeInterval(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age")
 
 \item{MinAge}{integer ignore ages below this age.}
 
-\item{MinAge}{integer ignore ages above this age.}
+\item{MaxAge}{integer ignore ages above this age.}
+
+\item{ageColumn}{character string giving the name of the Age column \code{"Age"} assumed.}
 }
 \value{
 integer the age interval. \code{NA} if this is not unique.

@@ -9,11 +9,9 @@ ggbFittedFromAges(codi, agesfit, deaths.summed = FALSE)
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
 
+\item{agesfit}{an a priori set of ages for which to calculate the fit}
+
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
-
-\item{minA}{the minimum of the age range searched. Default 15}
-
-\item{maxA}{the maximum of the age range searched. Default 75}
 }
 \value{
 codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.

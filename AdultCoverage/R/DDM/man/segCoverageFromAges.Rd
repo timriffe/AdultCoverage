@@ -10,12 +10,6 @@ segCoverageFromAges(codi, agesFit)
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
 
 \item{agesFit}{an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.}
-
-\item{minA}{the minimum of the age range searched. Default 15}
-
-\item{maxA}{the maximum of the age range searched. Default 75}
-
-\item{eOpen}{optional. A value for remaining life expectancy in the open age group.}
 }
 \value{
 numeric. the estimated level of coverage.

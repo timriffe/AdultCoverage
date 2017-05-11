@@ -118,8 +118,7 @@ ggbcoverageFromYear <- function(codi,
 #' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.
 #' 
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
-#' @param minA the minimum of the age range searched. Default 15
-#' @param maxA the maximum of the age range searched. Default 75
+#' @param agesfit an a priori set of ages for which to calculate the fit
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
 #' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
@@ -218,6 +217,8 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param minA the lowest age to be included in search
+#' @param maxA the highest age to be included in search (the lower bound thereof)
 #' 
 #' @return a vector of ages that minimizes the RMSE
 #' 

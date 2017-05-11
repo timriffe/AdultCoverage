@@ -14,17 +14,17 @@ yint(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = FALSE,
 
 \item{Year1}{Year of first date}
 
+\item{Day2}{Day of second date}
+
+\item{Month2}{Month of second date}
+
+\item{Year2}{Year of second date}
+
 \item{reproduce.matlab}{logical. default \code{FALSE}. Assume 365 days in all years?}
 
 \item{detect.mid.year}{logical. default \code{TRUE}. Should June 30 and July 1 be considered .5?}
 
 \item{detect.start.end}{logical. default \code{TRUE}. Should Jan 1 always be 0 and Dec 31 always be 1?}
-
-\item{Day1}{Day of second date}
-
-\item{Month1}{Month of second date}
-
-\item{Year1}{Year of second date}
 }
 \value{
 decimal value of year fraction (can be greater than 1)

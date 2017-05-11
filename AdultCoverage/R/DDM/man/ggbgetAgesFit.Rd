@@ -10,6 +10,10 @@ ggbgetAgesFit(codi, minA = 15, maxA = 75, minAges = 8,
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
 
+\item{minA}{the lowest age to be included in search}
+
+\item{maxA}{the highest age to be included in search (the lower bound thereof)}
+
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}

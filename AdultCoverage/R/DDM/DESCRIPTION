@@ -11,8 +11,6 @@ Description: An implementation of the GGB, and two Bennet-Horiuchi (SEG, and GGB
     use a graphical interface if required.
 Depends:
     R (>= 2.15)
-Imports:
-    data.table
 License: GPL-2
 LazyData: TRUE
 RoxygenNote: 6.0.1

@@ -9,6 +9,8 @@ reduceOpen(X, maxA = 75, group = TRUE)
 \arguments{
 \item{X}{data formatted per the requirements of \code{bh1()}, \code{bh2()}}
 
+\item{maxA}{integer ignore ages above this age.}
+
 \item{group}{logical. If \code{TRUE} we sum down to \code{min(maxA,95)}. If \code{FALSE}, we just chop off data above that age.}
 }
 \value{

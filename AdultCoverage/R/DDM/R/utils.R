@@ -10,7 +10,9 @@
 #' 
 #' @param Dat a \code{data.frame} containing a column called \code{Age}, or code{age}. 
 #' @param MinAge integer ignore ages below this age.
-#' @param MinAge integer ignore ages above this age.
+#' @param MaxAge integer ignore ages above this age.
+#' @param ageColumn character string giving the name of the Age column \code{"Age"} assumed.
+#' 
 #' @return integer the age interval. \code{NA} if this is not unique.
 #' @export
 #' 
@@ -36,9 +38,10 @@ detectAgeInterval <- function(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age"){
 #' @description The column name can be \code{"sex"} or \code{"Sex"} and nothing else. If coded with integer, the number 1 is recognized as male and numbers, 0, 2, or 6 are assumed to be female. Any other integer will throw an error. If character, if the first letter is \code{"f"}, then we assume female, and if the first letter is \code{"m"} we assume male. Case does not matter. Anything else will throw an error. This function allows for just a little flexibility.
 #' 
 #' @param Dat a \code{data.frame} containing a column called \code{Sex}, or code{sex}.
+#' @param sexColumn character string giving the name of the Sex column \code{"Sex"} assumed.
 
 #' @return either \code{"f"} or \code{"m"}
-#' @export
+#' @export 
 #' 
 
 detectSex <- function(Dat, sexColumn = "Sex"){
@@ -257,9 +260,9 @@ ypart <- function(Year, Month, Day, reproduce.matlab = TRUE, detect.mid.year = F
 #' @param Day1 Day of first date
 #' @param Month1 Month of first date
 #' @param Year1 Year of first date
-#' @param Day1 Day of second date
-#' @param Month1 Month of second date
-#' @param Year1 Year of second date
+#' @param Day2 Day of second date
+#' @param Month2 Month of second date
+#' @param Year2 Year of second date
 #' @param reproduce.matlab logical. default \code{FALSE}. Assume 365 days in all years?
 #' @param detect.mid.year logical. default \code{TRUE}. Should June 30 and July 1 be considered .5?
 #' @param detect.start.end logical. default \code{TRUE}. Should Jan 1 always be 0 and Dec 31 always be 1?
@@ -399,6 +402,7 @@ guessDeathsColumn <- function(X){
 #' 
 #' @param X data formatted per the requirements of \code{bh1()}, \code{bh2()}
 #' @param group logical. If \code{TRUE} we sum down to \code{min(maxA,95)}. If \code{FALSE}, we just chop off data above that age.
+#' @param maxA integer ignore ages above this age.
 #' 
 #' @return X, with the open age having been reduced either with or without aggregation.
 #' @export 
@@ -472,7 +476,7 @@ avgDeaths <- function(codi, deaths.summed = FALSE){
 #'
 #' @title a utility function to prep the header
 #' @description This is an internal utility function, to save on redundant lines of code. Not so useful for hand-processing.
-#' @param X 
+#' @param X this is any codi-style \code{data.frame}
 #' @return a list of codi chunks (by intercensal period, region, etc), with standardized names, dates, etc.
 #' @export
 #' 
