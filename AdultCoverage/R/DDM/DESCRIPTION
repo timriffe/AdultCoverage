@@ -14,5 +14,5 @@ Depends:
 Imports:
     data.table
 License: GPL-2
-LazyData: TRUE
+LazyData: FALSE
 RoxygenNote: 6.0.1
