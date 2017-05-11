@@ -71,7 +71,7 @@ ggbcoverageFromYear <- function(codi,
 	}
 	
 	# TR: test add this step, just in case
-	codi    <- codi[with(codi, order(age)), ]
+	codi    <- codi[ order(codi$age), ]
 	
 	codi    <- ggbMakeColumns(codi = codi, 
 							  minA = minA, 
@@ -188,9 +188,9 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
 #				pop1 <- as.double(pop1)
 #				pop2 <- as.double(pop2)
 #			})
-	cod$deathsAvg <- as.double(cod$deathsAvg)
-	cod$pop1      <- as.double(cod$pop1)
-	cod$pop2      <- as.double(cod$pop2)
+	codi$deathsAvg <- as.double(codi$deathsAvg)
+	codi$pop1      <- as.double(codi$pop1)
+	codi$pop2      <- as.double(codi$pop2)
 			
 	# group inf if necessary
 	codi                   <- group01(codi)
@@ -207,6 +207,7 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
 #			leftterm       <- (birthdays / Tx) - cumgrowth
 #			exclude        <-  Tx != 0 & birthdays != 0 & age >= minA & age <= maxA
 #		         })
+	
 	codi$pop1cum        <- rev(cumsum(rev(codi$pop1)))
 	codi$pop2cum        <- rev(cumsum(rev(codi$pop2))) 
 	codi$deathcum       <- rev(cumsum(rev(codi$deathsAvg)))
