@@ -1,4 +1,4 @@
-structure(list(cod = c(11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 
+BrasilMales <- structure(list(cod = c(11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 
 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 11L, 12L, 12L, 12L, 
 12L, 12L, 12L, 12L, 12L, 12L, 12L, 12L, 12L, 12L, 12L, 12L, 12L, 
 12L, 12L, 13L, 13L, 13L, 13L, 13L, 13L, 13L, 13L, 13L, 13L, 13L, 
