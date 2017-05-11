@@ -113,17 +113,24 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	# This is a good catch for that
 	stopifnot(length(ages) == length(unique(ages)))
 	
-	codi <- within(codi,{
-				# birthdays, as in GGB
-				birthdays <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
+#	codi <- within(codi,{
+#				# birthdays, as in GGB
+#				birthdays <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
+#				# age-specific growth
+#	        	growth    <- log(pop2 / pop1) / dif
+#				growth[is.infinite(growth) | is.nan(growth)] <- 0
+#				# cumulative growth
+#				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
+#				deathLT   <- deathsAvg * exp(cumgrowth)
+#			})
+	codi$birthdays <- c(0, sqrt(codi$pop1[ -N  ] * codi$pop2[ -1 ])) / AgeInt
 				# age-specific growth
-	        	growth    <- log(pop2 / pop1) / dif
-				growth[is.infinite(growth) | is.nan(growth)] <- 0
+	codi$growth    <- log(codi$pop2 / codi$pop1) / dif
+	codi$growth[is.infinite(codi$growth) | is.nan(codi$growth)] <- 0
 				# cumulative growth
-				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
-				deathLT   <- deathsAvg * exp(cumgrowth)
-			})
-	
+	codi$cumgrowth <- AgeInt * c(0,cumsum(codi$growth[ -N ])) + AgeInt / 2 * codi$growth
+	codi$deathLT   <- codi$deathsAvg * exp(codi$cumgrowth)
+			
 	if (is.null(eOpen)){
 		eOpen <- eOpenCD(codiaugmented = codi)
 	} else {
@@ -132,17 +139,25 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	
 	eON   <- eOpen * codi$growth[N]
 
-	codi <- within(codi, {
-				pop_a <- 0                         # TR: test this to see if more robust
-				pop_a[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
-				for(j in N:2){
-					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
-							deathsAvg[j - 1] * exp(AgeInt / 2 * growth[j - 1])
-				}
-				rm(j)
-				Cx <- pop_a / birthdays
-			})
-	
+#	codi <- within(codi, {
+#				pop_a <- 0                         # TR: test this to see if more robust
+#				pop_a[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
+#				for(j in N:2){
+#					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
+#							deathsAvg[j - 1] * exp(AgeInt / 2 * growth[j - 1])
+#				}
+#				rm(j)
+#				Cx <- pop_a / birthdays
+#			})
+	codi$pop_a <- 0                         # TR: test this to see if more robust
+	codi$pop_a[N] <- codi$deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
+		for(j in N:2){
+			codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
+					codi$deathsAvg[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
+		}
+	rm(j)
+	codi$Cx <- codi$pop_a / codi$birthdays
+			
 	################
 	codi
 }
@@ -379,18 +394,34 @@ ggbsegMakeColumns <- function(
 	# in the next couple lines we use pop1adj instead of pop1...
 	relcomp      <- exp(ab$a * dif)
    	
-	codi <- within(codi,{
-				pop1adj   <- pop1 / relcomp
-				# birthdays, as in GGB
-				birthdays <- c(0, sqrt(pop1adj[ -N  ] * pop2[ -1 ])) / AgeInt
-				# age-specific growth
-				growth    <- log(pop2 / pop1adj) / dif
-				growth[is.infinite(growth) | is.nan(growth)] <- 0
-				# cumulative growth
-				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
-				deathLT   <- deathsAvg * exp(cumgrowth)
-			})
+#	codi <- within(codi,{
+#				pop1adj   <- pop1 / relcomp
+#				# birthdays, as in GGB
+#				birthdays <- c(0, sqrt(pop1adj[ -N  ] * pop2[ -1 ])) / AgeInt
+#				# age-specific growth
+#				growth    <- log(pop2 / pop1adj) / dif
+#				growth[is.infinite(growth) | is.nan(growth)] <- 0
+#				# cumulative growth
+#				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
+#				deathLT   <- deathsAvg * exp(cumgrowth)
+#			})
 	
+	codi$pop1adj   <- codi$pop1 / relcomp
+	# birthdays, as in GGB
+	codi$birthdays <- c(0, sqrt(codi$pop1adj[ -N  ] * codi$pop2[ -1 ])) / AgeInt
+	# age-specific growth
+	codi$growth    <- log(codi$pop2 / codi$pop1adj) / dif
+	codi$growth[is.infinite(codi$growth) | is.nan(codi$growth)] <- 0
+	# cumulative growth
+	codi$cumgrowth <- AgeInt * c(0,cumsum(codi$growth[ -N ])) + AgeInt / 2 * codi$growth
+	codi$deathLT   <- codi$deathsAvg * exp(codi$cumgrowth)
+#	codi      <- cbind(codi, 
+#				data.frame(pop1adj = pop1adj,
+#					   birthdays = birthdays,
+#					   growth = growth,
+#					   cumgrowth = cumgrowth,
+#					   deathLT = deathLT))		
+#	
 	if (is.null(eOpen)){
 		eOpen <- eOpenCD(codiaugmented = codi)
 	} else {
@@ -399,16 +430,25 @@ ggbsegMakeColumns <- function(
 	
 	eON   <- eOpen * codi$growth[N]
 	
-	codi <- within(codi, {
-				pop_a    <- 0
-				pop_a[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2)^(1/6))
-				for(j in N:2){
-					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
-							deathsAvg[j - 1] * exp(AgeInt / 2 * growth[j - 1])
-				}
-				rm(j)
-				Cx <- pop_a / birthdays
-			})
+#	codi <- within(codi, {
+#				pop_a    <- 0
+#				pop_a[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2)^(1/6))
+#				for(j in N:2){
+#					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
+#							deathsAvg[j - 1] * exp(AgeInt / 2 * growth[j - 1])
+#				}
+#				rm(j)
+#				Cx <- pop_a / birthdays
+#			})
+	codi$pop_a    	<- 0
+	codi$pop_a[N] 	<- codi$deathsAvg[N] * exp(eON) - ((eON ^ 2)^(1/6))
+		for(j in N:2){
+			codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
+				codi$deathsAvg[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
+		}
+	rm(j)
+	codi$Cx 		<- codi$pop_a / codi$birthdays
+			
 	
 	codi
 }

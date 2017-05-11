@@ -59,10 +59,12 @@ ddm <- function(
 					seg = segres$coverage,
 					ggbseg = ggbsegres$coverage,
 					lower = ggbres$lower,
-					upper = ggbres$upper)
-	if (delta){
-		results <- cbind(results, delta = ggbres$delta)
-	}
+					upper = ggbres$upper,
+					delta = ggbres$delta)
+#	if (delta){
+#		results$delta <- ggbres$delta
+#		#results <- cbind(results, delta = ggbres$delta)
+#	}
 
 	results
 }

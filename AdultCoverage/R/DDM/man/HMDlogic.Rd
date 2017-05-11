@@ -25,7 +25,7 @@ x \%>=\% y
 x \%<=\% y
 }
 \arguments{
-\item{x, y}{any two vector that can be logically compared.}
+\item{x, y}{any two vectors that can be logically compared.}
 }
 \description{
 These logical functions are like the usual ones, but \code{NA} values are treated as \code{FALSE} by default. This is not an exhaustive list, but these are the ones that speed our coding, and reduce code clutter. Functions copied from HMD collection directly as-is.

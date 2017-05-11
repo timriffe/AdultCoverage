@@ -183,28 +183,40 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
 	dif                    <- yint2(codi)
 		
 		# a quick recheck of classes:
-	codi <- within(codi, {
-				deathsAvg <- as.double(deathsAvg)
-				pop1 <- as.double(pop1)
-				pop2 <- as.double(pop2)
-			})
-	
+#	codi <- within(codi, {
+#				deathsAvg <- as.double(deathsAvg)
+#				pop1 <- as.double(pop1)
+#				pop2 <- as.double(pop2)
+#			})
+	cod$deathsAvg <- as.double(cod$deathsAvg)
+	cod$pop1      <- as.double(cod$pop1)
+	cod$pop2      <- as.double(cod$pop2)
+			
 	# group inf if necessary
 	codi                   <- group01(codi)
 	N                      <- nrow(codi)
 	# now actual column creation
-	codi      <- within(codi, {
-			pop1cum        <- rev(cumsum(rev(pop1)))
-			pop2cum        <- rev(cumsum(rev(pop2))) 
-			deathcum       <- rev(cumsum(rev(deathsAvg)))
-			birthdays      <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
-			Tx             <- sqrt(pop1cum * pop2cum)
-			cumgrowth      <- log(pop2cum / pop1cum) / dif
-			rightterm      <- deathcum / Tx
-			leftterm       <- (birthdays / Tx) - cumgrowth
-			exclude        <-  Tx != 0 & birthdays != 0 & age >= minA & age <= maxA
-		         })
-
+#	codi      <- within(codi, {
+#			pop1cum        <- rev(cumsum(rev(pop1)))
+#			pop2cum        <- rev(cumsum(rev(pop2))) 
+#			deathcum       <- rev(cumsum(rev(deathsAvg)))
+#			birthdays      <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
+#			Tx             <- sqrt(pop1cum * pop2cum)
+#			cumgrowth      <- log(pop2cum / pop1cum) / dif
+#			rightterm      <- deathcum / Tx
+#			leftterm       <- (birthdays / Tx) - cumgrowth
+#			exclude        <-  Tx != 0 & birthdays != 0 & age >= minA & age <= maxA
+#		         })
+	codi$pop1cum        <- rev(cumsum(rev(codi$pop1)))
+	codi$pop2cum        <- rev(cumsum(rev(codi$pop2))) 
+	codi$deathcum       <- rev(cumsum(rev(codi$deathsAvg)))
+	codi$birthdays      <- c(0, sqrt(codi$pop1[ -N  ] * codi$pop2[ -1 ])) / AgeInt
+	codi$Tx             <- sqrt(codi$pop1cum * codi$pop2cum)
+	codi$cumgrowth      <- log(codi$pop2cum / codi$pop1cum) / dif
+	codi$rightterm      <- codi$deathcum / codi$Tx
+	codi$leftterm       <- (codi$birthdays / codi$Tx) - codi$cumgrowth
+	codi$exclude        <- codi$Tx != 0 & codi$birthdays != 0 & codi$age >= minA & codi$age <= maxA
+	
 	codi
 }
 
