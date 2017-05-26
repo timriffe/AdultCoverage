@@ -290,6 +290,27 @@ seg <- function(X,
 	coverages
 }
 
+#'
+#' plot the age-pattern of coverage estimates
+#' 
+#' @description the SEG method works by averaging the coverage estimates over a range of ages. 
+#' Users may wish to see the age pattern for diagnostic purposes.
+#' 
+#' @details All arguments are essentially the same as those given to \code{seg()}
+#' 
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
+#' @param minA the lowest age to be included in search
+#' @param maxA the highest age to be included in search (the lower bound thereof)
+#' @param minAges the minimum number of adjacent ages to be used in estimating
+#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
+#' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#'
+#' @return Function called for its graphical side effects
+#' 
+#' @export 
+#' 
+
 plot.seg <- function(
 		X, 
 		minA = 15, 
