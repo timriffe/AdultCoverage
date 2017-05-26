@@ -1,7 +1,11 @@
 setwd("/home/tim/git/AdultCoverage/AdultCoverage")
 
 devtools::load_all("R/DDM")
-
+## add information of sex ###
+BrasilMales$sex='m'
+head(BrasilMales)
+## is it right?
+plot.seg(BrasilMales[BrasilMales$cod==11,])
 x <- read.csv("Data/Mozambique.csv", stringsAsFactors = FALSE)
 head(x)
 
