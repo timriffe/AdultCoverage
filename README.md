@@ -32,7 +32,7 @@ Then you can load the package using:
 library(DDM)
 ```
 
-Currently the `devtools` solutions isn't working on Windows machines and we're looking into it. Be aware that if you report a bug and we fix it, then you'll need to reinstall to get the changes. 
+Be aware that if you report a bug and we fix it, then you'll need to reinstall to get the changes. 
 
 Your data need to be in this kind of shape:
 
