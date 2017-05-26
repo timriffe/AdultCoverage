@@ -100,7 +100,7 @@ assignNoteCode <- function(X, code){
 #' 
 #' @description These logical functions are like the usual ones, but \code{NA} values are treated as \code{FALSE} by default. This is not an exhaustive list, but these are the ones that speed our coding, and reduce code clutter. Functions copied from HMD collection directly as-is. 
 #' 
-#' @details Note that one of these, \code{%>%} makes this package incompativle with the \code{magrittr} package.
+#' @details Note that one of these, \code{%>%} makes this package incompatible with the \code{magrittr} package.
 #' 
 #' @param x,y any two vectors that can be logically compared.
 #' @name HMDlogic
