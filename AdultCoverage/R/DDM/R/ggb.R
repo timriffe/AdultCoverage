@@ -436,6 +436,14 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 #' 
 #' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, \code{$upper}, and \code{ages}.
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' # for interactive sessions only
+#' # *click points to adjus age range used (yellow)
+#' # *click in margin to stop and return coverage results
+#' ggbChooseAges(Moz)
+#' }
 
 ggbChooseAges <- function(codi, 
 		                  minA = 15, 

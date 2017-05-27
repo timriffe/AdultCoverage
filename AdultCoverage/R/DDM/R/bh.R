@@ -318,7 +318,9 @@ seg <- function(X,
 #' @export 
 #' 
 #' @examples 
-#' 
+#' \dontrun{
+#' segplot(Moz)
+#' }
 
 
 segplot <- function(

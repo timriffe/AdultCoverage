@@ -31,3 +31,11 @@ In a spreadsheet one would typically set up the GGB method to produce a plot tha
 \details{
 If you want to send the results of this into \code{ggb()}, you can do so by setting \code{Exact.ages} to \code{seq(lower,upper,by=5)}, where \code{$lower}, and \code{$upper} are the results returned from \code{ggbChooseAges()} after you're done manually determining the age range.
 }
+\examples{
+\dontrun{
+# for interactive sessions only
+# *click points to adjus age range used (yellow)
+# *click in margin to stop and return coverage results
+ggbChooseAges(Moz)
+}
+}
