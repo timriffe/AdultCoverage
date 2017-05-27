@@ -46,5 +46,9 @@ head(BM)
 head(BF)
 }
 \references{
-Need to cite stuff here.
+Bennett Neil G, Shiro Horiuchi. Estimating the completeness of death registration in a closed population. Population Index. 1981; 1:207-221.
+
+Hill K. Estimating census and death registration completeness. Asian and Pacific Population Forum. 1987; 1:1-13.
+
+Hill K, You D, Choi Y. Death distribution methods for estimating adult mortality: sensitivity analysis with simulated data errors. Demographic Research. 2009; 21:235-254.
 }
