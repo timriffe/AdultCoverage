@@ -311,7 +311,7 @@ seg <- function(X,
 #' @export 
 #' 
 
-plot.seg <- function(
+segplot <- function(
 		X, 
 		minA = 15, 
 		maxA = 75, 
