@@ -14,6 +14,7 @@
 #'   \item{year1}{integer 1991}
 #'   \item{year2}{integer 2000}
 #'   \item{age}{integer lower age bound for each age group}
+#'   \item{sex}{character, 'f'}
 #' }
 #' 
 #' @source DATASUS \url{http://www2.datasus.gov.br/DATASUS/index.php?area=0205}
@@ -33,6 +34,7 @@
 #'   \item{year1}{integer 1991}
 #'   \item{year2}{integer 2000}
 #'   \item{age}{integer lower age bound for each age group}
+#'   \item{sex}{character, 'm'}
 #' }
 #' 
 #' @source DATASUS \url{http://www2.datasus.gov.br/DATASUS/index.php?area=0205}
