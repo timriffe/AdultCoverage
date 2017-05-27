@@ -42,4 +42,6 @@ head(BF)
 }
 \references{
 Hill K. Estimating census and death registration completeness. Asian and Pacific Population Forum. 1987; 1:1-13.
+
+Brass, William, 1975.  Methods for Estimating Fertility and Mortality from Limited and Defective Data, Carolina Population Center, Laboratory for Population Studies, University of North Carolina, Chapel Hill.
 }

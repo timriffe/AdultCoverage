@@ -259,6 +259,8 @@ segCoverageFromYear <-  function(codi,
 #' 
 #' @references Bennett Neil G, Shiro Horiuchi. Estimating the completeness of death registration in a closed population. Population Index. 1981; 1:207-221.
 #' 
+#' Preston, S. H., Coale, A. J., Trussel, J. & Maxine, W. Estimating the completeness of reporting of adult deaths in populations that are approximately stable.  Population Studies, 1980; v.4: 179-202
+#' 
 #' @examples 
 #' # The Mozambique data
 #' res <- seg(Moz)
@@ -557,7 +559,12 @@ ggbsegCoverageFromYear <- function(codi,
 #' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
-#' @references Hill K, You D, Choi Y. Death distribution methods for estimating adult mortality: sensitivity analysis with simulated data errors. Demographic Research. 2009; 21:235-254.
+#' @references Hill K. Methods for measuring adult mortality in developing countries: a comparative review. The global burden of disease 2000 in aging populations. Research paper; No. 01.13; 2001.
+#' 
+#' Hill K, You D, Choi Y.  Death distribution methods for estimating adult mortality: sensitivity analysis with simulated data errors. Demographic Research. 2009; 21:235-254.
+#' 
+#' Preston, S. H., Coale, A. J., Trussel, J. & Maxine, W. Estimating the completeness of reporting of adult deaths in populations that are approximately stable.  Population Studies, 1980; v.4: 179-202
+#' 
 #' 
 #' @examples 
 #' # The Mozambique data

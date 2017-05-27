@@ -285,7 +285,10 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed
 #' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. \code{$a} and \code{$b} give the intercept and slope of the line on which the coverage estimate is based. \code{$delta}, \code{$k1}, and \code{$k2}  are further derived quantities that may be intersting for advanced users. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
-#' @references Hill K. Estimating census and death registration completeness. Asian and Pacific Population Forum. 1987; 1:1-13.
+#' @references 
+#' Hill K. Estimating census and death registration completeness. Asian and Pacific Population Forum. 1987; 1:1-13.
+#' 
+#' Brass, William, 1975.  Methods for Estimating Fertility and Mortality from Limited and Defective Data, Carolina Population Center, Laboratory for Population Studies, University of North Carolina, Chapel Hill.
 #' 
 #' @examples 
 #' # The Mozambique data
