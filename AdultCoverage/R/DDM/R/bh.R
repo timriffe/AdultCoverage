@@ -3,7 +3,7 @@
 ###############################################################################
 # contains functions related to Bennet-Horiuchi methods
 
-#'
+
 #' @title estimate remaining life expectancy in the open age group
 #' @description This calculation is based on an indirect method to reference the Coale-Demeny West model lifetable. First one makes a psuedo lifetable deaths column using some stable pop assumptions (different in seg vs ggbseg). Then take the ratio of the sum of ages 10-39 to 40-59. These ratios have been worked out for each model lifetable level, so we can pick the level based on the ratio we produce from the data. From there, we just pick out the remaining life expectancy that corresponds to the top age in our data, which for now hopefully isn't higher than 95. The model lifetables don't go higher than 95 for now, but that's well beyond the range for this method family. If your data go beyong 85 or so, then just group down to 85, say, and estimate using that instead of keeping a high open age. Called by \code{segMakeColumns()} and \code{ggbsegMakeColumns()}, and not intended for direct user interface, because you need to produce the \code{$deathsLT} column. You can skip calling this function by specifying \code{eOpen} in the top call to \code{seg()} or \code{ggbseg()}.
 #' 
@@ -79,7 +79,7 @@ segCoverageFromAges <- function(codi, agesFit){
 	sum(codi$Cx[inds]) / length(agesFit)
 }
 
-#'
+
 #' @title make the Bennett-Horiuchi quasi lifetable columns required by the estimation method
 #' 
 #' @description Called by \code{segCoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
@@ -162,7 +162,7 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	codi
 }
 
-#'
+
 #' @title estimate death registration coverage for a single year/sex/region using the Bennet-Horiuchi method
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. Called by \code{seg()}. Users probably do not need to use this function directly.
@@ -239,9 +239,6 @@ segCoverageFromYear <-  function(codi,
 }
 
 
-
-
-#'
 #' @title estimate death registration coverage using the synthetic extinct generation method 
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value.
@@ -290,7 +287,6 @@ seg <- function(X,
 	coverages
 }
 
-#'
 #' plot the age-pattern of coverage estimates
 #' 
 #' @description the SEG method works by averaging the coverage estimates over a range of ages. 
@@ -309,7 +305,7 @@ seg <- function(X,
 #' @return Function called for its graphical side effects
 #' 
 #' @export 
-#' 
+
 
 segplot <- function(
 		X, 
@@ -362,8 +358,6 @@ segplot <- function(
 ###################################################################################
 
 
-
-#'
 #' @title make the Bennett-Horiuchi quasi lifetable columns required by the second estimation method
 #' 
 #' @description Called by \code{ggbsegCoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
@@ -475,7 +469,6 @@ ggbsegMakeColumns <- function(
 }
 
 
-#'
 #' @title estimate death registration coverage for a single year/sex/region using the modified Bennet-Horiuchi method
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. The difference between this method and \code{seg()} is that here we adjust census 1 part way through processing, based on some calcs similar to GGB. Called by \code{ggbseg()}. Users probably do not need to use this function directly.
@@ -530,7 +523,6 @@ ggbsegCoverageFromYear <- function(codi,
 }
 
 
-#'
 #' @title estimate death registration coverage using the hybrid ggb synthetic extinct generation
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model lifetable, although the user may also supply a value. The difference between this method and \code{seg()} is that here we adjust census 1 part way through processing, based on some calcs similar to GGB.

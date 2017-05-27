@@ -3,7 +3,6 @@
 ###############################################################################
 # contains utilities used throught.
 
-#'
 #' @title Detect the age interval for some demographic data
 #' 
 #' @description Since death distribution methods are primarily used in adult ages, it's OK to chop off the irregular infant and child age intervals (0,1], (1,5]. Further, if high ages are in different intervals this might also be a non-issue. In principal, the user should set \code{MinAge} and \code{MaxAge} to the same values used in the death distribution methods. Here we have some defaults that should almost always return the result \code{5} for standard abridged data, or \code{1} for single age data. Really there aren't any other common age-specifications, but it is best to identify these and be explicit about them. We return a warning and \code{NA} if more than one age interval is used. It is assumed that ages refer to the lower bounds of age intervals, as is the standard in demography.
@@ -15,7 +14,6 @@
 #' 
 #' @return integer the age interval. \code{NA} if this is not unique.
 #' @export
-#' 
 
 detectAgeInterval <- function(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age"){
 	
@@ -32,7 +30,6 @@ detectAgeInterval <- function(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age"){
 }
 
 
-#'
 #' @title Detect the sex for some demographic data
 #' 
 #' @description The column name can be \code{"sex"} or \code{"Sex"} and nothing else. If coded with integer, the number 1 is recognized as male and numbers, 0, 2, or 6 are assumed to be female. Any other integer will throw an error. If character, if the first letter is \code{"f"}, then we assume female, and if the first letter is \code{"m"} we assume male. Case does not matter. Anything else will throw an error. This function allows for just a little flexibility.
@@ -42,7 +39,7 @@ detectAgeInterval <- function(Dat, MinAge = 5, MaxAge = 70, ageColumn = "Age"){
 
 #' @return either \code{"f"} or \code{"m"}
 #' @export 
-#' 
+
 
 detectSex <- function(Dat, sexColumn = "Sex"){
 	
@@ -79,7 +76,7 @@ detectSex <- function(Dat, sexColumn = "Sex"){
 #' @param code character string to assign to the column, typically the name of the function operating on \code{X}.
 #' 
 #' @export
-#' 
+
 
 assignNoteCode <- function(X, code){
 	
@@ -152,7 +149,7 @@ NULL
 #' @return X with a new column, \code{$cod} appended. 
 #' 
 #' @export
-#' 
+
 addcod <- function(X){
 	stopifnot(is.data.frame(X))
 	
@@ -168,7 +165,6 @@ addcod <- function(X){
     X
 }
 
-#'
 #' @title determine whether a year is a leap year. 
 #' 
 #' @description In order to remove lubridate dependency, we self-detect leap years and adjust February accordingly.
@@ -186,7 +182,6 @@ isLeapYear <- function (Year){      # CB: mostly good algorithm from wikipedia
 			TRUE, FALSE )
 }
 
-#'
 #' @title determine the proportion of a year passed as of a particular date
 #' 
 #' @description The fraction returned by this is used e.g. for intercensal estimates. Function uses 'lubridate' package to handle dates elegantly.
@@ -199,7 +194,7 @@ isLeapYear <- function (Year){      # CB: mostly good algorithm from wikipedia
 #' @param detect.start.end logical. default \code{TRUE}. Should Jan 1 always be 0 and Dec 31 always be 1?
 #' 
 #' @export
-#' 
+
 
 ypart <- function(Year, Month, Day, reproduce.matlab = TRUE, detect.mid.year = FALSE, detect.start.end = TRUE){
 	M <- c(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
@@ -254,7 +249,6 @@ ypart <- function(Year, Month, Day, reproduce.matlab = TRUE, detect.mid.year = F
 }
 
 
-#'
 #' @title get interval as fraction of full years
 #' 
 #' @description Either assume 365 days in the year, or get the precise duration.
@@ -272,7 +266,7 @@ ypart <- function(Year, Month, Day, reproduce.matlab = TRUE, detect.mid.year = F
 #' @return decimal value of year fraction (can be greater than 1)
 #' 
 #' @export
-#' 
+
 yint <- function(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = FALSE, 
 		detect.mid.year = TRUE, detect.start.end = TRUE){
 	if (reproduce.matlab){
@@ -303,7 +297,6 @@ yint <- function(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = FA
 }
 
 
-#'
 #' @title assume Jan 1 if no month or day given
 #' @description We still require two year columns, \code{year1} and \code{year2}, at a minimum. If this function is called, and if month and day columns are missing we add these columns, with values of 1. If date columns are given, then these must be either in an unambiguous character format ("YYYY-MM-DD", e.g. \code{"2016-05-30"} is unambiguous). Date columns will override the presence of other year, month, day columns.
 #' 
@@ -355,7 +348,6 @@ fakeDates <- function(X){
 	X
 }
 
-#'
 #' @title get the time interval without having to specify so many args
 #' @description We accept dates, and fake them otherwise. Dates must be unique. Iterate over data if necessary for multiple intervals.
 #' 
@@ -380,7 +372,6 @@ yint2 <- function(X){
 }
 
 
-#'
 #' @title Figure out which column is the deaths column
 #' @description This function will pick up \code{"death"}, \code{"deaths"}, \code{"Death"}, or \code{"Deaths"} (and maybe some others?) and rename it \code{"deaths"} for easier internal usage.
 #' 
@@ -397,7 +388,7 @@ guessDeathsColumn <- function(X){
 	X
 }
 
-#'
+
 #' @title chop down or group down the open age
 #' 
 #' @description These methods are not intended to be applied to ages greater than, say 90 or 95. Usually, we'd top out in the range 75 to 85. In any case, the Coale-Demeny lifetable implementation that we have only goes up to age 95, so there is a practical limitation to deriving a remaining life expectancy for the open age group. If a user tries to apply the Bennett-Horiuchi methods to data with higher open ages, stuff breaks for the time being. So this function chops the data off at \code{min(maxA,95)}, after having (optionally) grouped data down. This function needs to work with a single partition of data (intercensal period, sex, region, etc).
@@ -408,7 +399,7 @@ guessDeathsColumn <- function(X){
 #' 
 #' @return X, with the open age having been reduced either with or without aggregation.
 #' @export 
-#' 
+
 reduceOpen <- function(X, maxA = 75, group = TRUE){
 	ages   <- X$age
 	topper <- min(maxA,95)
@@ -427,7 +418,6 @@ reduceOpen <- function(X, maxA = 75, group = TRUE){
 	X
 }
 
-#'
 #' @title group down standard abridged data in child mort group
 #' @description We want 5-year age groups starting from 0. Standard abridged data has 0i,1,5. So we need to group together 0 and 1. Just for the sake of getting comparable results.
 #' 
@@ -453,7 +443,7 @@ group01 <- function(X){
 }
 
 
-#'
+
 #' @title if necessary divide deaths by intercensal interval
 #' @description ideally \code{deaths} is the averag annual deaths in the intercensal period, but it is also common to give it as the sum. If this was the case, set \code{deaths.summed} to \code{TRUE} and we take care of it.
 #' @param codi the standard object as described in e.g. \code{ggb()}.
@@ -475,13 +465,13 @@ avgDeaths <- function(codi, deaths.summed = FALSE){
 }
 
 
-#'
+
 #' @title a utility function to prep the header
 #' @description This is an internal utility function, to save on redundant lines of code. Not so useful for hand-processing.
 #' @param X this is any codi-style \code{data.frame}
 #' @return a list of codi chunks (by intercensal period, region, etc), with standardized names, dates, etc.
 #' @export
-#' 
+
 headerPrep <- function(X){
 	tab         <- data.frame(X)           
 	colnames(tab) <- tolower(colnames(tab))

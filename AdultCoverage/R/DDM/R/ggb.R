@@ -31,7 +31,7 @@ ggbgetRMS <- function(agesi, codi){
 }
 
 
-#'
+
 #' @title estimate death registration coverage for a single year/sex/region using the GGB method
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. Called by \code{ggb()}. Users probably don't need to call this directly. Just use \code{ggb()} instead.
@@ -112,7 +112,7 @@ ggbcoverageFromYear <- function(codi,
 }
 
 
-#'
+
 #' @title make the growth-adjusted quasi lifetable columns required by GGB method
 #' 
 #' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.
@@ -222,7 +222,7 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
 }
 
 
-#'
+
 #' @title determine the age range that minimizes the mean squared error
 #' @description Called by \code{ggbcoverageFromYear()} whenever \code{exact.ages} are not given. This automates what one typically does visually.
 #' @seealso ggbChooseAges
@@ -269,7 +269,7 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed
 }
 
 
-#'
+
 #' @title estimate death registration coverage using the GGB method
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. 
@@ -324,7 +324,7 @@ ggb <- function(
 
 # functions related to ggb plotting.
 
-#'
+
 #' @title does a given pairlist of x and y coordinates fall within the plot region?
 #' 
 #' @description Check to see if a point clicked falls in the plot or outside it. This function is used by \code{ggbChooseAges()}.
@@ -344,7 +344,7 @@ inUSR <- function(USR, click){
 	TRUE
 }
 
-#'
+
 #' @title which age is closest to the point clicked?
 #' @description a utility function called by \code{ggbChooseAges()}.
 #' 
@@ -360,7 +360,7 @@ guessage <- function(xvec,yvec,click,age){
 	age[which.min(sqrt((xvec - click$x) ^ 2 + (yvec - click$y) ^ 2))]
 }
 
-#'
+
 #' @title adjust the range of ages used by \code{ggbChooseAges()}
 #' @description a utility function called by \code{ggbChooseAges()}. After clicking a point, this function readjusts the age range
 #' 
@@ -411,7 +411,7 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 }
 
 
-#'
+
 #' @title interactively determine ages to use for estimating coverage
 #' @description In a spreadsheet one would typically set up the GGB method to produce a plot that updates as the user changes the age range. This function implements that kind of workflow. This will be intuitive for spreadsheet users, but it does not scale well. Imagine you have 200 territorial units, then you wouldn't want to repeat this task. \code{ggb()} does the same thing automatically. You can compare the age range you select manually with the one given back by \code{ggb()} as a diagnostic, for instance. To set up the plot device, just give a single year/region/sex of data. By default it will give the RMSE-optimized age range to start with, but you can specify a  vector of exact ages to use as well. All points are plotted, with a fitted line that has been set to a subset of the points, which is plotted in a different color. You can click any point to change the age range, and the plot updates accordingly, up to a maximum of 15 clicks so you don't waste your time. You can stop the plot by either clicking on the graphics device outside the plot area or clicking out the 15 tries (or more if you increase \code{maxit}).
 #' @details If you want to send the results of this into \code{ggb()}, you can do so by setting \code{Exact.ages} to \code{seq(lower,upper,by=5)}, where \code{$lower}, and \code{$upper} are the results returned from \code{ggbChooseAges()} after you're done manually determining the age range.
@@ -427,7 +427,7 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 #' 
 #' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, \code{$upper}, and \code{ages}.
 #' @export
-#' 
+
 ggbChooseAges <- function(codi, 
 		                  minA = 15, 
 						  maxA = 75, 

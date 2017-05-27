@@ -2,7 +2,7 @@
 # Author: tim
 ###############################################################################
 
-#'
+
 #' @title single ages to standard abridged ages
 #' @description convert ages of the form 0,1,2,3,4,5,... into 0,1,1,1,1,5,...
 #' 

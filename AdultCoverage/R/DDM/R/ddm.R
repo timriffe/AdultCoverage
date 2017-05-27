@@ -2,7 +2,6 @@
 # Author: tim
 ###############################################################################
 
-#'
 #' @title run all three deaths registration coverage estimation methods
 #' 
 #' @description Estimate the generalized growth balance method, and the two Bennett-Horiuchi methods of estimating death registration coverage. This requires two censuses and an estimate of the deaths in each 5-year age group between censuses. This might be the arithmetic average of deaths in each age class, or simply the average of deaths around the time of the two censuses. All methods use some stable population assumptions. 
@@ -69,7 +68,6 @@ ddm <- function(
 	results
 }
 
-#'
 #' @title get a quick overview of the different estimates produced
 #' @description produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. Feed this function the output of \code{ddm()}.
 #' 

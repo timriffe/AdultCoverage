@@ -4,7 +4,7 @@
 #' @param sex \code{"F"} or \code{"M"}
 #' @return Tons of lifetable output in matrices. Age in columns, lifetable levels in rows.
 #' @export
-#' 
+
 cdmltw <-
 		function(sex="F"){
 	if (sex != "F" & sex !="M"){
