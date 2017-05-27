@@ -253,11 +253,21 @@ segCoverageFromYear <-  function(codi,
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'
-#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
+#' @return a \code{data.frame} with columns for the coverage coefficient (\code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable. \code{$l25} (\code{$u25}) give the mean of the lower (upper) quartile of the distribution of age-specific coverage estimates.
 #' 
 #' @export
 #' 
-#' @references Need to cite stuff here.
+#' @references Bennett Neil G, Shiro Horiuchi. Estimating the completeness of death registration in a closed population. Population Index. 1981; 1:207-221.
+#' 
+#' @examples 
+#' # The Mozambique data
+#' res <- seg(Moz)
+#' res
+#' # The Brasil data
+#' BM <- seg(BrasilMales)
+#' BF <- seg(BrasilFemales)
+#' head(BM)
+#' head(BF)
 
 seg <- function(X, 
 				minA = 15, 
@@ -542,11 +552,20 @@ ggbsegCoverageFromYear <- function(codi,
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'
 #' 
-#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
+#' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \cpde{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
-#' @references Need to cite stuff here.
-
+#' @references Hill K, You D, Choi Y. Death distribution methods for estimating adult mortality: sensitivity analysis with simulated data errors. Demographic Research. 2009; 21:235-254.
+#' 
+#' @examples 
+#' # The Mozambique data
+#' res <- ggbseg(Moz)
+#' res
+#' # The Brasil data
+#' BM <- ggbseg(BrasilMales)
+#' BF <- ggbseg(BrasilFemales)
+#' head(BM)
+#' head(BF)
 ggbseg <- function(X, 
 				minA = 15, 
 				maxA = 75, 

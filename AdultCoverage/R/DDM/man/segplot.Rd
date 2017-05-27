@@ -32,3 +32,6 @@ Users may wish to see the age pattern for diagnostic purposes.
 \details{
 All arguments are essentially the same as those given to \code{seg()}
 }
+\examples{
+
+}

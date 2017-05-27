@@ -282,11 +282,21 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'
-#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
+#' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. \code{$a} and \code{$b} give the intercept and slope of the line on which the coverage estimate is based. \code{$delta}, \code{$k1}, and \code{$k2}  are further derived quantities that may be intersting for advanced users. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
-#' @references Need to cite stuff here.
-
+#' @references Hill K. Estimating census and death registration completeness. Asian and Pacific Population Forum. 1987; 1:1-13.
+#' 
+#' @examples 
+#' # The Mozambique data
+#' res <- ggb(Moz)
+#' res
+#' # The Brasil data
+#' BM <- ggb(BrasilMales)
+#' BF <- ggb(BrasilFemales)
+#' head(BM)
+#' head(BF)
+#' 
 ggb <- function(
 		X, 
 		minA = 15, 
