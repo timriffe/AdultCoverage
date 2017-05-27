@@ -1,7 +1,7 @@
 Package: DDM
 Type: Package
 Title: Death registration coverage estimation
-Version: 0.25
+Version: 0.9
 Date: 2017-05-11
 Author: Tim Riffe, Everton Lima, Bernardo Queiroz
 Maintainer: Tim Riffe <riffe@demogr.mpg.de>
