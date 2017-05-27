@@ -14,7 +14,6 @@
 #' @return the RMSE
 #' 
 #' @export 
-#' 
 
 ggbgetRMS <- function(agesi, codi){
 	codi <- ggbFittedFromAges(codi, agesfit = agesi)
@@ -164,7 +163,7 @@ ggbcoverageFromAges <- function(codi, agesfit, deaths.summed = FALSE){
 }
 
 
-#'
+
 #' @title make the growth-adjusted quasi lifetable columns required by GGB method
 #' 
 #' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
