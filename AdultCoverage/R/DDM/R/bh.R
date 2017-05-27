@@ -318,7 +318,8 @@ segplot <- function(
 		minAges = 8, 
 		exact.ages = NULL, 
 		eOpen = NULL, 
-		deaths.summed = FALSE){
+		deaths.summed = FALSE
+		){
 	tab1        <- headerPrep(X)
 	
 	if (length(tab1) > 1){
