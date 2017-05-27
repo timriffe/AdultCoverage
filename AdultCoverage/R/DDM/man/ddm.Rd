@@ -35,6 +35,16 @@ All three methods require time points of the two censuses. Census dates can be g
 
 Thesynthetic extinct generation methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. That is a place where things can be improved.
 }
+\examples{
+# The Mozambique data
+res <- ddm(Moz)
+head(res)
+# The Brasil data
+BM <- ddm(BrasilMales)
+BF <- ddm(BrasilFemales)
+head(BM)
+head(BF)
+}
 \references{
 Need to cite stuff here.
 }

@@ -17,3 +17,8 @@ called for its graphical device side-effects.
 \description{
 produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. Feed this function the output of \code{ddm()}.
 }
+\examples{
+# just a rough sketch of the results!
+res <- ddm(Moz)
+ddmplot(res)
+}

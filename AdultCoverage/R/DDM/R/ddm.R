@@ -22,6 +22,16 @@
 #' @return data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}. 
 #' @references Need to cite stuff here.
 #' @export
+#' 
+#' @examples 
+#' # The Mozambique data
+#' res <- ddm(Moz)
+#' head(res)
+#' # The Brasil data
+#' BM <- ddm(BrasilMales)
+#' BF <- ddm(BrasilFemales)
+#' head(BM)
+#' head(BF)
 ddm <- function(
 		X, 
 		minA = 15, 
@@ -76,6 +86,12 @@ ddm <- function(
 #' 
 #' @return called for its graphical device side-effects.
 #' @export
+#' 
+#' @examples 
+#' # just a rough sketch of the results!
+#' res <- ddm(Moz)
+#' ddmplot(res)
+
 ddmplot <- function(X,...){
 #	if (class(X) == "data.frame"){
 #		X <- ddm(X, minA = minA, 
