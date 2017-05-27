@@ -5,7 +5,7 @@ Version: 0.9.0.0
 Date: 2017-05-27
 Author: Tim Riffe, Everton Lima, Bernardo Queiroz
 Maintainer: Tim Riffe <riffe@demogr.mpg.de>
-Description: An implementation of the GGB, and two Bennet-Horiuchi (SEG, and GGB-SEG) methods to
+Description: An implementation of the GGB, and two Bennett-Horiuchi (SEG, and GGB-SEG) methods to
     indirectly estimate the degree of death registration for a population. Methods
     produce automatic estimation, but users may also specify exact parameters or
     use a graphical interface if required.
