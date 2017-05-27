@@ -18,6 +18,15 @@ X <- X[,c(ncol(X),1:(ncol(X)-1))]
 Moz <- X
 save(Moz, file = "/home/tim/git/AdultCoverage/AdultCoverage/R/DDM/data/Moz.rda")
 tail(Moz)
+
+head(BrasilMales)
+#BrasilMales$sex <- 'm'
+#save(BrasilMales, file = "/home/tim/git/AdultCoverage/AdultCoverage/R/DDM/data/BrasilMales.rda")
+#
+#
+#BrasilFemales$sex <- 'f'
+#save(BrasilFemales, file = "/home/tim/git/AdultCoverage/AdultCoverage/R/DDM/data/BrasilFemales.rda")
+
 #devtools::document("/home/tim/git/AdultCoverage/AdultCoverage/R/DDM")
 #?devtools::document
 #?create

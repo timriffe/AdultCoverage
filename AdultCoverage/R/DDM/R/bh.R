@@ -258,6 +258,7 @@ segCoverageFromYear <-  function(codi,
 #' @export
 #' 
 #' @references Need to cite stuff here.
+
 seg <- function(X, 
 				minA = 15, 
 				maxA = 75, 
@@ -305,6 +306,9 @@ seg <- function(X,
 #' @return Function called for its graphical side effects
 #' 
 #' @export 
+#' 
+#' @examples 
+#' 
 
 
 segplot <- function(
