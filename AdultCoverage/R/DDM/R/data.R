@@ -17,7 +17,7 @@
 #'   \item{sex}{character, 'f'}
 #' }
 #' 
-#' @source DATASUS \url{http://www2.datasus.gov.br/DATASUS/index.php?area=0205}
+#' @source data downloaded from DATASUS http://www.datasus.gov.br
 "BrasilFemales"
 
 
@@ -37,7 +37,7 @@
 #'   \item{sex}{character, 'm'}
 #' }
 #' 
-#' @source DATASUS \url{http://www2.datasus.gov.br/DATASUS/index.php?area=0205}
+#' @source data downloaded from DATASUS http://www.datasus.gov.br
 "BrasilMales"
 
 
