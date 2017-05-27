@@ -1,8 +1,8 @@
 Package: DDM
 Type: Package
 Title: Death registration coverage estimation
-Version: 0.9
-Date: 2017-05-11
+Version: 0.9.0.0
+Date: 2017-05-27
 Author: Tim Riffe, Everton Lima, Bernardo Queiroz
 Maintainer: Tim Riffe <riffe@demogr.mpg.de>
 Description: An implementation of the GGB, and two Bennet-Horiuchi (SEG, and GGB-SEG) methods to
