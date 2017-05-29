@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggb.R
 \name{ggbFittedFromAges}
 \alias{ggbFittedFromAges}
-\title{make the growth-adjusted quasi lifetable columns required by GGB method}
+\title{make the growth-adjusted quasi life table columns required by GGB method}
 \usage{
 ggbFittedFromAges(codi, agesfit, deaths.summed = FALSE)
 }

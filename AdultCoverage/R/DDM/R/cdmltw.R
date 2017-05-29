@@ -1,5 +1,5 @@
 
-#' @title Coale-Demeny model lifetable: West
+#' @title Coale-Demeny model life table: West
 #' @description function from now-deprecated \code{demogR} package. Originally written by Ken Wachter, modified by James Jones, and again by the current maintainer, Tim Riffe. Only minor edits to margin naming in the current version.
 #' @param sex \code{"F"} or \code{"M"}
 #' @return Tons of lifetable output in matrices. Age in columns, lifetable levels in rows.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/bh.R
 \name{ggbsegMakeColumns}
 \alias{ggbsegMakeColumns}
-\title{make the Bennett-Horiuchi quasi lifetable columns required by the second estimation method}
+\title{make the Bennett-Horiuchi quasi life table columns required by the second estimation method}
 \usage{
 ggbsegMakeColumns(codi, minA = 15, maxA = 75, agesFit, eOpen = NULL,
   deaths.summed = FALSE)

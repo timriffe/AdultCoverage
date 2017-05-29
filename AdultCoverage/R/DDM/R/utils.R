@@ -143,7 +143,7 @@ NULL
 }
 
 #' @title append a \code{$cod} column if missing
-#' @description Only handles the case of missing \code{$cod} splitting variable for data of a single year/region. This isn't super robust. If you have many regions or whatever then do it yourself. This function was just written to make \code{ggb()} robust to the case of a user specifying data that don't have any territorial or other subgroups, aside from sex.
+#' @description Only handles the case of missing \code{$cod} splitting variable for data of a single year/region. This is not super robust. If you have many regions or whatever then do it yourself. This function was just written to make \code{ggb()} robust to the case of a user specifying data that don't have any territorial or other subgroups, aside from sex.
 #' 
 #' @param X a \code{data.frame}, possibly but not necessarily with column \code{$sex}.
 #' @return X with a new column, \code{$cod} appended. 
@@ -391,7 +391,7 @@ guessDeathsColumn <- function(X){
 
 #' @title chop down or group down the open age
 #' 
-#' @description These methods are not intended to be applied to ages greater than, say 90 or 95. Usually, we'd top out in the range 75 to 85. In any case, the Coale-Demeny lifetable implementation that we have only goes up to age 95, so there is a practical limitation to deriving a remaining life expectancy for the open age group. If a user tries to apply the Bennett-Horiuchi methods to data with higher open ages, stuff breaks for the time being. So this function chops the data off at \code{min(maxA,95)}, after having (optionally) grouped data down. This function needs to work with a single partition of data (intercensal period, sex, region, etc).
+#' @description These methods are not intended to be applied to ages greater than, say 90 or 95. Usually, we'd top out in the range 75 to 85. In any case, the Coale-Demeny life table implementation that we have only goes up to age 95, so there is a practical limitation to deriving a remaining life expectancy for the open age group. If a user tries to apply the Bennett-Horiuchi methods to data with higher open ages, stuff breaks for the time being. So this function chops the data off at \code{min(maxA,95)}, after having (optionally) grouped data down. This function needs to work with a single partition of data (intercensal period, sex, region, etc).
 #' 
 #' @param X data formatted per the requirements of \code{bh1()}, \code{bh2()}
 #' @param group logical. If \code{TRUE} we sum down to \code{min(maxA,95)}. If \code{FALSE}, we just chop off data above that age.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggb.R
 \name{ggbMakeColumns}
 \alias{ggbMakeColumns}
-\title{make the growth-adjusted quasi lifetable columns required by GGB method}
+\title{make the growth-adjusted quasi life table columns required by GGB method}
 \usage{
 ggbMakeColumns(codi, minA = 15, maxA = 75, deaths.summed = FALSE)
 }

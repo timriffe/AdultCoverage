@@ -2,7 +2,7 @@
 % Please edit documentation in R/cdmltw.R
 \name{cdmltw}
 \alias{cdmltw}
-\title{Coale-Demeny model lifetable: West}
+\title{Coale-Demeny model life table: West}
 \usage{
 cdmltw(sex = "F")
 }

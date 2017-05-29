@@ -2,7 +2,7 @@
 % Please edit documentation in R/bh.R
 \name{segMakeColumns}
 \alias{segMakeColumns}
-\title{make the Bennett-Horiuchi quasi lifetable columns required by the estimation method}
+\title{make the Bennett-Horiuchi quasi life table columns required by the estimation method}
 \usage{
 segMakeColumns(codi, minA = 15, maxA = 75, eOpen = NULL,
   deaths.summed = FALSE)

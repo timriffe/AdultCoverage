@@ -112,7 +112,7 @@ ggbcoverageFromYear <- function(codi,
 
 
 
-#' @title make the growth-adjusted quasi lifetable columns required by GGB method
+#' @title make the growth-adjusted quasi life table columns required by GGB method
 #' 
 #' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.
 #' 
@@ -164,7 +164,7 @@ ggbcoverageFromAges <- function(codi, agesfit, deaths.summed = FALSE){
 
 
 
-#' @title make the growth-adjusted quasi lifetable columns required by GGB method
+#' @title make the growth-adjusted quasi life table columns required by GGB method
 #' 
 #' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
 #' 
