@@ -486,6 +486,7 @@ headerPrep <- function(X){
 	tab$deaths  <- as.double(tab$deaths)
 	
 	tab1        <- split(tab, tab$cod)
+	
 	tab1
 }
 
