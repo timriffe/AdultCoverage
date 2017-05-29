@@ -13,5 +13,5 @@ fakeDates(X)
 X the same \code{data.frame}, possibly with columns for year, month, or day added.
 }
 \description{
-We still require two year columns, \code{year1} and \code{year2}, at a minimum. If this function is called, and if month and day columns are missing we add these columns, with values of 1. If date columns are given, then these must be either in an unambiguous character format ("YYYY-MM-DD", e.g. \code{"2016-05-30"} is unambiguous). Date columns will override the presence of other year, month, day columns.
+We still require two year columns, \code{year1} and \code{year2}, at a minimum. If this function is called, and if month and day columns are missing we add these columns, with values of 1. If date columns are given, then these must be either in an unambiguous character format (\code{"YYYY-MM-DD"}, e.g. \code{"2016-05-30"} is unambiguous). Date columns will override the presence of other year, month, day columns.
 }

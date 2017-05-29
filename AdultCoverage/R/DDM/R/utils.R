@@ -5,7 +5,7 @@
 
 #' @title Detect the age interval for some demographic data
 #' 
-#' @description Since death distribution methods are primarily used in adult ages, it's OK to chop off the irregular infant and child age intervals (0,1], (1,5]. Further, if high ages are in different intervals this might also be a non-issue. In principal, the user should set \code{MinAge} and \code{MaxAge} to the same values used in the death distribution methods. Here we have some defaults that should almost always return the result \code{5} for standard abridged data, or \code{1} for single age data. Really there aren't any other common age-specifications, but it is best to identify these and be explicit about them. We return a warning and \code{NA} if more than one age interval is used. It is assumed that ages refer to the lower bounds of age intervals, as is the standard in demography.
+#' @description Since death distribution methods are primarily used in adult ages, it's OK to chop off the irregular infant and child age intervals (0,1], (1,5]. Further, if high ages are in different intervals this might also be a non-issue. In principal, the user should set \code{MinAge} and \code{MaxAge} to the same values used in the death distribution methods. Here we have some defaults that should almost always return the result \code{5} for standard abridged data, or \code{1} for single age data. Really there are not any other common age-specifications, but it is best to identify these and be explicit about them. We return a warning and \code{NA} if more than one age interval is used. It is assumed that ages refer to the lower bounds of age intervals, as is the standard in demography.
 #' 
 #' @param Dat a \code{data.frame} containing a column called \code{Age}, or code{age}. 
 #' @param MinAge integer ignore ages below this age.
@@ -68,9 +68,9 @@ detectSex <- function(Dat, sexColumn = "Sex"){
 	stop("must specify sex using a character class column called sex, with values 'm' and/or 'f'")
 }
 
-#' @title a cheap way to choose which column to assign a NoteCode to
+#' @title a cheap way to choose which column to assign a \code{NoteCode} to
 #' 
-#' @description One property of the LexisDB scripts that might be useful for downstream checks is the ability to trace which functions have modified a given data object. These can go into NoteCode slots. This function writes \code{code} to the first unoccupied \code{NoteCode} column. If all three \code{NoteCode} columns are occupied, it concatenates the end of the third column. This way we preserve a full history. Unfortunately it gets split between columns. Oh well. Good for eyeballing. This function written for the sake of modularity. Function copied from HMD collection directly as-is.
+#' @description One property of the LexisDB scripts that might be useful for downstream checks is the ability to trace which functions have modified a given data object. These can go into NoteCode slots. This function writes \code{code} to the first unoccupied \code{NoteCode} column. If all three \code{NoteCode} columns are occupied, it concatenates the end of the third column. This way we preserve a full history. Unfortunately it gets split between columns. Oh well. Good for eyeballing. This function written for the sake of modularity. Function copied from Human Mortality Database collection directly as-is.
 #' 
 #' @param X the HMD data object that presumably has three \code{NoteCode} columns
 #' @param code character string to assign to the column, typically the name of the function operating on \code{X}.
@@ -167,7 +167,7 @@ addcod <- function(X){
 
 #' @title determine whether a year is a leap year. 
 #' 
-#' @description In order to remove lubridate dependency, we self-detect leap years and adjust February accordingly.
+#' @description In order to remove \code{lubridate} dependency, we self-detect leap years and adjust February accordingly.
 #' 
 #' @param Year integer of year to query
 #' 
@@ -298,7 +298,7 @@ yint <- function(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = FA
 
 
 #' @title assume Jan 1 if no month or day given
-#' @description We still require two year columns, \code{year1} and \code{year2}, at a minimum. If this function is called, and if month and day columns are missing we add these columns, with values of 1. If date columns are given, then these must be either in an unambiguous character format ("YYYY-MM-DD", e.g. \code{"2016-05-30"} is unambiguous). Date columns will override the presence of other year, month, day columns.
+#' @description We still require two year columns, \code{year1} and \code{year2}, at a minimum. If this function is called, and if month and day columns are missing we add these columns, with values of 1. If date columns are given, then these must be either in an unambiguous character format (\code{"YYYY-MM-DD"}, e.g. \code{"2016-05-30"} is unambiguous). Date columns will override the presence of other year, month, day columns.
 #' 
 #' @param X a \code{data.frame} with at least columns \code{year1} and \code{year2}.
 #' 
@@ -348,7 +348,7 @@ fakeDates <- function(X){
 	X
 }
 
-#' @title get the time interval without having to specify so many args
+#' @title get the time interval without having to specify so many arguments
 #' @description We accept dates, and fake them otherwise. Dates must be unique. Iterate over data if necessary for multiple intervals.
 #' 
 #' @param X \code{data.frame} with at least columns \code{$date1} and \code{$date2}, or \code{$year1} and \code{$year2}. 
@@ -418,7 +418,7 @@ reduceOpen <- function(X, maxA = 75, group = TRUE){
 	X
 }
 
-#' @title group down standard abridged data in child mort group
+#' @title group down standard abridged data in child mortality group
 #' @description We want 5-year age groups starting from 0. Standard abridged data has 0i,1,5. So we need to group together 0 and 1. Just for the sake of getting comparable results.
 #' 
 #' @param X standard input as required by \code{ddm()}, \code{ggb()}, \code{bh1()}, or \code{bh2()}
@@ -445,7 +445,7 @@ group01 <- function(X){
 
 
 #' @title if necessary divide deaths by intercensal interval
-#' @description ideally \code{deaths} is the averag annual deaths in the intercensal period, but it is also common to give it as the sum. If this was the case, set \code{deaths.summed} to \code{TRUE} and we take care of it.
+#' @description ideally \code{deaths} is the average annual deaths in the intercensal period, but it is also common to give it as the sum. If this was the case, set \code{deaths.summed} to \code{TRUE} and we take care of it.
 #' @param codi the standard object as described in e.g. \code{ggb()}.
 #' @param deaths.summed logical. If \code{TRUE} then \code{deaths} was specified as the sum over the intercensal period. Otherwise it was the mean.
 #' @return codi a new column, \code{deathsAvg} will be appended.

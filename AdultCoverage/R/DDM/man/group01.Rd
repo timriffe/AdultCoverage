@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{group01}
 \alias{group01}
-\title{group down standard abridged data in child mort group}
+\title{group down standard abridged data in child mortality group}
 \usage{
 group01(X)
 }

@@ -13,7 +13,7 @@ isLeapYear(Year)
 logical is the Year a leap year or not
 }
 \description{
-In order to remove lubridate dependency, we self-detect leap years and adjust February accordingly.
+In order to remove \code{lubridate} dependency, we self-detect leap years and adjust February accordingly.
 }
 \author{
 Carl Boe

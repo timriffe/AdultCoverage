@@ -16,12 +16,12 @@
   \item{sex}{character, 'm'}
 }}
 \source{
-data downloaded from DATASUS http://www.datasus.gov.br
+data downloaded from DATASUS \code{http://www.datasus.gov.br}
 }
 \usage{
 BrasilMales
 }
 \description{
-A dataset containing 486 rows and 7 variables: Population counts for 1980 and 1991 in abridged ages 0, 1, 5, ... 75, with an open age of 80. Deaths are given as the average death count per age group over the ntercensal period. In total there are 53 states in this dataset.
+A dataset containing 486 rows and 7 variables: Population counts for 1980 and 1991 in abridged ages 0, 1, 5, ... 75, with an open age of 80. Deaths are given as the average death count per age group over the intercensal period. In total there are 53 states in this dataset.
 }
 \keyword{datasets}

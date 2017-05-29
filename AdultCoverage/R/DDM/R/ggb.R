@@ -4,9 +4,9 @@
 # contains functions related to the generalized growth balance method
 
 
-#' @title calcuate the root means square of the error to help find optimal age range
+#' @title calculate the root means square of the error to help find optimal age range
 #' 
-#' @description Called by \code{ggbgetAgesFit()} whenever the user doesn't want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to \code{ggbcoverageFromYear()} where \code{ggbgetRMS} is called and add another condition or make it call something else.
+#' @description Called by \code{ggbgetAgesFit()} whenever the user does not want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to \code{ggbcoverageFromYear()} where \code{ggbgetRMS} is called and add another condition or make it call something else.
 #' 
 #' @param agesi the set of ages used for this iteration
 #' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}. 
@@ -282,7 +282,7 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'
-#' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. \code{$a} and \code{$b} give the intercept and slope of the line on which the coverage estimate is based. \code{$delta}, \code{$k1}, and \code{$k2}  are further derived quantities that may be intersting for advanced users. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
+#' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. \code{$a} and \code{$b} give the intercept and slope of the line on which the coverage estimate is based. \code{$delta}, \code{$k1}, and \code{$k2}  are further derived quantities that may be interesting for advanced users. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
 #' @references 
@@ -425,7 +425,7 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 
 
 #' @title interactively determine ages to use for estimating coverage
-#' @description In a spreadsheet one would typically set up the GGB method to produce a plot that updates as the user changes the age range. This function implements that kind of workflow. This will be intuitive for spreadsheet users, but it does not scale well. Imagine you have 200 territorial units, then you wouldn't want to repeat this task. \code{ggb()} does the same thing automatically. You can compare the age range you select manually with the one given back by \code{ggb()} as a diagnostic, for instance. To set up the plot device, just give a single year/region/sex of data. By default it will give the RMSE-optimized age range to start with, but you can specify a  vector of exact ages to use as well. All points are plotted, with a fitted line that has been set to a subset of the points, which is plotted in a different color. You can click any point to change the age range, and the plot updates accordingly, up to a maximum of 15 clicks so you don't waste your time. You can stop the plot by either clicking on the graphics device outside the plot area or clicking out the 15 tries (or more if you increase \code{maxit}).
+#' @description In a spreadsheet one would typically set up the GGB method to produce a plot that updates as the user changes the age range. This function implements that kind of work flow. This will be intuitive for spreadsheet users, but it does not scale well. Imagine you have 200 territorial units, then you would not want to repeat this task. \code{ggb()} does the same thing automatically. You can compare the age range you select manually with the one given back by \code{ggb()} as a diagnostic, for instance. To set up the plot device, just give a single year/region/sex of data. By default it will give the RMSE-optimized age range to start with, but you can specify a  vector of exact ages to use as well. All points are plotted, with a fitted line that has been set to a subset of the points, which is plotted in a different color. You can click any point to change the age range, and the plot updates accordingly, up to a maximum of 15 clicks so you don't waste your time. You can stop the plot by either clicking on the graphics device outside the plot area or clicking out the 15 tries (or more if you increase \code{maxit}).
 #' @details If you want to send the results of this into \code{ggb()}, you can do so by setting \code{Exact.ages} to \code{seq(lower,upper,by=5)}, where \code{$lower}, and \code{$upper} are the results returned from \code{ggbChooseAges()} after you're done manually determining the age range.
 #' 
 #' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.

@@ -10,7 +10,7 @@
 #' 
 #' All three methods require time points of the two censuses. Census dates can be given in a variety of ways: 1) (preferred) using \code{Date} classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing respective integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.  Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. 
 #' 
-#' Thesynthetic extinct generation methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. That is a place where things can be improved.
+#' The synthetic extinct generation methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. That is a place where things can be improved.
 #' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
@@ -90,7 +90,7 @@ ddm <- function(
 }
 
 #' @title get a quick overview of the different estimates produced
-#' @description produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, BH1, BH2, and harmonic mean of these. Feed this function the output of \code{ddm()}.
+#' @description produce a dot plot, where each x position is a unique value of \code{$cod}, and points indicate the GGB, SEG, GGB-SEG, and harmonic mean of these. Feed this function the output of \code{ddm()}.
 #' 
 #' @param X output of \code{ddm()}.
 #' @param ... other arguments passed to \code{plot()}

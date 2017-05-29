@@ -17,13 +17,13 @@
 #'   \item{sex}{character, 'f'}
 #' }
 #' 
-#' @source data downloaded from DATASUS http://www.datasus.gov.br
+#' @source data downloaded from DATASUS \code{http://www.datasus.gov.br}
 "BrasilFemales"
 
 
 #' Example data for Brasil males by federal states, years 1980 to 1991
 #'
-#' A dataset containing 486 rows and 7 variables: Population counts for 1980 and 1991 in abridged ages 0, 1, 5, ... 75, with an open age of 80. Deaths are given as the average death count per age group over the ntercensal period. In total there are 53 states in this dataset.
+#' A dataset containing 486 rows and 7 variables: Population counts for 1980 and 1991 in abridged ages 0, 1, 5, ... 75, with an open age of 80. Deaths are given as the average death count per age group over the intercensal period. In total there are 53 states in this dataset.
 #' 
 #' @format A data frame with 53940 rows and 10 variables:
 #' \describe{
@@ -37,7 +37,7 @@
 #'   \item{sex}{character, 'm'}
 #' }
 #' 
-#' @source data downloaded from DATASUS http://www.datasus.gov.br
+#' @source data downloaded from DATASUS \code{http://www.datasus.gov.br}
 "BrasilMales"
 
 

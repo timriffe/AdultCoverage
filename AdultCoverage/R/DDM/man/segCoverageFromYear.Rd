@@ -2,7 +2,7 @@
 % Please edit documentation in R/bh.R
 \name{segCoverageFromYear}
 \alias{segCoverageFromYear}
-\title{estimate death registration coverage for a single year/sex/region using the Bennet-Horiuchi method}
+\title{estimate death registration coverage for a single year/sex/region using the Bennett-Horiuchi method}
 \usage{
 segCoverageFromYear(codi, minA = 15, maxA = 75, minAges = 8,
   exact.ages = NULL, eOpen = NULL, deaths.summed = FALSE)

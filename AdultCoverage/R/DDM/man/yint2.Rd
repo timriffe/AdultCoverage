@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{yint2}
 \alias{yint2}
-\title{get the time interval without having to specify so many args}
+\title{get the time interval without having to specify so many arguments}
 \usage{
 yint2(X)
 }

@@ -15,5 +15,5 @@ avgDeaths(codi, deaths.summed = FALSE)
 codi a new column, \code{deathsAvg} will be appended.
 }
 \description{
-ideally \code{deaths} is the averag annual deaths in the intercensal period, but it is also common to give it as the sum. If this was the case, set \code{deaths.summed} to \code{TRUE} and we take care of it.
+ideally \code{deaths} is the average annual deaths in the intercensal period, but it is also common to give it as the sum. If this was the case, set \code{deaths.summed} to \code{TRUE} and we take care of it.
 }

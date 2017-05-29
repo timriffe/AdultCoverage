@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggb.R
 \name{ggbgetRMS}
 \alias{ggbgetRMS}
-\title{calcuate the root means square of the error to help find optimal age range}
+\title{calculate the root means square of the error to help find optimal age range}
 \usage{
 ggbgetRMS(agesi, codi)
 }
@@ -15,5 +15,5 @@ ggbgetRMS(agesi, codi)
 the RMSE
 }
 \description{
-Called by \code{ggbgetAgesFit()} whenever the user doesn't want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to \code{ggbcoverageFromYear()} where \code{ggbgetRMS} is called and add another condition or make it call something else.
+Called by \code{ggbgetAgesFit()} whenever the user does not want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to \code{ggbcoverageFromYear()} where \code{ggbgetRMS} is called and add another condition or make it call something else.
 }

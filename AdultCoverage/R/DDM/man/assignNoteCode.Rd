@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{assignNoteCode}
 \alias{assignNoteCode}
-\title{a cheap way to choose which column to assign a NoteCode to}
+\title{a cheap way to choose which column to assign a \code{NoteCode} to}
 \usage{
 assignNoteCode(X, code)
 }
@@ -12,5 +12,5 @@ assignNoteCode(X, code)
 \item{code}{character string to assign to the column, typically the name of the function operating on \code{X}.}
 }
 \description{
-One property of the LexisDB scripts that might be useful for downstream checks is the ability to trace which functions have modified a given data object. These can go into NoteCode slots. This function writes \code{code} to the first unoccupied \code{NoteCode} column. If all three \code{NoteCode} columns are occupied, it concatenates the end of the third column. This way we preserve a full history. Unfortunately it gets split between columns. Oh well. Good for eyeballing. This function written for the sake of modularity. Function copied from HMD collection directly as-is.
+One property of the LexisDB scripts that might be useful for downstream checks is the ability to trace which functions have modified a given data object. These can go into NoteCode slots. This function writes \code{code} to the first unoccupied \code{NoteCode} column. If all three \code{NoteCode} columns are occupied, it concatenates the end of the third column. This way we preserve a full history. Unfortunately it gets split between columns. Oh well. Good for eyeballing. This function written for the sake of modularity. Function copied from Human Mortality Database collection directly as-is.
 }

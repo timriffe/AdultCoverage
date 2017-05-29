@@ -16,7 +16,7 @@
   \item{sex}{character, 'f'}
 }}
 \source{
-data downloaded from DATASUS http://www.datasus.gov.br
+data downloaded from DATASUS \code{http://www.datasus.gov.br}
 }
 \usage{
 BrasilFemales
