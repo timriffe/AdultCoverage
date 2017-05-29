@@ -317,7 +317,8 @@ seg <- function(X,
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#'
+#' @param log logical. should we log the y axis?
+#' 
 #' @return Function called for its graphical side effects
 #' 
 #' @importFrom grDevices gray
@@ -337,8 +338,8 @@ segplot <- function(
 		minAges = 8, 
 		exact.ages = NULL, 
 		eOpen = NULL, 
-		deaths.summed = FALSE
-		){
+		deaths.summed = FALSE,
+		log = FALSE){
 	tab1        <- headerPrep(X)
 	
 	if (length(tab1) > 1){
@@ -361,12 +362,17 @@ segplot <- function(
 	ages2 	 <- codi$age[keep2]
 	yvals2 	 <- codi$Cx[keep2]
 	
-	# TODO: make yrange more flexible.
+	# TR: 29 May ylim changes
+	if (!log){
+		ymin <- min(c(0, min(yvals)))
+		ymax <- max(1, max(yvals))
+		ylim <- c(ymin, ymax)
+	} else {
+		ylim <- range(yvals)
+	}
+
 	
-	ymin <- min(c(0,min(yvals)))
-	ymax <- max(1,max(yvals))
-	
-	plot(ages, yvals, pch = 16, ylim = c(ymin,ymax), col = gray(.5),log='y', ylab="Cx")
+	plot(ages, yvals, pch = 16, ylim = ylim, col = gray(.5), ylab="Cx", log = ifelse(log,"y",""))
 	rect(ages2[1]-2.5,coverage$l25,ages2[length(ages2)]+2.5,coverage$u25, 
 			border = NA, col = "#00000040")
 	points(ages2, yvals2, pch = 16, col = "black")
