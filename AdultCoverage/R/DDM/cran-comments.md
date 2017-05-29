@@ -11,7 +11,8 @@ This is a first release of the DDM package, which has so far only been available
 
 0 ERRORs | 0 WARNINGs | 1 NOTE
 
-* Non-standard file/directory found at top level:
-  ‘cran-comments.md’
+* Possibly mis-spelled words in DESCRIPTION:
+  GGB (8:189, 8:267)
+  SEG (8:236, 8:271)
 
-  That refers to this very file, which the devtools package makes use of in release(), which produced this submission.
+These are abbreviations pertinent to the methods in the package.
