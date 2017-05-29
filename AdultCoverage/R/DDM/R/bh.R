@@ -363,7 +363,10 @@ segplot <- function(
 	
 	# TODO: make yrange more flexible.
 	
-	plot(ages, yvals, pch = 16, ylim = range(yvals), col = gray(.5),log='y', ylab="Cx")
+	ymin <- min(c(0,min(yvals)))
+	ymax <- max(1,max(yvals))
+	
+	plot(ages, yvals, pch = 16, ylim = c(ymin,ymax), col = gray(.5),log='y', ylab="Cx")
 	rect(ages2[1]-2.5,coverage$l25,ages2[length(ages2)]+2.5,coverage$u25, 
 			border = NA, col = "#00000040")
 	points(ages2, yvals2, pch = 16, col = "black")
