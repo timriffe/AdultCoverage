@@ -25,5 +25,5 @@ a vector of ages that minimizes the RMSE
 Called by \code{ggbcoverageFromYear()} whenever \code{exact.ages} are not given. This automates what one typically does visually.
 }
 \seealso{
-ggbChooseAges
+code{\link{ggbChooseAges}}
 }

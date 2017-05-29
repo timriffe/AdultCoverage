@@ -224,7 +224,7 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
 
 #' @title determine the age range that minimizes the mean squared error
 #' @description Called by \code{ggbcoverageFromYear()} whenever \code{exact.ages} are not given. This automates what one typically does visually.
-#' @seealso ggbChooseAges
+#' @seealso code{\link{ggbChooseAges}}
 #' 
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param minAges the minimum number of adjacent ages to be used in estimating
