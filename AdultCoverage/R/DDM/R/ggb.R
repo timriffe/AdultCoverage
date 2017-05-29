@@ -438,6 +438,9 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 #' 
 #' 
 #' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, \code{$upper}, and \code{ages}.
+#' 
+#' @importFrom grDevices gray
+#' @importFrom graphics abline legend locator mtext par plot points rect segments text
 #' @export
 #' 
 #' @examples

@@ -11,6 +11,7 @@
 #' 
 #' @return numeric an estimate of remaining life expectancy in the open age group
 #' 
+#' @importFrom stats splinefun
 #' @export
 
 eOpenCD <- function(codiaugmented){
@@ -179,6 +180,8 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
+#' @importFrom stats quantile
+#' 
 #' @export
 
 
@@ -317,6 +320,8 @@ seg <- function(X,
 #'
 #' @return Function called for its graphical side effects
 #' 
+#' @importFrom grDevices gray
+#' @importFrom graphics abline legend locator mtext par plot points rect segments text
 #' @export 
 #' 
 #' @examples 

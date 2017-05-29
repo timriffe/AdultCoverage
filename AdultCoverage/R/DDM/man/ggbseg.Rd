@@ -20,7 +20,7 @@ ggbseg(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
 
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
-\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+\item{deaths.summed}{logical. Is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.

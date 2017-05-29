@@ -489,11 +489,3 @@ headerPrep <- function(X){
 	tab1
 }
 
-
-# Import suggestions made by Winbuilder: 
-# https://win-builder.r-project.org
-#' importFrom("grDevices", "gray")
-#' importFrom("graphics", "abline", "legend", "locator", "mtext", "par",
-#'              "plot", "points", "rect", "segments", "text")
-#' importFrom("stats", "approx", "quantile", "splinefun")
-NULL

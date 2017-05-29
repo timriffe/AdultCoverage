@@ -96,6 +96,8 @@ ddm <- function(
 #' @param ... other arguments passed to \code{plot()}
 #' 
 #' @return called for its graphical device side-effects.
+#' @importFrom grDevices gray 
+#' @importFrom graphics abline legend locator mtext par plot points rect segments text
 #' @export
 #' 
 #' @examples 
