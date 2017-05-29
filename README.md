@@ -5,17 +5,20 @@ This repository contains R code for a technical paper in progress, provisionally
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">"R implementations of three growth balance methods for estimating adult mortality coverage</span> by Everton Lima, Bernardo Queiroz, and <a xmlns:cc="http://creativecommons.org/ns#" href="https://sites.google.com/site/timriffepersonal/" property="cc:attributionName" rel="cc:attributionURL">Timothy L. M. Riffe</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
 
-More instructions, and possibly a website, will be made available after publication. Aiming for 100% reproducibility here.
-
-
 DDM R package
 =============
-This project has produced a small R package that implements three methods for indirect estimation of death registration coverage (Generalized Growth Balance, Synthetic Extinct Generations, and a hybrid of the two). It is still not fully documented, and the methods are currently in beta testing. So please use and test away. Package test data coming soon.
+This project has produced a small R package that implements three methods for indirect estimation of death registration coverage (Generalized Growth Balance, Synthetic Extinct Generations, and a hybrid of the two). 
 
 A short tutorial 
 ------------------
 
-To download the most recent version of DDM:
+To install from the central R repository (current version 1.0-0):
+
+```r
+install.packages("DDM")
+```
+
+The development version (current version 1.0-0) hosted here on github is always the most up-to-date version. There are different ways to install the development version of the package.
 
 Download the [zip ball](https://github.com/timriffe/AdultCoverage/zipball/master) or [tar ball](https://github.com/timriffe/AdultCoverage/tarball/master), decompress and run `R CMD INSTALL` on the subfolder called `R/DDM` in the terminal command line, or (easier) use the **devtools** package to install the development version:
 
@@ -32,7 +35,7 @@ Then you can load the package using:
 library(DDM)
 ```
 
-Be aware that if you report a bug and we fix it, then you'll need to reinstall to get the changes. 
+Be aware that if you report a bug and we fix it, then you'll need to reinstall (from github) to get the changes. 
 
 Your data need to be in this kind of shape:
 
@@ -95,6 +98,7 @@ This overview plot also gives the harmonic mean of the coverage estimate given f
 What's missing?
 ==============
 
-Testing. More documentation. A dataset to provide with the package. A proper vignette. References to the papers where these methods come from (Brass, Bennett-Horiuchi, Hill, etc). We aim to provide a manuscript as an overview of the methods provided here, and once-tested, we'll upload the `DDM` package to CRAN. 
+This code is newish, and certainly changes will be made as users report issues or make requests. The next steps will include improvements to graphical diagnostics and an easier way to return the interim data object used to calculate results. Possibly in the future we would think about adding more methods, such as DDM methods that adjust for migration.
+
 
 
