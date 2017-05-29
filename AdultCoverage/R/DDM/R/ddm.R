@@ -118,10 +118,10 @@ ddmplot <- function(X,...){
 	h.mean <- function(x){
 		1/mean(1/x)
 	}
-	g.mean <- function(x){
-		n <- length(x)
-		prod(x)^(1/n)
-	}
+	#g.mean <- function(x){
+	#	n <- length(x)
+	#	prod(x)^(1/n)
+	#}
 	Range <- range(as.matrix(X[,c("ggb","seg","ggbseg")]))
 	plot(X$x,X$ggb, pch = 19,col="#FFA155", ylim=Range, cex=.6, 
 			xlab = "data row", ylab = "coverage estimate",

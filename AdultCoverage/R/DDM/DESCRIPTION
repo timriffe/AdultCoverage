@@ -5,10 +5,7 @@ Version: 0.9.0.0
 Date: 2017-05-27
 Author: Tim Riffe, Everton Lima, Bernardo Queiroz
 Maintainer: Tim Riffe <riffe@demogr.mpg.de>
-Description: An implementation of the GGB, and two Bennett-Horiuchi (SEG, and GGB-SEG) methods to
-    indirectly estimate the degree of death registration for a population. Methods
-    produce automatic estimation, but users may also specify exact parameters or
-    use a graphical interface if required.
+Description: An implementation of three two-census methods to the estimate the degree of death registration coverage for a population. These include the Generalized Growth Balance method (GGB), the Synthetic Extinct Generation method (SEG), and a hybrid of the two, GGB-SEG. Methods produce automatic estimation, but users may also specify exact parameters or use a graphical interface if desired.
 Depends:
     R (>= 2.15)
 License: GPL-2

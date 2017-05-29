@@ -553,7 +553,7 @@ ggbsegCoverageFromYear <- function(codi,
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
-#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param deaths.summed logical. Is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
