@@ -543,6 +543,10 @@ ggbsegCoverageFromYear <- function(codi,
 		agesFit <- exact.ages
 	}
 	
+	# TODO: TR: make this function take two exact.ages args (exact.ages.ggb and exact.ages.seg)
+	# by default equal, but potentially different if desired. Per Ken Hill recommendations 
+	# TODO nr 2: make an seg automatic age selection function(horizontal criteria) so that 
+	# automatic age selection can happen twice. (re PG comment)
 	codi         <- ggbsegMakeColumns(
 								codi = codiggb, 
 								minA = minA, 
