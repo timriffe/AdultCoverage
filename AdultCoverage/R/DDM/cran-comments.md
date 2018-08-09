@@ -9,10 +9,7 @@ This is a first release of the DDM package, which has so far only been available
 
 ## R CMD check results
 
-0 ERRORs | 0 WARNINGs | 1 NOTE
+There were no ERRORs, WARNING or NOTEs
 
-* Possibly mis-spelled words in DESCRIPTION:
-  GGB (8:189, 8:267)
-  SEG (8:236, 8:271)
 
 These are abbreviations pertinent to the methods in the package.
