@@ -63,6 +63,50 @@ eOpenCD <- function(codiaugmented){
 	eOpen
 }
 
+# TR: start a bunch of new SEG functions to help with automatic age selection.
+#' @title select age range for SEG method automatically
+#' @description We try all possible age ranges given the constraints provided. Whichever age range has the lowest root mean square residual with respect to the corresponding coverage estimate is returned.
+#' @importParams ggbgetAgesFit
+#' @export
+
+seggetAgesFit <- function (codi, 
+                           minA = 15, 
+                           maxA = 75, 
+                           minAges = 8, 
+                           deaths.summed = FALSE) {
+  codi <- segMakeColumns(codi = codi, minA = minA, maxA = maxA, 
+                         deaths.summed = deaths.summed)
+  
+  keep <- codi$age >= minA & codi$age <= maxA
+  maxAges   <- sum(keep)
+  agesUniv  <- codi$age[keep]
+  FirstAges <- agesUniv[agesUniv < 30]
+  ind       <- 0
+  agesL     <- list()
+  for (Nr in maxAges:minAges) {
+    its <- length(agesUniv) - Nr + 1
+    for (set in 1:its) {
+      ind <- ind + 1
+      agesL[[ind]] <- agesUniv[set:(set + Nr - 1)]
+    }
+  }
+  
+
+  agesfit <- agesL[[which.min(unlist(lapply(agesL, seggetRMS, 
+                                            codi = codi )))]]
+  agesfit
+}
+
+
+#' 
+
+seggetRMS <- function(codi, agesFit){
+  coverage      <- segCoverageFromAges(codi, agesFit = agesFit)
+  Cx <- codi$Cx
+  keep <- codi$age %in% agesFit  
+  sqrt(mean((Cx[keep] - coverage) ^ 2, na.rm = TRUE))
+}
+
 
 #' @title given a set of ages, what is the implied death registration coverage?
 #' 
@@ -205,9 +249,11 @@ segCoverageFromYear <-  function(codi,
 		}
 	}
 	
-	# outsource automatic age selection to GGB method.
+	# TR: 19.06.2020 pick ages by minimizing RMS
+  # assuming a horizontal coverage line on 
+  # a sequential range of ages of Cx
 	if (is.null(exact.ages)){
-		agesFit <- ggbgetAgesFit(codi = codi, 
+		agesFit <- seggetAgesFit(codi = codi, 
 								 minA = minA, 
 								 maxA = maxA, 
 								 minAges = minAges, 
@@ -355,8 +401,8 @@ segplot <- function(
 			deaths.summed = deaths.summed)
 	codi     <- goods$codi
 	coverage <- goods$coverages
-	keep 	 <- codi$age >= minA &  codi$age <= maxA
-	ages 	 <- codi$age[keep]
+	keep 	   <- codi$age >= minA &  codi$age <= maxA
+	ages 	   <- codi$age[keep]
 	yvals 	 <- codi$Cx[keep]
 	keep2 	 <- codi$age >= coverage$lower & codi$age <= coverage$upper
 	ages2 	 <- codi$age[keep2]
@@ -410,7 +456,8 @@ ggbsegMakeColumns <- function(
 		codi, 
 		minA = 15, 
 		maxA = 75,  
-		agesFit, 
+		agesFit.ggb, 
+		agesFit.seg, 
 		eOpen = NULL,
 		deaths.summed = FALSE){
 	codi         <- avgDeaths(codi = codi, deaths.summed = deaths.summed)
@@ -435,7 +482,7 @@ ggbsegMakeColumns <- function(
 	
 	# just get left term / right term
 	# slopeint() is in the ggb() family
-	ab           <- slopeint(codi = codi, agesfit = agesFit)
+	ab           <- slopeint(codi = codi, agesfit = agesFit.ggb)
 	
 	# the only difference between this method and seg is that
 	# in the next couple lines we use pop1adj instead of pop1...
@@ -500,7 +547,8 @@ ggbsegCoverageFromYear <- function(codi,
 								minA = 15, 
 								maxA = 75, 
 								minAges = 8, 
-								exact.ages = NULL, 
+								exact.ages.ggb = NULL, 
+								exact.ages.seg = NULL,
 								eOpen = NULL, 
 								deaths.summed = FALSE){
 	codiggb      <- ggbMakeColumns(codi = codi, 
@@ -508,16 +556,26 @@ ggbsegCoverageFromYear <- function(codi,
 								   maxA = maxA, 
 								   deaths.summed = deaths.summed)
 	# Get age range using the GGB auto fitting
-	if (is.null(exact.ages)){
-		agesFit <- ggbgetAgesFit(codi = codiggb, 
+	if (is.null(exact.ages.ggb)){
+		agesFitggb <- ggbgetAgesFit(codi = codiggb, 
 								minA = minA, 
 								maxA = maxA, 
 								minAges = minAges,
 								deaths.summed = deaths.summed)
 	} else {
-		agesFit <- exact.ages
+		agesFit.ggb <- exact.ages.ggb
 	}
-	
+	# Get age range using the SEG auto fitting
+	# NOTE: we need to make the function seggetAgesFit()
+	if (is.null(exact.ages.seg)){
+	  agesFitseg <- seggetAgesFit(codi = codiggb, 
+	                              minA = minA, 
+	                              maxA = maxA, 
+	                              minAges = minAges,
+	                              deaths.summed = deaths.summed)
+	} else {
+	  agesFit.seg <- exact.ages.seg
+	}
 	# TODO: TR: make this function take two exact.ages args (exact.ages.ggb and exact.ages.seg)
 	# by default equal, but potentially different if desired. Per Ken Hill recommendations 
 	# TODO nr 2: make an seg automatic age selection function(horizontal criteria) so that 
@@ -526,11 +584,14 @@ ggbsegCoverageFromYear <- function(codi,
 								codi = codiggb, 
 								minA = minA, 
 								maxA = maxA, 	
-								agesFit = agesFit,
+								agesFit.ggb = agesFit.ggb,
 								eOpen = eOpen,
 								deaths.summed = deaths.summed)
-	coverage     <- segCoverageFromAges(codi = codi, agesFit = agesFit )
-	data.frame(cod = unique(codi$cod), coverage = coverage, lower = min(agesFit), upper = max(agesFit))
+	coverage     <- segCoverageFromAges(codi = codi, agesFit = agesFit.seg)
+	data.frame(cod = unique(codi$cod), 
+	           coverage = coverage, 
+	           lower.ggb = min(agesFit.ggb), upper.ggb = max(agesFit.ggb),
+	           lower.seg = min(agesFit.seg), upper.seg = max(agesFit.seg))
 }
 
 
@@ -572,7 +633,8 @@ ggbseg <- function(X,
 				minA = 15, 
 				maxA = 75, 
 				minAges = 8, 
-				exact.ages = NULL, 
+				exact.ages.ggb = NULL, 
+				exact.age.seg = NULL,
 				eOpen = NULL, 
 				deaths.summed = FALSE){
 	# TR: modularized Apr 2, 2017
@@ -587,7 +649,8 @@ ggbseg <- function(X,
 						minA = minA,  
 						maxA = maxA,
 						minAges = minAges,  	
-						exact.ages = exact.ages,
+						exact.ages.ggb = exact.ages.ggb,
+						exact.ages.seg = exact.ages.seg,
 						eOpen = eOpen,
 						deaths.summed = deaths.summed
                   )))

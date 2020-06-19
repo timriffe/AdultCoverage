@@ -26,11 +26,13 @@
 #BR3 <- read.table(file.path("Data","data_Brazil_p3.txt"), 
 #		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 #
-#
-#
-#
-#
-#
-#
-#
-#
+library(devtools)
+getwd()
+load_all("AdultCoverage/R/DDM")
+
+res <- seg(Moz)
+res
+# The Brasil data
+BM <- seg(BrasilMales)
+BF <- seg(BrasilFemales)
+
