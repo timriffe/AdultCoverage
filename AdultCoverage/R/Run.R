@@ -35,4 +35,6 @@ res
 # The Brasil data
 BM <- seg(BrasilMales)
 BF <- seg(BrasilFemales)
-
+ggbseg(Moz)
+ggb(Moz)
+seg(Moz)
