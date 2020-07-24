@@ -616,7 +616,7 @@ ggbsegCoverageFromYear <- function(codi,
 	                              agesFit.ggb = agesFit.ggb,
 	                              deaths.summed = deaths.summed)
 	} else {
-	  agesFit.ggbseg <- agesFit.ggbseg
+	  agesFit.ggbseg <- exact.ages.seg
 	}
 	# TODO: TR: make this function take two exact.ages args (exact.ages.ggb and exact.ages.seg)
 	# by default equal, but potentially different if desired. Per Ken Hill recommendations 
