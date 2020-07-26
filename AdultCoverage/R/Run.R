@@ -1,18 +1,4 @@
-#
-#if (system("hostname",intern=TRUE) %in% c("triffe-N80Vm", "tim-ThinkPad-L440")){
-#	# if I'm on the laptop
-#	setwd("/home/tim/git/AdultCoverage/AdultCoverage")
-#} else {
-#	if (system("hostname",intern=TRUE) == "PC-403478"){
-#		# on MPIDR PC
-#		setwd("U://git//AdultCoverage//AdultCoverage")
-#	} else {
-#		# in that case I'm on Berkeley system, and other people in the dept can run this too
-#		setwd(paste0("/data/commons/",system("whoami",intern=TRUE),"/git/AdultCoverage/AdultCoverage"))
-#	}
-#}
-#getwd()
-#
+
 #ITA <- read.table("Data/italy.test.txt", 
 #  header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 #
@@ -29,7 +15,7 @@
 library(devtools)
 getwd()
 load_all("AdultCoverage/R/DDM")
-
+document("AdultCoverage/R/DDM")
 res <- seg(Moz)
 res
 # The Brasil data
@@ -38,3 +24,26 @@ BF <- seg(BrasilFemales)
 ggbseg(Moz)
 ggb(Moz)
 seg(Moz)
+
+ggb_res    <- ggb(BrasilMales)
+seg_res    <- seg(BrasilMales)
+ggbseg_res <- ggbseg(BrasilMales)
+
+ggb_res$method <- "GGB"
+seg_res$method <- "SEG"
+ggbseg_res$method <- "GGBSEG"
+colnames(ggbseg_res) <- c("cod","coverage", "lower.ggb","upper.ggb","lower","upper","method")
+res <- rbind(ggb_res[,c("cod","method","lower","upper")],
+             seg_res[,c("cod","method","lower","upper")],
+             ggbseg_res[,c("cod","method","lower","upper")]
+             )
+library(tidyverse)
+library(ggplot2)
+res %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x=as.factor(cod),ymin=lower, ymax = upper,color = method)) + 
+           geom_errorbar(position = "dodge")
+
+segplot(subset(BrasilMales, cod == 51))
+ggbsegplot
+ggbChooseAges(subset(BrasilMales, cod == 51))

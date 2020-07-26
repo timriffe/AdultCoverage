@@ -4,8 +4,14 @@
 \alias{ypart}
 \title{determine the proportion of a year passed as of a particular date}
 \usage{
-ypart(Year, Month, Day, reproduce.matlab = TRUE, detect.mid.year = FALSE,
-  detect.start.end = TRUE)
+ypart(
+  Year,
+  Month,
+  Day,
+  reproduce.matlab = TRUE,
+  detect.mid.year = FALSE,
+  detect.start.end = TRUE
+)
 }
 \arguments{
 \item{Year}{4-digit year (string or integer)}

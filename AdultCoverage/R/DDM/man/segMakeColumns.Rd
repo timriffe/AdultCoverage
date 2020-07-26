@@ -4,8 +4,7 @@
 \alias{segMakeColumns}
 \title{make the Bennett-Horiuchi quasi life table columns required by the estimation method}
 \usage{
-segMakeColumns(codi, minA = 15, maxA = 75, eOpen = NULL,
-  deaths.summed = FALSE)
+segMakeColumns(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE)
 }
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{seg()}}

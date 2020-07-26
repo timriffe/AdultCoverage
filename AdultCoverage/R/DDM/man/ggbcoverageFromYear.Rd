@@ -4,8 +4,14 @@
 \alias{ggbcoverageFromYear}
 \title{estimate death registration coverage for a single year/sex/region using the GGB method}
 \usage{
-ggbcoverageFromYear(codi, exact.ages = NULL, minA = 15, maxA = 75,
-  minAges = 8, deaths.summed = FALSE)
+ggbcoverageFromYear(
+  codi,
+  exact.ages = NULL,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  deaths.summed = FALSE
+)
 }
 \arguments{
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}

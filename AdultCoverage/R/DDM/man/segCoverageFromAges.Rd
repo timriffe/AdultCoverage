@@ -9,7 +9,7 @@ segCoverageFromAges(codi, agesFit)
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
 
-\item{agesFit}{an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.}
+\item{agesFit}{an integer vector of ages, either returned from \code{seggetAgesFit} or user-supplied.}
 }
 \value{
 numeric. the estimated level of coverage.

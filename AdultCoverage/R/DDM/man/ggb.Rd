@@ -4,8 +4,14 @@
 \alias{ggb}
 \title{estimate death registration coverage using the GGB method}
 \usage{
-ggb(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
-  deaths.summed = FALSE)
+ggb(
+  X,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  exact.ages = NULL,
+  deaths.summed = FALSE
+)
 }
 \arguments{
 \item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}

@@ -4,8 +4,15 @@
 \alias{ggbChooseAges}
 \title{interactively determine ages to use for estimating coverage}
 \usage{
-ggbChooseAges(codi, minA = 15, maxA = 75, minAges = 8,
-  exact.ages = NULL, maxit = 15, deaths.summed = FALSE)
+ggbChooseAges(
+  codi,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  exact.ages = NULL,
+  maxit = 15,
+  deaths.summed = FALSE
+)
 }
 \arguments{
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}

@@ -63,11 +63,11 @@ eOpenCD <- function(codiaugmented){
 	eOpen
 }
 
-# TR: start a bunch of new SEG functions to help with automatic age selection.
-#' @title select age range for SEG method automatically
-#' @description We try all possible age ranges given the constraints provided. Whichever age range has the lowest root mean square residual with respect to the corresponding coverage estimate is returned.
-#' @importParams ggbgetAgesFit
+#' @title select age range for SEG method automatically.
+#' @description We try all possible age ranges given the constraints provided. Whichever age range has the lowest RMSE with respect to the corresponding coverage estimate is returned.
+#' @inheritParams ggbgetAgesFit
 #' @export
+#' @return integer vector of ages that minimize the RMSE.
 
 seggetAgesFit <- function (codi, 
                            minA = 15, 
@@ -97,8 +97,11 @@ seggetAgesFit <- function (codi,
   agesfit
 }
 
-
-#' 
+#' calculates RMSE for SEG and a specfied age vector.
+#' @description return the RMSE of `Cx` with respect to the coverage estimate for a given range of ages.
+#' @inheritParams ggbgetAgesFit
+#' @export
+#' @return numeric. RMSE
 
 seggetRMS <- function(codi, agesFit){
   coverage      <- segCoverageFromAges(codi, agesFit = agesFit)
@@ -110,8 +113,9 @@ seggetRMS <- function(codi, agesFit){
 # TR: start a bunch of new SEG functions to help with automatic age selection.
 #' @title select age range for GGBSEG method automatically
 #' @description We try all possible age ranges given the constraints provided. Whichever age range has the lowest root mean square residual with respect to the corresponding coverage estimate is returned.
-#' @importParams ggbgetAgesFit
+#' @inheritParams ggbgetAgesFit
 #' @export
+#' @return integer vector of ages that minimize the RMSE.
 
 ggbseggetAgesFit <- function (codi, 
                            minA = 15, 
@@ -154,7 +158,7 @@ ggbseggetAgesFit <- function (codi,
 #' @description For a single year/sex/region of data (formatted as required by \code{seg()}, \code{ggbseg()}), what is the registration coverage implied by a given age range? Called by \code{segCoverageFromYear()} and  \code{ggbsegCoverageFromYear()}. Here, the function simply takes the arithmetic mean of a given age range of \code{$Cx}, as returned by \code{segMakeColumns()} or \code{ggbsegMakeColumns()}. Not intended for top-level use.
 #' 
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
-#' @param agesFit an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.
+#' @param agesFit an integer vector of ages, either returned from \code{seggetAgesFit} or user-supplied.
 #'
 #' @return numeric. the estimated level of coverage.
 #' @export
@@ -331,15 +335,17 @@ segCoverageFromYear <-  function(codi,
 
 #' @title estimate death registration coverage using the synthetic extinct generation method 
 #' 
-#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model life table, although the user may also supply a value.
+#' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the ages to fit against are not specified, then these are optimized. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model life table, although the user may also supply a value.
 #' 
 #' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOpen} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
+#' 
+#' If \code{exact.ages} is specified as \code{NULL}, coverage is estimated by minimizing the RMSE of the coverage estimate versus \code{$Cx}.
 #' 
 #' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
 #' @param minAges the minimum number of adjacent ages to be used in estimating
-#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
+#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation. if left as \code{NULL} these are optimized.
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'
@@ -486,7 +492,7 @@ segplot <- function(
 #' @param minA the minimum of the age range searched. Default 15
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param eOpen optional. A value for remaining life expectancy in the open age group.
-#' @param agesFit vector of ages as passed in by \code{ggbsegCoverageFromYear)} 
+#' @param agesFit.ggb vector of ages as passed in by \code{ggbsegCoverageFromYear)} 
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'
 #' @return codi, with many columns added, most importantly \code{$Cx}.
@@ -570,19 +576,10 @@ ggbsegMakeColumns <- function(
 #' 
 #' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. 
 #' 
-#' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$sex}, \code{$age}, and \code{$cod} (to indicate regions, periods, sexes).
-#' @param exact.ages optional. use an exact set of ages to estimate coverage.
-#' @param minA the minimum of the age range searched. Default 15
-#' @param maxA the maximum of the age range searched. Default 75
-#' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
-#' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
-#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#'
-#' 
+#' @inheritParams ggbseg
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
 #' @export
-
 
 ggbsegCoverageFromYear <- function(codi, 
 								minA = 15, 
@@ -641,13 +638,14 @@ ggbsegCoverageFromYear <- function(codi,
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method estimates age-specific degrees of coverage. The age pattern of these is assumed to be noisy, so we take the arithmetic mean over some range of ages. One may either specify a particular age-range, or let the age range be determined automatically. If the age-range is found automatically, this is done using the method developed for the generalized growth-balance method. Part of this method relies on a prior value for remaining life expectancy in the open age group. By default, this is estimated using a standard reference to the Coale-Demeny West model life table, although the user may also supply a value. The difference between this method and \code{seg()} is that here we adjust census 1 part way through processing, based on some calculations similar to GGB.
 #' 
-#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term. Finally, only specify \code{eOpen} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} columns are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with a unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths in each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range for the GGB method in the traditional visual way, see \code{ggbChooseAges()}, when working with a single year/sex/region of data. A similar visual picker for SEG is not yet implemented. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared error (RMSE) between the fitted line and right term for the GGB (first stage), and the SEG stage minimizes RMSE for \code{$Cx} against the coverage estimate implied by the age range. Finally, only specify \code{eOpen} when working with a single region/sex/period of data, otherwise the same value will be passed in irrespective of mortality and sex.
 #' 
 #' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
 #' @param minAges the minimum number of adjacent ages to be used in estimating
-#' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
+#' @param exact.ages.ggb optional. A user-specified vector of exact ages to use for coverage estimation in the GGB (first stage) part of the estimation.
+#' @param exact.ages.seg optional. A user-specified vector of exact ages to use for coverage estimation in the SEG (second stage) part of the estimation.
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. Is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #'

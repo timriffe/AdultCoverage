@@ -4,8 +4,17 @@
 \alias{yint}
 \title{get interval as fraction of full years}
 \usage{
-yint(Day1, Month1, Year1, Day2, Month2, Year2, reproduce.matlab = FALSE,
-  detect.mid.year = TRUE, detect.start.end = TRUE)
+yint(
+  Day1,
+  Month1,
+  Year1,
+  Day2,
+  Month2,
+  Year2,
+  reproduce.matlab = FALSE,
+  detect.mid.year = TRUE,
+  detect.start.end = TRUE
+)
 }
 \arguments{
 \item{Day1}{Day of first date}

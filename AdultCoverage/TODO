@@ -1,7 +1,12 @@
-add u25, l25, k1, k2, delta to ggbseg methods
+* add u25, l25, k1, k2, delta to ggbseg methods
 
-allow for other model lifetables (note demogr package now alive again)
+* allow for other model lifetables (note demogr package now alive again)
 
-plot function for ggbseg
+* plot function for ggbseg (3hrs)
 
-does it make sense to have a different age picker for SEG?
+* incorporate Bernardo's delta method (two scripts, design)
+
+* document all new functions
+
+* make new examples
+

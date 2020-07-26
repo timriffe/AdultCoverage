@@ -4,8 +4,15 @@
 \alias{segCoverageFromYear}
 \title{estimate death registration coverage for a single year/sex/region using the Bennett-Horiuchi method}
 \usage{
-segCoverageFromYear(codi, minA = 15, maxA = 75, minAges = 8,
-  exact.ages = NULL, eOpen = NULL, deaths.summed = FALSE)
+segCoverageFromYear(
+  codi,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  exact.ages = NULL,
+  eOpen = NULL,
+  deaths.summed = FALSE
+)
 }
 \arguments{
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$sex}, \code{$age}, and \code{$cod} (to indicate regions, periods, sexes).}

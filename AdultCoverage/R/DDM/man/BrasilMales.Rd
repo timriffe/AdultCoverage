@@ -4,7 +4,8 @@
 \name{BrasilMales}
 \alias{BrasilMales}
 \title{Example data for Brasil males by federal states, years 1980 to 1991}
-\format{A data frame with 53940 rows and 10 variables:
+\format{
+A data frame with 53940 rows and 10 variables:
 \describe{
   \item{cod}{integer an id number for each state}
   \item{pop1}{integer the census population count in 1991}
@@ -14,7 +15,8 @@
   \item{year2}{integer 2000}
   \item{age}{integer lower age bound for each age group}
   \item{sex}{character, 'm'}
-}}
+}
+}
 \source{
 data downloaded from DATASUS \code{http://www.datasus.gov.br}
 }

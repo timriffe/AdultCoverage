@@ -4,8 +4,16 @@
 \alias{segplot}
 \title{plot the age-pattern of coverage estimates}
 \usage{
-segplot(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
-  eOpen = NULL, deaths.summed = FALSE, log = FALSE)
+segplot(
+  X,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  exact.ages = NULL,
+  eOpen = NULL,
+  deaths.summed = FALSE,
+  log = FALSE
+)
 }
 \arguments{
 \item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}
