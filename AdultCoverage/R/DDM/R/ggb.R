@@ -498,9 +498,16 @@ ggbChooseAges <- function(codi,
 	#coverage <- ggbcoverageFromAges(codi, agesfit)
 	coverage <- 1/si$b
 	# some objects used throughout
+
+	
 	age      <- codi$age
+	# rm border ages re PJ issue #2
+	ages.rm  <- age < minA | age > maxA 
 	leftt    <- codi$leftterm
 	rightt   <- codi$rightterm
+	leftt[ages.rm]  <- NA
+	rightt[ages.rm] <- NA
+	
 	
 	# age ranges used for fitting
 	amin    <- min(agesfit); amax <- max(agesfit)
@@ -545,7 +552,7 @@ ggbChooseAges <- function(codi,
 			si       <- slopeint(codi, agesfit)
 			
 			# redraw plot
-			plot(   rightt, 
+			plot(rightt, 
 					leftt, 
 					asp = 1, 
 					pch = 19, 
