@@ -91,7 +91,7 @@ ggbcoverageFromYear <- function(codi,
 	# TR: 3-4-2017 no longer optional
 
 	coefs    <- slopeint(codi, agesfit)
-	dif      <- yint2(codi)
+	dif      <- codi$dif %>% '['(1)
 	# TR: 3-4-2017 this is k1/k2
 	delta    <- exp(coefs$a * dif)
 	# TR: 3-4-2017 these are calulcated per the IUSSP spreadsheet
@@ -120,7 +120,7 @@ ggbcoverageFromYear <- function(codi,
 #' @param agesfit an a priori set of ages for which to calculate the fit
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
-#' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
+#' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
 #' 
 #' @export
 
@@ -173,50 +173,41 @@ ggbcoverageFromAges <- function(codi, agesfit, deaths.summed = FALSE){
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' 
-#' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
+#' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
 #' 
 #' @export
+#' @importFrom Demotools age2int 
+#' @importFrom Demotools lt_id_L_T 
+#' @importFrom lubridate decimal_date
+#' @import dplyr
+#' @import magrittr
+
 ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
-	codi                   <- avgDeaths(codi = codi, deaths.summed = deaths.summed)
-	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
-	dif                    <- yint2(codi)
-		
-		# a quick recheck of classes:
-#	codi <- within(codi, {
-#				deathsAvg <- as.double(deathsAvg)
-#				pop1 <- as.double(pop1)
-#				pop2 <- as.double(pop2)
-#			})
-	codi$deathsAvg <- as.double(codi$deathsAvg)
-	codi$pop1      <- as.double(codi$pop1)
-	codi$pop2      <- as.double(codi$pop2)
-			
 	# group inf if necessary
 	codi                   <- group01(codi)
 	N                      <- nrow(codi)
-	# now actual column creation
-#	codi      <- within(codi, {
-#			pop1cum        <- rev(cumsum(rev(pop1)))
-#			pop2cum        <- rev(cumsum(rev(pop2))) 
-#			deathcum       <- rev(cumsum(rev(deathsAvg)))
-#			birthdays      <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
-#			Tx             <- sqrt(pop1cum * pop2cum)
-#			cumgrowth      <- log(pop2cum / pop1cum) / dif
-#			rightterm      <- deathcum / Tx
-#			leftterm       <- (birthdays / Tx) - cumgrowth
-#			exclude        <-  Tx != 0 & birthdays != 0 & age >= minA & age <= maxA
-#		         })
 	
-	codi$pop1cum        <- rev(cumsum(rev(codi$pop1)))
-	codi$pop2cum        <- rev(cumsum(rev(codi$pop2))) 
-	codi$deathcum       <- rev(cumsum(rev(codi$deathsAvg)))
-	codi$birthdays      <- c(0, sqrt(codi$pop1[ -N  ] * codi$pop2[ -1 ])) / AgeInt
-	codi$Tx             <- sqrt(codi$pop1cum * codi$pop2cum)
-	codi$cumgrowth      <- log(codi$pop2cum / codi$pop1cum) / dif
-	codi$rightterm      <- codi$deathcum / codi$Tx
-	codi$leftterm       <- (codi$birthdays / codi$Tx) - codi$cumgrowth
-	codi$exclude        <- codi$Tx != 0 & codi$birthdays != 0 & codi$age >= minA & codi$age <= maxA
-	
+	codi <-
+	  codi %>% 
+	  mutate(	date1          = ifelse(is.numeric(date1), date1, decimal_date(date1)),
+	          date2          = ifelse(is.numeric(date2), date2, decimal_date(date2)),
+	          AgeInt         = age2int(age),
+	          dif            = date2 - date1,
+	          deathsAvg      = ifelse(deaths.summed, deaths / dif, deaths),
+	          pop1           = as.double(pop1),
+	          pop2           = as.double(pop2),
+	          pop1cum        = lt_id_L_T(pop1),
+	          pop2cum        = lt_id_L_T(pop2) ,
+	          deathcum       = lt_id_L_T(deathsAvg),
+	          # TR: maybe rethink this line as a function?
+	          # this appears to have a strong assumption about census spacing (10 years?) in it.
+	          birthdays      = c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt,
+	          Tx             = sqrt(pop1cum * pop2cum),
+	          cumgrowth      = log(pop2cum / pop1cum) / dif,
+	          rightterm      = deathcum / Tx,
+	          leftterm       = (birthdays / Tx) - cumgrowth,
+	          keep        = Tx != 0 & birthdays != 0 & age >= minA & age <= maxA)
+
 	codi
 }
 
@@ -245,8 +236,8 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed
 							   deaths.summed = deaths.summed)
 	}
 	
-	maxAges   <- sum(codi$exclude)
-	agesUniv  <- codi$age[codi$exclude]
+	maxAges   <- sum(codi$keep)
+	agesUniv  <- codi$age[codi$keep]
 	
 	FirstAges <- agesUniv[agesUniv < 30]
 	

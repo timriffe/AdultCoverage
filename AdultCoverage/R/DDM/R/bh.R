@@ -185,42 +185,33 @@ segCoverageFromAges <- function(codi, agesFit){
 #' @export
 
 segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE){
-	codi                   <- avgDeaths(codi = codi, deaths.summed = deaths.summed)
-	
-	# attempt to detect AgeInterval, should be obvious. And really, we only consider 5-yr intervals.
-	# if this were done w single ages minAges would need to increase to at least 35 I guess.
-	AgeInt                 <- detectAgeInterval(Dat = codi, MinAge =  minA, MaxAge = maxA, ageColumn = "age")
-	
-	# reduce open age to desired range
-	codi                   <- reduceOpen(codi, maxA = 95, group = TRUE)
-	# group inf if necessary
-	codi                   <- group01(codi)
-	# codi can use date columns, or year, month, day columns...
-	dif                    <- yint2(X = codi)
-	N                      <- nrow(codi)
-	ages                   <- codi$age
-	# ages better be unique! I expect this will work unless $cod is mis-specified. 
-	# This is a good catch for that
-	stopifnot(length(ages) == length(unique(ages)))
-	
-#	codi <- within(codi,{
-#				# birthdays, as in GGB
-#				birthdays <- c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt
-#				# age-specific growth
-#	        	growth    <- log(pop2 / pop1) / dif
-#				growth[is.infinite(growth) | is.nan(growth)] <- 0
-#				# cumulative growth
-#				cumgrowth <- AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth
-#				deathLT   <- deathsAvg * exp(cumgrowth)
-#			})
-	codi$birthdays <- c(0, sqrt(codi$pop1[ -N  ] * codi$pop2[ -1 ])) / AgeInt
-				# age-specific growth
-	codi$growth    <- log(codi$pop2 / codi$pop1) / dif
-	codi$growth[is.infinite(codi$growth) | is.nan(codi$growth)] <- 0
-				# cumulative growth
-	codi$cumgrowth <- AgeInt * c(0,cumsum(codi$growth[ -N ])) + AgeInt / 2 * codi$growth
-	codi$deathLT   <- codi$deathsAvg * exp(codi$cumgrowth)
-			
+  # group inf if necessary
+  codi                   <- group01(codi)
+  codi                   <- reduceOpen(codi, maxA = 95, group = TRUE)
+  N                      <- nrow(codi)
+  
+  
+  codi <-
+    codi %>% 
+    mutate(	date1          = ifelse(is.numeric(date1), date1, decimal_date(date1)),
+            date2          = ifelse(is.numeric(date2), date2, decimal_date(date2)),
+            AgeInt         = age2int(age),
+            dif            = date2 - date1,
+            deathsAvg      = ifelse(deaths.summed, deaths / dif, deaths),
+            pop1           = as.double(pop1),
+            pop2           = as.double(pop2),
+            deathcum       = lt_id_L_T(deathsAvg),
+            # TR: maybe rethink this line as a function?
+            # this appears to have a strong assumption about census spacing (10 years?) in it.
+            birthdays      = c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt,
+     
+            growth         = log(pop2 / pop1) / dif,
+            growth         = ifelse(is.infinite(growth) | is.nan(growth), 0, growth),
+            # cumulative growth
+            cumgrowth      = AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth,
+            deathLT        = deathsAvg * exp(cumgrowth))
+  
+
 	if (is.null(eOpen)){
 		eOpen <- eOpenCD(codiaugmented = codi)
 	} else {
@@ -229,24 +220,30 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	
 	eON   <- eOpen * codi$growth[N]
 
-#	codi <- within(codi, {
-#				pop_a <- 0                         # TR: test this to see if more robust
-#				pop_a[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
-#				for(j in N:2){
-#					pop_a[j - 1] <- pop_a[j] * exp(AgeInt * growth[j - 1]) + 
-#							deathsAvg[j - 1] * exp(AgeInt / 2 * growth[j - 1])
-#				}
-#				rm(j)
-#				Cx <- pop_a / birthdays
-#			})
-	codi$pop_a <- 0                         # TR: test this to see if more robust
-	codi$pop_a[N] <- codi$deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
-		for(j in N:2){
-			codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
-					codi$deathsAvg[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
-		}
-	rm(j)
-	codi$Cx <- codi$pop_a / codi$birthdays
+	calc_pop_a <- function(deathsAvg,eON,AgeInt,growth){
+	  N <- length(deathsAvg)
+	  pop_aa <- rep(0,N)                       
+	  pop_aa[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
+	  for(j in N:2){
+	    pop_aa[j - 1] <- pop_aa[j] * exp( AgeInt[j-1] * growth[j - 1]) + 
+	      deathsAvg[j - 1] * exp( AgeInt[j-1] / 2 * growth[j - 1])
+	  }
+	  pop_aa
+	}
+  # TR: this ugly appendage remains for now.
+	# pop_aa <- rep(0,N)                       
+	# pop_aa[N] <- codi$deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
+	# 	for(j in N:2){
+	# 		pop_aa[j - 1] <- pop_aa[j] * exp( codi$AgeInt[j-1] * codi$growth[j - 1]) + 
+	# 				codi$deathsAvg[j - 1] * exp( codi$AgeInt[j-1] / 2 * codi$growth[j - 1])
+	# 	}
+
+	codi <-
+	  codi %>% 
+	  mutate(
+	    pop_a = calc_pop_a(deathsAvg,eON,AgeInt,growth),
+	    Cx = pop_a / birthdays)
+
 			
 	################
 	codi
