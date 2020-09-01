@@ -197,7 +197,8 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
             date2          = ifelse(is.numeric(date2), date2, decimal_date(date2)),
             AgeInt         = age2int(age),
             dif            = date2 - date1,
-            deathsAvg      = ifelse(deaths.summed, deaths / dif, deaths),
+            avg            = deaths.summed,
+            deathsAvg      = ifelse(avg, deaths / dif, deaths),
             pop1           = as.double(pop1),
             pop2           = as.double(pop2),
             deathcum       = lt_id_L_T(deathsAvg),
@@ -230,6 +231,17 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	  }
 	  pop_aa
 	}
+	# 
+	# codi$pop_a    	<- 0
+	# codi$pop_a[N] 	<- codi$deathsAvg[N] * exp(eON) - (eON ^ 2) / 6
+	# for(j in N:2){
+	#   codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
+	#     codi$deathsAvg[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
+	# }
+	# rm(j)
+	# codi$Cx 		<- codi$pop_a / codi$birthdays
+	
+	
   # TR: this ugly appendage remains for now.
 	# pop_aa <- rep(0,N)                       
 	# pop_aa[N] <- codi$deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
