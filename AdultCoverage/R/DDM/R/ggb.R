@@ -405,8 +405,10 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE){
 	slope       <- 	with(codi,sd(leftterm[age %in% agesfit]) /  
 						sd(rightterm[age %in% agesfit]))
 #	
-	intercept   <- 	with(codi,mean(leftterm[age %in% agesfit]) * (1/slope) - 
-			            mean(rightterm[age %in% agesfit]))
+	# intercept   <- 	with(codi,mean(leftterm[age %in% agesfit]) * (1/slope) - 
+	# 		            mean(rightterm[age %in% agesfit]))
+	# PJ: fix https://github.com/timriffe/AdultCoverage/issues/3
+	intercept <- with(codi,mean(leftterm[age %in% agesfit]) - mean(rightterm[age %in% agesfit])) * slope
 #	
 	#coefs <- with(codi,lm(leftterm[age %in% agesfit]~rightterm[age %in% agesfit]))$coef
 	

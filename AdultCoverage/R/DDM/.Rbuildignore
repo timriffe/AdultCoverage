@@ -1,3 +1,5 @@
 ^cran-comments\.md
 ^\.gitattributes
 ^README\.md
+^.*\.Rproj$
+^\.Rproj\.user$

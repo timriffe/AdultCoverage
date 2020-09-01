@@ -435,13 +435,14 @@ segplot <- function(
 		warning("codi was not unique, taking first element")
 	}
 	tab1 <- tab1[[1]]
-	goods <- segCoverageFromYear(tab1,
-			minA = minA, 
-			maxA = maxA,
-			minAges = minAges,  
-			exact.ages = exact.ages,
-			eOpen = eOpen,
-			deaths.summed = deaths.summed)
+	goods <- segCoverageFromYear(
+	                        tab1,
+		                      minA = minA, 
+		                      maxA = maxA,
+		                      minAges = minAges,  
+		                      exact.ages = exact.ages,
+		                      eOpen = eOpen,
+		                      deaths.summed = deaths.summed)
 	codi     <- goods$codi
 	coverage <- goods$coverages
 	keep 	   <- codi$age >= minA &  codi$age <= maxA
@@ -596,8 +597,10 @@ ggbsegCoverageFromYear <- function(codi,
 	coverage     <- segCoverageFromAges(codi = codi, agesFit = agesFit.ggbseg)
 	data.frame(cod = unique(codi$cod), 
 	           coverage = coverage, 
-	           lower.ggb = min(agesFit.ggb), upper.ggb = max(agesFit.ggb),
-	           lower.ggbseg = min(agesFit.ggbseg), upper.ggbseg = max(agesFit.ggbseg))
+	           lower.ggb = min(agesFit.ggb), 
+	           upper.ggb = max(agesFit.ggb),
+	           lower.ggbseg = min(agesFit.ggbseg), 
+	           upper.ggbseg = max(agesFit.ggbseg))
 }
 
 
