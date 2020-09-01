@@ -16,7 +16,7 @@ ggbMakeColumns(codi, minA = 15, maxA = 75, deaths.summed = FALSE)
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
-codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
+codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
 }
 \description{
 Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly.
