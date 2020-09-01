@@ -183,13 +183,17 @@ segCoverageFromAges <- function(codi, agesFit){
 #' @return codi, with many columns added, most importantly \code{$Cx}.
 #' 
 #' @export
+#' @import dplyr
+#' @import magrittr
+#' @importFrom lubridate decimal_date
+#' @importFrom DemoTools lt_id_L_T
+#' @importFrom DemoTools age2int
 
 segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE){
   # group inf if necessary
   codi                   <- group01(codi)
   codi                   <- reduceOpen(codi, maxA = 95, group = TRUE)
   N                      <- nrow(codi)
-  
   
   codi <-
     codi %>% 
@@ -221,9 +225,10 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	
 	eON   <- eOpen * codi$growth[N]
 
+	# TR: this little thing is ugly for my taste, hoping it gets replaced.
 	calc_pop_a <- function(deathsAvg,eON,AgeInt,growth){
-	  N <- length(deathsAvg)
-	  pop_aa <- rep(0,N)                       
+	  N        <- length(deathsAvg)
+	  pop_aa   <- rep(0,N)                       
 	  pop_aa[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
 	  for(j in N:2){
 	    pop_aa[j - 1] <- pop_aa[j] * exp( AgeInt[j-1] * growth[j - 1]) + 
@@ -231,24 +236,6 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	  }
 	  pop_aa
 	}
-	# 
-	# codi$pop_a    	<- 0
-	# codi$pop_a[N] 	<- codi$deathsAvg[N] * exp(eON) - (eON ^ 2) / 6
-	# for(j in N:2){
-	#   codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
-	#     codi$deathsAvg[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
-	# }
-	# rm(j)
-	# codi$Cx 		<- codi$pop_a / codi$birthdays
-	
-	
-  # TR: this ugly appendage remains for now.
-	# pop_aa <- rep(0,N)                       
-	# pop_aa[N] <- codi$deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
-	# 	for(j in N:2){
-	# 		pop_aa[j - 1] <- pop_aa[j] * exp( codi$AgeInt[j-1] * codi$growth[j - 1]) + 
-	# 				codi$deathsAvg[j - 1] * exp( codi$AgeInt[j-1] / 2 * codi$growth[j - 1])
-	# 	}
 
 	codi <-
 	  codi %>% 
@@ -507,73 +494,44 @@ segplot <- function(
 #' @return codi, with many columns added, most importantly \code{$Cx}.
 #' 
 #' @export
+#' @import dplyr
+#' @import magrittr
 
 ggbsegMakeColumns <- function(
 		codi, 
 		minA = 15, 
 		maxA = 75,  
 		agesFit.ggb, 
-		#agesFit.seg, 
 		eOpen = NULL,
 		deaths.summed = FALSE){
-	codi         <- avgDeaths(codi = codi, deaths.summed = deaths.summed)
-	
-	AgeInt       <- detectAgeInterval(
-							      Dat = codi, 
-							      MinAge =  minA, 
-							      MaxAge = maxA, 
-							      ageColumn = "age")
-	
-	# reduce open age to desired range
-	codi         <- reduceOpen(codi, maxA = 95, group = TRUE)
-	# group inf if necessary
-	codi         <- group01(codi)
-	ages         <- codi$age
-	N            <- nrow(codi)
-	# ages better be unique! I expect this will work unless $cod is mis-specified. 
-	# This is a good catch for that
-	stopifnot(length(ages) == length(unique(ages)))
-	
-	dif          <- yint2(X = codi)
+  
+  codi                   <- group01(codi)
+  codi                   <- reduceOpen(codi, maxA = 95, group = TRUE)
+  N                      <- nrow(codi)
+  codi                   <- ggbMakeColumns(codi, 
+                                           minA = minA, 
+                                           maxA = maxA,	
+                                           deaths.summed = deaths.summed)
+  
+	dif          <- codi$dif[1]
 	
 	# just get left term / right term
 	# slopeint() is in the ggb() family
+	# TR: this function will likely change.
 	ab           <- slopeint(codi = codi, agesfit = agesFit.ggb)
 	
 	# the only difference between this method and seg is that
 	# in the next couple lines we use pop1adj instead of pop1...
 	relcomp      <- exp(ab$a * dif)
    	
-
-	
-	codi$pop1adj   <- codi$pop1 / relcomp
-	# birthdays, as in GGB
-	codi$birthdays <- c(0, sqrt(codi$pop1adj[ -N  ] * codi$pop2[ -1 ])) / AgeInt
-	# age-specific growth
-	codi$growth    <- log(codi$pop2 / codi$pop1adj) / dif
-	codi$growth[is.infinite(codi$growth) | is.nan(codi$growth)] <- 0
-	# cumulative growth
-	codi$cumgrowth <- AgeInt * c(0,cumsum(codi$growth[ -N ])) + AgeInt / 2 * codi$growth
-	codi$deathLT   <- codi$deathsAvg * exp(codi$cumgrowth)
-
-	if (is.null(eOpen)){
-		eOpen <- eOpenCD(codiaugmented = codi)
-	} else {
-		eOpen <- eOpen
-	}
-	
-	eON   <- eOpen * codi$growth[N]
-	
-
-	codi$pop_a    	<- 0
-	codi$pop_a[N] 	<- codi$deathsAvg[N] * exp(eON) - (eON ^ 2) / 6
-		for(j in N:2){
-			codi$pop_a[j - 1] <- codi$pop_a[j] * exp(AgeInt * codi$growth[j - 1]) + 
-				codi$deathsAvg[j - 1] * exp(AgeInt / 2 * codi$growth[j - 1])
-		}
-	rm(j)
-	codi$Cx 		<- codi$pop_a / codi$birthdays
-			
+  codi <-
+    codi %>% 
+    # just call it pop1 still, used to be pop1adj, but this lets us recycle code easier.
+    mutate(pop1 = pop1 / relcomp) %>% 
+    segMakeColumns(minA = minA,
+                   maxA = maxA, 
+                   eOpen = eOpen, 
+                   deaths.summed = deaths.summed)
 	
 	codi
 }
