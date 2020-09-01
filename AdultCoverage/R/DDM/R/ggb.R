@@ -176,8 +176,8 @@ ggbcoverageFromAges <- function(codi, agesfit, deaths.summed = FALSE){
 #' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
 #' 
 #' @export
-#' @importFrom Demotools age2int 
-#' @importFrom Demotools lt_id_L_T 
+#' @importFrom DemoTools age2int 
+#' @importFrom DemoTools lt_id_L_T 
 #' @importFrom lubridate decimal_date
 #' @import dplyr
 #' @import magrittr
