@@ -4,7 +4,12 @@
 \alias{ggbFittedFromAges}
 \title{make the growth-adjusted quasi life table columns required by GGB method}
 \usage{
-ggbFittedFromAges(codi, agesfit, deaths.summed = FALSE)
+ggbFittedFromAges(
+  codi,
+  agesfit,
+  deaths.summed = FALSE,
+  lm.method = "oldschool"
+)
 }
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
@@ -12,9 +17,16 @@ ggbFittedFromAges(codi, agesfit, deaths.summed = FALSE)
 \item{agesfit}{an a priori set of ages for which to calculate the fit}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{lm.method}{character, one of:\itemize{
+  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+}}
 }
 \value{
-codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$exclude}.
+codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
 }
 \description{
 Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.

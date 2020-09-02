@@ -4,23 +4,33 @@
 \alias{ggbsegCoverageFromYear}
 \title{estimate death registration coverage for a single year/sex/region using the modified Bennett-Horiuchi method}
 \usage{
-ggbsegCoverageFromYear(codi, minA = 15, maxA = 75, minAges = 8,
-  exact.ages = NULL, eOpen = NULL, deaths.summed = FALSE)
+ggbsegCoverageFromYear(
+  codi,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  exact.ages.ggb = NULL,
+  exact.ages.seg = NULL,
+  eOpen = NULL,
+  deaths.summed = FALSE
+)
 }
 \arguments{
-\item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$sex}, \code{$age}, and \code{$cod} (to indicate regions, periods, sexes).}
+\item{codi}{a chunk of data (single sex, year, region, etc) with all columns created by \code{ggbsegMakeColumns()}}
 
-\item{minA}{the minimum of the age range searched. Default 15}
+\item{minA}{the lowest age to be included in search}
 
-\item{maxA}{the maximum of the age range searched. Default 75}
+\item{maxA}{the highest age to be included in search (the lower bound thereof)}
 
-\item{minAges}{the minimum number of adjacent ages needed as points for fitting. Default 8}
+\item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
-\item{exact.ages}{optional. use an exact set of ages to estimate coverage.}
+\item{exact.ages.ggb}{optional. A user-specified vector of exact ages to use for coverage estimation in the GGB (first stage) part of the estimation.}
+
+\item{exact.ages.seg}{optional. A user-specified vector of exact ages to use for coverage estimation in the SEG (second stage) part of the estimation.}
 
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
-\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+\item{deaths.summed}{logical. Is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.

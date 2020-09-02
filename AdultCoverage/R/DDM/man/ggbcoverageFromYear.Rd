@@ -4,8 +4,15 @@
 \alias{ggbcoverageFromYear}
 \title{estimate death registration coverage for a single year/sex/region using the GGB method}
 \usage{
-ggbcoverageFromYear(codi, exact.ages = NULL, minA = 15, maxA = 75,
-  minAges = 8, deaths.summed = FALSE)
+ggbcoverageFromYear(
+  codi,
+  exact.ages = NULL,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  deaths.summed = FALSE,
+  lm.method = "oldschool"
+)
 }
 \arguments{
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}
@@ -19,6 +26,13 @@ ggbcoverageFromYear(codi, exact.ages = NULL, minA = 15, maxA = 75,
 \item{minAges}{the minimum number of adjacent ages needed as points for fitting. Default 8}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{lm.method}{character, one of:\itemize{
+  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+}}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.

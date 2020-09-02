@@ -4,8 +4,14 @@
 \alias{ggbsegMakeColumns}
 \title{make the Bennett-Horiuchi quasi life table columns required by the second estimation method}
 \usage{
-ggbsegMakeColumns(codi, minA = 15, maxA = 75, agesFit, eOpen = NULL,
-  deaths.summed = FALSE)
+ggbsegMakeColumns(
+  codi,
+  minA = 15,
+  maxA = 75,
+  agesFit.ggb,
+  eOpen = NULL,
+  deaths.summed = FALSE
+)
 }
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggbseg()}}
@@ -14,7 +20,7 @@ ggbsegMakeColumns(codi, minA = 15, maxA = 75, agesFit, eOpen = NULL,
 
 \item{maxA}{the maximum of the age range searched. Default 75}
 
-\item{agesFit}{vector of ages as passed in by \code{ggbsegCoverageFromYear)}}
+\item{agesFit.ggb}{vector of ages as passed in by \code{ggbsegCoverageFromYear)}}
 
 \item{eOpen}{optional. A value for remaining life expectancy in the open age group.}
 

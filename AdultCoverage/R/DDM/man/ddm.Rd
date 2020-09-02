@@ -4,8 +4,16 @@
 \alias{ddm}
 \title{run all three deaths registration coverage estimation methods}
 \usage{
-ddm(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
-  eOpen = NULL, deaths.summed = FALSE)
+ddm(
+  X,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  exact.ages.ggb = NULL,
+  exact.ages.seg = NULL,
+  eOpen = NULL,
+  deaths.summed = FALSE
+)
 }
 \arguments{
 \item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}
@@ -16,7 +24,9 @@ ddm(X, minA = 15, maxA = 75, minAges = 8, exact.ages = NULL,
 
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
-\item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
+\item{exact.ages.ggb}{optional. A user-specified vector of exact ages to use for coverage estimation in the GGB method and the GGB stage of the GGBSEG method.}
+
+\item{exact.ages.seg}{optional. A user-specified vector of exact ages to use for coverage estimation in the SEG method and the SEG stage of the GGBSEG method.}
 
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
@@ -29,7 +39,7 @@ data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \cod
 Estimate the generalized growth balance method, and the two Bennett-Horiuchi methods of estimating death registration coverage. This requires two censuses and an estimate of the deaths in each 5-year age group between censuses. This might be the arithmetic average of deaths in each age class, or simply the average of deaths around the time of the two censuses. All methods use some stable population assumptions.
 }
 \details{
-All methods require some specification about which age range to base results on. If not given, an optimal age range will be estimated automatically, and this information is returned to the user. To identify an age-range in the visually, see \code{plot.ggb()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term.If you want coverage estimates for a variety of partitions (intercensal periods/regions/by sex), then stack them, and use a variable called \code{$cod} with unique values for each data partition. If data is partitioned using the variable \code{$cod}, then the age range automatically determined might not be the same for each partition. If user-specified, (using a vector of \code{exact.ages}) the age ranges will be the same for all partitions. If you want to specify particular age ranges for each data partition, then you'll need to loop it somehow. 
+All methods require some specification about which age range to base results on. If not given, an optimal age range will be estimated automatically, and this information is returned to the user. To identify an age-range in the visually, see \code{ggbChooseAges()}, when working with a single year/sex/region of data (SEG varient of this visual picker is forthcoming). The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the root of the average squared residual (RMSE) between the fitted line and right term for GGB, and we minimize the RMSE of a horizontal sequence of Cx estimates for SEG. If you want coverage estimates for a variety of partitions (intercensal periods/regions/by sex), then stack them, and use a variable called \code{$cod} with unique values for each data partition. If data is partitioned using the variable \code{$cod}, then the age range automatically determined might not be the same for each partition. If user-specified, (using vectors of specified ages \code{exact.ages.ggb} and/or \code{exact.ages.seg}) the age ranges will be the same for all partitions. If you want to specify particular age ranges for each data partition, then you'll need to loop it somehow. 
 
 All three methods require time points of the two censuses. Census dates can be given in a variety of ways: 1) (preferred) using \code{Date} classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing respective integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.  Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. 
 
@@ -37,9 +47,17 @@ The synthetic extinct generation methods require an estimate of remaining life e
 }
 \examples{
 # The Mozambique data
+library(dplyr)
+library(magrittr)
+Moz <- Moz \%>\% 
+rename(date1 = "year1", date2 = "year2")
 res <- ddm(Moz)
 head(res)
 # The Brasil data
+BrasilMales <- BrasilMales \%>\% 
+rename(date1 = "year1", date2 = "year2")
+BrasilFemales <- BrasilFemales \%>\% 
+rename(date1 = "year1", date2 = "year2")
 BM <- ddm(BrasilMales)
 BF <- ddm(BrasilFemales)
 head(BM)

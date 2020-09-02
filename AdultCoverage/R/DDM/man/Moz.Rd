@@ -4,7 +4,8 @@
 \name{Moz}
 \alias{Moz}
 \title{Example data for Mozambique females 1997-2007}
-\format{A data frame with 17 rows and 8 variables:
+\format{
+A data frame with 17 rows and 8 variables:
 \describe{
   \item{cod}{integer a column of 1s  }
   \item{pop1}{integer the census population count in 1997}
@@ -14,7 +15,8 @@
   \item{sex}{character ``f'' for female}
   \item{year1}{integer 1997}
   \item{year2}{integer 2007}
-}}
+}
+}
 \source{
 Data courtesy of Bernardo Queiroz.
 }
