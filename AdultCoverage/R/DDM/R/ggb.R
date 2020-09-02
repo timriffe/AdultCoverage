@@ -286,7 +286,12 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#'
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
 #' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. \code{$a} and \code{$b} give the intercept and slope of the line on which the coverage estimate is based. \code{$delta}, \code{$k1}, and \code{$k2}  are further derived quantities that may be interesting for advanced users. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
 #' @export
@@ -319,7 +324,8 @@ ggb <- function(
 		maxA = 75, 
 		minAges = 8, 
 		exact.ages = NULL, 
-		deaths.summed = FALSE){         
+		deaths.summed = FALSE,
+		lm.method = "oldschool"){         
 	
 	# TR: modularized Apr 2, 2017
 	tab1        <- headerPrep(X)
@@ -334,7 +340,8 @@ ggb <- function(
 						minA = minA, 
 						maxA= maxA,
 						minAges = minAges,
-						deaths.summed = deaths.summed
+						deaths.summed = deaths.summed,
+						lm.method = lm.method
 					)))
 	
 	# this has cod as a column, but no year, sex. 
