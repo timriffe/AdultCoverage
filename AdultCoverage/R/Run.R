@@ -16,6 +16,24 @@ library(devtools)
 getwd()
 load_all("AdultCoverage/R/DDM")
 document("AdultCoverage/R/DDM")
+check("AdultCoverage/R/DDM")
+
+
+#--------------------
+library(dplyr)
+library(magrittr)
+Moz <- Moz %>% rename(date1 = "year1", date2 = "year2")
+res <- ddm(Moz)
+
+Moz %>% 
+  ggb()
+
+
+
+
+
+
+
 res <- seg(Moz)
 res
 # The Brasil data
@@ -36,13 +54,13 @@ colnames(ggbseg_res) <- c("cod","coverage", "lower.ggb","upper.ggb","lower","upp
 res <- rbind(ggb_res[,c("cod","method","lower","upper")],
              seg_res[,c("cod","method","lower","upper")],
              ggbseg_res[,c("cod","method","lower","upper")]
-             )
+)
 library(tidyverse)
 library(ggplot2)
 res %>% 
   as.data.frame() %>% 
   ggplot(aes(x=as.factor(cod),ymin=lower, ymax = upper,color = method)) + 
-           geom_errorbar(position = "dodge")
+  geom_errorbar(position = "dodge")
 
 segplot(subset(BrasilMales, cod == 51))
 ggbsegplot

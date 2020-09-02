@@ -8,6 +8,8 @@ seggetRMS(codi, agesFit)
 }
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
+
+\item{agesFit}{ineger vector of age trim for SEG method.}
 }
 \value{
 numeric. RMSE

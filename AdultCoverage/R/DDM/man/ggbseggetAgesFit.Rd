@@ -22,6 +22,8 @@ ggbseggetAgesFit(
 
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
+\item{agesFit.ggb}{integer vector of age trim from GGB method.}
+
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{

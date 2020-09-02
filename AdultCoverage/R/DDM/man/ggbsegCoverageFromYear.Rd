@@ -16,6 +16,8 @@ ggbsegCoverageFromYear(
 )
 }
 \arguments{
+\item{codi}{a chunk of data (single sex, year, region, etc) with all columns created by \code{ggbsegMakeColumns()}}
+
 \item{minA}{the lowest age to be included in search}
 
 \item{maxA}{the highest age to be included in search (the lower bound thereof)}

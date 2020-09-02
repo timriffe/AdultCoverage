@@ -186,28 +186,6 @@ group01 <- function(X){
 
 
 
-#' @title if necessary divide deaths by intercensal interval
-#' @description ideally \code{deaths} is the average annual deaths in the intercensal period, but it is also common to give it as the sum. If this was the case, set \code{deaths.summed} to \code{TRUE} and we take care of it.
-#' @param codi the standard object as described in e.g. \code{ggb()}.
-#' @param deaths.summed logical. If \code{TRUE} then \code{deaths} was specified as the sum over the intercensal period. Otherwise it was the mean.
-#' @return codi a new column, \code{deathsAvg} will be appended.
-#' 
-#' @export
-
-avgDeaths <- function(codi, deaths.summed = FALSE){
-	if (!"deathsAvg" %in% colnames(codi)){
-		if (deaths.summed){
-			dif                    <- yint2(codi)
-			codi$deathsAvg         <- codi$deaths / dif
-		} else {
-			codi$deathsAvg <- codi$death
-		}
-	}
-	codi
-}
-
-
-
 #' @title a utility function to prep the header
 #' @description This is an internal utility function, to save on redundant lines of code. Not so useful for hand-processing.
 #' @param X this is any codi-style \code{data.frame}

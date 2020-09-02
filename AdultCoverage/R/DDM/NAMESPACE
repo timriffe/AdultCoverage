@@ -3,7 +3,6 @@
 export(addcod)
 export(adjustages)
 export(assignNoteCode)
-export(avgDeaths)
 export(cdmltw)
 export(ddm)
 export(ddmplot)

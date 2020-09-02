@@ -91,14 +91,29 @@ ggbcoverageFromYear <- function(codi,
 	# TR: 3-4-2017 no longer optional
 
 	coefs    <- slopeint(codi, agesfit)
+	# (time between censuses)
 	dif      <- codi$dif %>% '['(1)
 	# TR: 3-4-2017 this is k1/k2
+	# Relative completeness of Census 1 to Census 2
 	delta    <- exp(coefs$a * dif)
-	# TR: 3-4-2017 these are calulcated per the IUSSP spreadsheet
-	k1       <- ifelse(delta > 1, 1, delta)
-	k2       <- k1 / delta
-	# this is the basic formula
-	coverage <- ggbcoverageFromAges(codi = codi, agesfit = agesfit)
+	# TR: 2-9-2020
+	
+  if (delta > 1){
+    k1 <- 1
+    k2 <- 1 / delta
+  }
+	if (delta == 1){
+	  k1 <- 1
+	  k2 <- 1
+	}
+	if (delta < 1){
+	  k1 <- 1 / delta
+	  k2 <- 1
+	}
+	# now get everything from the k parameters 
+	a <- log(delta) / dif
+	coverage <- sqrt(k1 * k2) / coefs$b
+
 	result   <- data.frame(cod = unique(codi$cod), 
 			   coverage = coverage, 
 			   lower = min(agesfit), 
@@ -189,24 +204,24 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
 	
 	codi <-
 	  codi %>% 
-	  mutate(	date1          = ifelse(is.numeric(date1), date1, decimal_date(date1)),
-	          date2          = ifelse(is.numeric(date2), date2, decimal_date(date2)),
-	          AgeInt         = age2int(age),
-	          dif            = date2 - date1,
-	          deathsAvg      = ifelse(deaths.summed, deaths / dif, deaths),
-	          pop1           = as.double(pop1),
-	          pop2           = as.double(pop2),
-	          pop1cum        = lt_id_L_T(pop1),
-	          pop2cum        = lt_id_L_T(pop2) ,
-	          deathcum       = lt_id_L_T(deathsAvg),
+	  mutate(	date1          = ifelse(is.numeric(.data$date1), .data$date1, decimal_date(.data$date1)),
+	          date2          = ifelse(is.numeric(.data$date2), .data$date2, decimal_date(.data$date2)),
+	          AgeInt         = age2int(.data$age),
+	          dif            = .data$date2 - .data$date1,
+	          deathsAvg      = ifelse(deaths.summed, .data$deaths / .data$dif, .data$deaths),
+	          pop1           = as.double(.data$pop1),
+	          pop2           = as.double(.data$pop2),
+	          pop1cum        = lt_id_L_T(.data$pop1),
+	          pop2cum        = lt_id_L_T(.data$pop2) ,
+	          deathcum       = lt_id_L_T(.data$deathsAvg),
 	          # TR: maybe rethink this line as a function?
 	          # this appears to have a strong assumption about census spacing (10 years?) in it.
-	          birthdays      = c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt,
-	          Tx             = sqrt(pop1cum * pop2cum),
-	          cumgrowth      = log(pop2cum / pop1cum) / dif,
-	          rightterm      = deathcum / Tx,
-	          leftterm       = (birthdays / Tx) - cumgrowth,
-	          keep        = Tx != 0 & birthdays != 0 & age >= minA & age <= maxA)
+	          birthdays      = c(0, sqrt(.data$pop1[ -N  ] * .data$pop2[ -1 ])) / .data$AgeInt,
+	          Tx             = sqrt(.data$pop1cum * .data$pop2cum),
+	          cumgrowth      = log(.data$pop2cum / .data$pop1cum) / .data$dif,
+	          rightterm      = .data$deathcum / .data$Tx,
+	          leftterm       = (.data$birthdays / .data$Tx) - .data$cumgrowth,
+	          keep           = .data$Tx != 0 & .data$birthdays != 0 & .data$age >= minA & .data$age <= maxA)
 
 	codi
 }
@@ -395,23 +410,24 @@ adjustages <- function(a, age, agesfit){
 #' 
 #' @return a pairlist with elements \code{$a} for the intercept and \code{$b} for the slope
 #' @export
-slopeint <- function(codi, agesfit, deaths.summed = FALSE){
+slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschool"){
 	# a robustness measure
 	if (! "leftterm" %in% colnames(codi)){
 		codi <- ggbMakeColumns(codi, minA = min(agesfit), maxA = max(agesfit), deaths.summed = deaths.summed)
 	}
-	#age <- codi$age
-	# TODO: find eq numbers to cite here
-	slope       <- 	with(codi,sd(leftterm[age %in% agesfit]) /  
-						sd(rightterm[age %in% agesfit]))
-#	
-	# intercept   <- 	with(codi,mean(leftterm[age %in% agesfit]) * (1/slope) - 
-	# 		            mean(rightterm[age %in% agesfit]))
-	# PJ: fix https://github.com/timriffe/AdultCoverage/issues/3
-	intercept <- with(codi,mean(leftterm[age %in% agesfit]) - mean(rightterm[age %in% agesfit])) * slope
-#	
-	#coefs <- with(codi,lm(leftterm[age %in% agesfit]~rightterm[age %in% agesfit]))$coef
-	
+  if (lm.method == "oldschool"){
+  	#age <- codi$age
+  	# TODO: find eq numbers to cite here
+  	slope       <- 	with(codi,sd(leftterm[age %in% agesfit]) /  
+  						sd(rightterm[age %in% agesfit]))
+
+  	# intercept   <- 	with(codi,mean(leftterm[age %in% agesfit]) * (1/slope) - 
+  	# 		            mean(rightterm[age %in% agesfit]))
+  	# PJ: fix https://github.com/timriffe/AdultCoverage/issues/3
+  	intercept <- with(codi,mean(leftterm[age %in% agesfit]) - mean(rightterm[age %in% agesfit])) * slope
+  	
+  	#coefs <- with(codi,lm(leftterm[age %in% agesfit]~rightterm[age %in% agesfit]))$coef
+  }
 	list(a = intercept, b = slope)
 }
 

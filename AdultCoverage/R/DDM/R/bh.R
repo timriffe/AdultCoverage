@@ -100,6 +100,7 @@ seggetAgesFit <- function (codi,
 #' calculates RMSE for SEG and a specfied age vector.
 #' @description return the RMSE of `Cx` with respect to the coverage estimate for a given range of ages.
 #' @inheritParams ggbgetAgesFit
+#' @param agesFit ineger vector of age trim for SEG method.
 #' @export
 #' @return numeric. RMSE
 
@@ -114,6 +115,7 @@ seggetRMS <- function(codi, agesFit){
 #' @title select age range for GGBSEG method automatically
 #' @description We try all possible age ranges given the constraints provided. Whichever age range has the lowest root mean square residual with respect to the corresponding coverage estimate is returned.
 #' @inheritParams ggbgetAgesFit
+#' @param agesFit.ggb integer vector of age trim from GGB method.
 #' @export
 #' @return integer vector of ages that minimize the RMSE.
 
@@ -197,24 +199,24 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
   
   codi <-
     codi %>% 
-    mutate(	date1          = ifelse(is.numeric(date1), date1, decimal_date(date1)),
-            date2          = ifelse(is.numeric(date2), date2, decimal_date(date2)),
-            AgeInt         = age2int(age),
-            dif            = date2 - date1,
+    mutate(	date1          = ifelse(is.numeric(.data$date1), .data$date1, decimal_date(.data$date1)),
+            date2          = ifelse(is.numeric(.data$date2), .data$date2, decimal_date(.data$date2)),
+            AgeInt         = age2int(.data$age),
+            dif            = .data$date2 - .data$date1,
             avg            = deaths.summed,
-            deathsAvg      = ifelse(avg, deaths / dif, deaths),
-            pop1           = as.double(pop1),
-            pop2           = as.double(pop2),
-            deathcum       = lt_id_L_T(deathsAvg),
+            deathsAvg      = ifelse(.data$avg, .data$deaths / .data$dif, .data$deaths),
+            pop1           = as.double(.data$pop1),
+            pop2           = as.double(.data$pop2),
+            deathcum       = lt_id_L_T(.data$deathsAvg),
             # TR: maybe rethink this line as a function?
             # this appears to have a strong assumption about census spacing (10 years?) in it.
-            birthdays      = c(0, sqrt(pop1[ -N  ] * pop2[ -1 ])) / AgeInt,
+            birthdays      = c(0, sqrt(.data$pop1[ -N  ] * .data$pop2[ -1 ])) / .data$AgeInt,
      
-            growth         = log(pop2 / pop1) / dif,
-            growth         = ifelse(is.infinite(growth) | is.nan(growth), 0, growth),
+            growth         = log(.data$pop2 / .data$pop1) / .data$dif,
+            growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
             # cumulative growth
-            cumgrowth      = AgeInt * c(0,cumsum(growth[ -N ])) + AgeInt / 2 * growth,
-            deathLT        = deathsAvg * exp(cumgrowth))
+            cumgrowth      = .data$AgeInt * c(0,cumsum(.data$growth[ -N ])) + .data$AgeInt / 2 * .data$growth,
+            deathLT        = .data$deathsAvg * exp(.data$cumgrowth))
   
 
 	if (is.null(eOpen)){
@@ -240,8 +242,8 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 	codi <-
 	  codi %>% 
 	  mutate(
-	    pop_a = calc_pop_a(deathsAvg,eON,AgeInt,growth),
-	    Cx = pop_a / birthdays)
+	    pop_a = calc_pop_a(.data$deathsAvg,eON,.data$AgeInt,.data$growth),
+	    Cx = .data$pop_a / .data$birthdays)
 
 			
 	################
@@ -528,7 +530,7 @@ ggbsegMakeColumns <- function(
   codi <-
     codi %>% 
     # just call it pop1 still, used to be pop1adj, but this lets us recycle code easier.
-    mutate(pop1 = pop1 / relcomp) %>% 
+    mutate(pop1 = .data$pop1 / relcomp) %>% 
     segMakeColumns(minA = minA,
                    maxA = maxA, 
                    eOpen = eOpen, 
@@ -545,6 +547,7 @@ ggbsegMakeColumns <- function(
 #' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. 
 #' 
 #' @inheritParams ggbseg
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns created by \code{ggbsegMakeColumns()}
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
 #' @export

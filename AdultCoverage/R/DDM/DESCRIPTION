@@ -10,9 +10,9 @@ Depends:
     R (>= 2.15)
 Imports:
     dplyr,
-    magrittr
-Suggests:
-    DemoTools
+    magrittr,
+    DemoTools,
+    lubridate
 License: GPL-2
 LazyData: TRUE
 RoxygenNote: 7.1.1
