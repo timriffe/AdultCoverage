@@ -37,14 +37,21 @@ Census dates can be given in a variety of ways: 1) using Date classes, and colum
 }
 \examples{
 # The Mozambique data
+library(dplyr)
+library(magrittr)
+Moz <- Moz \%>\% 
+rename(date1 = "year1", date2 = "year2")
 res <- ggb(Moz)
 res
 # The Brasil data
+BrasilMales <- BrasilMales \%>\% 
+rename(date1 = "year1", date2 = "year2")
+ BrasilFemales <- BrasilFemales \%>\% 
+rename(date1 = "year1", date2 = "year2")
 BM <- ggb(BrasilMales)
 BF <- ggb(BrasilFemales)
 head(BM)
 head(BF)
-
 }
 \references{
 Hill K. Estimating census and death registration completeness. Asian and Pacific Population Forum. 1987; 1:1-13.

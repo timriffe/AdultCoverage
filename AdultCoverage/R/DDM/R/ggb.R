@@ -16,8 +16,10 @@
 #' @export 
 
 ggbgetRMS <- function(agesi, codi){
+  # TODO: should this be sensitive to the line fitting method?
+  
 	codi <- ggbFittedFromAges(codi, agesfit = agesi) %>% 
-	  filter(age %in% agesi)
+	  filter(.data$age %in% agesi)
 
 	(codi$leftterm - codi$fitted) %>% 
 	  '^'(2) %>% 
@@ -51,7 +53,12 @@ ggbgetRMS <- function(agesi, codi){
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' 
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
 #' @export
@@ -143,12 +150,17 @@ ggbcoverageFromYear <- function(codi,
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param agesfit an a priori set of ages for which to calculate the fit
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' 
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
 #' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
 #' 
 #' @export
 
-ggbFittedFromAges <- function(codi, agesfit, deaths.summed = FALSE){
+ggbFittedFromAges <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschool"){
 	
 	if (! "leftterm" %in% colnames(codi)){
 		codi <- ggbMakeColumns(codi=codi, deaths.summed = deaths.summed)
@@ -160,33 +172,10 @@ ggbFittedFromAges <- function(codi, agesfit, deaths.summed = FALSE){
 #	intercept   <-  with(codi, 
 #			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
 #	) 
-	coefs       <- slopeint(codi, agesfit)
+	coefs       <- slopeint(codi, agesfit, lm.method = lm.method)
 	codi$fitted <- coefs$a + codi$rightterm * 1/coefs$b 
 	codi
 }
-
-#' @title given a set of ages, what is the implied death registration coverage?
-#' 
-#' @description For a single year/sex/region of data (formatted as required by \code{ggb()}), what is the registration coverage implied by a given age range? Called by \code{ggbcoverageFromYear()} and \code{ggbChooseAges()}.
-#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
-#' @param agesfit an integer vector of ages, either returned from \code{ggbgetAgesFit} or user-supplied.
-#' @return numeric. the estimated level of coverage.
-#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-
-#' @export
-ggbcoverageFromAges <- function(codi, agesfit, deaths.summed = FALSE){
-	if (! "leftterm" %in% colnames(codi)){
-		codi <- ggbMakeColumns(codi = codi, 
-				               minA = min(agesfit), 
-							   maxA = max(agesfit), 
-							   deaths.summed = deaths.summed)
-	}
-	# this is the coverage estimate
-	#with(codi, sd(rightterm[age %in% agesfit])/ sd(leftterm[age %in% agesfit]))
-	1 / slopeint(codi = codi, agesfit = agesfit)$b
-}
-
-
 
 #' @title make the growth-adjusted quasi life table columns required by GGB method
 #' 
@@ -308,14 +297,22 @@ ggbgetAgesFit <- function(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed
 #' 
 #' @examples 
 #' # The Mozambique data
+#' library(dplyr)
+#' library(magrittr)
+#' Moz <- Moz %>% 
+#' rename(date1 = "year1", date2 = "year2")
 #' res <- ggb(Moz)
 #' res
 #' # The Brasil data
+#' BrasilMales <- BrasilMales %>% 
+#' rename(date1 = "year1", date2 = "year2")
+#'  BrasilFemales <- BrasilFemales %>% 
+#' rename(date1 = "year1", date2 = "year2")
 #' BM <- ggb(BrasilMales)
 #' BF <- ggb(BrasilFemales)
 #' head(BM)
 #' head(BF)
-#' 
+
 ggb <- function(
 		X, 
 		minA = 15, 
@@ -417,10 +414,18 @@ adjustages <- function(a, age, agesfit){
 #' @param codi \code{data.frame} as produced by \code{ggbMakeColumns()}
 #' @param agesfit a set of ages to estimate coverage from 
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' @param lm.method character, one of
-#' 
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
 #' @return a pairlist with elements \code{$a} for the intercept and \code{$b} for the slope
-#' @imporFrom tukeyedar eda_rline
+#' @importFrom tukeyedar eda_rline
+#' @importFrom stats lm
+#' @importFrom stats cov
+#' @importFrom stats var
+#' @importFrom stats sd
 #' @export
 slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschool"){
   
@@ -433,16 +438,15 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
   
   # eliminate repeated subsetting
   codi <- codi %>% 
-    filter(age %in% agefit)
+    filter(.data$age %in% agesfit)
   
   if (lm.method == "oldschool"){
   	#age <- codi$age
   	# TODO: find eq numbers to cite here
-  	slope       <- 	with(codi,sd(leftterm) /  
-  						sd(rightterm))
+  	slope       <- 	sd(codi$leftterm) /  sd(codi$rightterm)
 
   	# PJ: fix https://github.com/timriffe/AdultCoverage/issues/3
-  	intercept <- with(codi,mean(leftterm) - mean(rightterm)) * slope
+  	intercept <- mean(codi$leftterm) - mean(codi$rightterm) * slope
   	
   	#coefs <- with(codi,lm(leftterm~rightterm))$coef
   }
@@ -450,7 +454,7 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
   
   if (lm.method %in% c("lm","ols")){
     
-   ab        <- lm(leftterm~rightterm, data = codi)$coef
+   ab        <- lm("leftterm~rightterm", data = codi)$coef
    slope     <- ab["b"]
    intercept <- ab["a"]
   }
@@ -458,16 +462,17 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
   if (lm.method %in% c("tls","orthogonal","deming")){
     y <- codi$leftterm
     x <- codi$rightterm
+    delta <- 1 # assumed
     # let's avoid a new package dependency
     # PJ's implementation via Wikipedia formulas
     slope <- (var(y)-delta*var(x)+sqrt((var(y)-delta*var(x))^2+4*delta*cov(x,y)^2)) /
       (2*cov(x,y))
     
-    intercept <- mean(y) - slope3 * mean(x)
+    intercept <- mean(y) - slope * mean(x)
   }
   
   if (lm.method %in% c("tukey","resistant","median")){
-    ab.etc <- eda_rline(codi, rightterm, leftterm)
+    ab.etc <- eda_rline(x = codi$rightterm, y = codi$leftterm)
     slope     <- ab.etc["b"]
     intercept <- ab.etc["a"]
   }
@@ -488,8 +493,12 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation. 
 #' @param maxit the maximum number of clicks you can take. Default 15.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' 
-#' 
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
 #' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, \code{$upper}, and \code{ages}.
 #' 
 #' @importFrom grDevices gray

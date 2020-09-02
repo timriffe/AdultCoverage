@@ -11,7 +11,8 @@ ggbChooseAges(
   minAges = 8,
   exact.ages = NULL,
   maxit = 15,
-  deaths.summed = FALSE
+  deaths.summed = FALSE,
+  lm.method = "oldschool"
 )
 }
 \arguments{
@@ -28,6 +29,13 @@ ggbChooseAges(
 \item{maxit}{the maximum number of clicks you can take. Default 15.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{lm.method}{character, one of:\itemize{
+  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+}}
 }
 \value{
 \code{data.frame} containing elements \code{$coverage}, \code{$lower}, \code{$upper}, and \code{ages}.
