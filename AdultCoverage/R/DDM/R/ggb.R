@@ -16,17 +16,25 @@
 #' @export 
 
 ggbgetRMS <- function(agesi, codi){
-	codi <- ggbFittedFromAges(codi, agesfit = agesi)
+	codi <- ggbFittedFromAges(codi, agesfit = agesi) %>% 
+	  filter(age %in% agesi)
+
+	(codi$leftterm - codi$fitted) %>% 
+	  '^'(2) %>% 
+	  mean() %>% 
+	  sqrt()
 	# get root mean square of residuals
 	# I'd do this with magrittr, but just to stay dependency-free...
-	sqrt(
-		sum(
-			  (
-				 (codi$leftterm[codi$age %in% agesi] - codi$fitted[codi$age %in% agesi]) ^ 2
-			   )
-	        ) / length(agesi)
-         )
-	# no checks here for NAs...
+# 	sqrt(
+# 		sum(
+# 			  (
+# 				 (codi$leftterm - codi$fitted) ^ 2
+# 			   )
+# 	        ) / length(agesi)
+#          )
+	
+	
+	
 }
 
 
@@ -53,7 +61,8 @@ ggbcoverageFromYear <- function(codi,
 								minA = 15, 
 								maxA = 75, 
 								minAges = 8, 
-								deaths.summed = FALSE
+								deaths.summed = FALSE,
+								lm.method = "oldschool"
 								){
 	
 	# if exact.ages is given, we override other age-parameters
@@ -90,7 +99,7 @@ ggbcoverageFromYear <- function(codi,
 	# TR: added 17 June, 2016. Get Lambda to adjust first census:
 	# TR: 3-4-2017 no longer optional
 
-	coefs    <- slopeint(codi, agesfit)
+	coefs    <- slopeint(codi, agesfit, lm.method = lm.method)
 	# (time between censuses)
 	dif      <- codi$dif %>% '['(1)
 	# TR: 3-4-2017 this is k1/k2
@@ -408,10 +417,15 @@ adjustages <- function(a, age, agesfit){
 #' @param codi \code{data.frame} as produced by \code{ggbMakeColumns()}
 #' @param agesfit a set of ages to estimate coverage from 
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param lm.method character, one of
 #' 
 #' @return a pairlist with elements \code{$a} for the intercept and \code{$b} for the slope
+#' @imporFrom tukeyedar eda_rline
 #' @export
 slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschool"){
+  
+  lm.method <- match.arg(lm.method, choices = c("oldschool", "lm", "ols", "tls","orthogonal","deming","tukey","resistant","median"))
+  
 	# a robustness measure
 	if (! "leftterm" %in% colnames(codi)){
 		codi <- ggbMakeColumns(codi, minA = min(agesfit), maxA = max(agesfit), deaths.summed = deaths.summed)
@@ -452,6 +466,11 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
     intercept <- mean(y) - slope3 * mean(x)
   }
   
+  if (lm.method %in% c("tukey","resistant","median")){
+    ab.etc <- eda_rline(codi, rightterm, leftterm)
+    slope     <- ab.etc["b"]
+    intercept <- ab.etc["a"]
+  }
   
 	list(a = intercept, b = slope)
 }
@@ -485,13 +504,15 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
 #' ggbChooseAges(Moz)
 #' }
 
-ggbChooseAges <- function(codi, 
-		                  minA = 15, 
+ggbChooseAges <- function(
+              codi, 
+		          minA = 15, 
 						  maxA = 75, 
 						  minAges = 8, 
 						  exact.ages = NULL, 
 						  maxit = 15, 
-						  deaths.summed = FALSE){
+						  deaths.summed = FALSE,
+						  lm.method = "oldschool"){
 	# this is the automatic age selection.
 	
 	# only run if in anteractive r session...
@@ -525,12 +546,13 @@ ggbChooseAges <- function(codi,
 		agesfit <- ggbgetAgesFit(codi, minAges, deaths.summed = deaths.summed)
 	}
 	codi     <- ggbFittedFromAges(codi=codi, agesfit=agesfit, deaths.summed = deaths.summed)
-	# starting values for abline
-	si       <- slopeint(codi, agesfit)
 	
-	# this is the basic formula
-	#coverage <- ggbcoverageFromAges(codi, agesfit)
-	coverage <- 1/si$b
+	# starting values for abline
+	# si       <- slopeint(codi, agesfit, lm.method = lm.method)
+	# 
+	# # this is the basic formula
+	# #coverage <- ggbcoverageFromAges(codi, agesfit)
+	# coverage <- 1/si$b
 	# some objects used throughout
 
 	
@@ -583,7 +605,7 @@ ggbChooseAges <- function(codi,
 			# an estimate of the resulting coverage
 			coverage <- 1/si$b
 			# get params for abline..
-			si       <- slopeint(codi, agesfit)
+			si       <- slopeint(codi, agesfit, lm.method = lm.method)
 			
 			# redraw plot
 			plot(rightt, 

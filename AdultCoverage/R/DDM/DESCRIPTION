@@ -17,4 +17,6 @@ License: GPL-2
 LazyData: TRUE
 RoxygenNote: 7.1.1
 Encoding: UTF-8
-Remotes: github::timriffe/DemoTools
+Remotes: 
+    github::timriffe/DemoTools,
+    github::mgimond/tukeyedar
