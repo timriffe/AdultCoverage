@@ -25,8 +25,7 @@ library(magrittr)
 Moz <- Moz %>% rename(date1 = "year1", date2 = "year2")
 res <- ddm(Moz)
 
-Moz %>% 
-  ggb()
+Moz %>% ggbMakeColumns()
 
 
 

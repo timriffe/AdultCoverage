@@ -208,7 +208,8 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE){
 	          date2          = ifelse(is.numeric(.data$date2), .data$date2, decimal_date(.data$date2)),
 	          AgeInt         = age2int(.data$age),
 	          dif            = .data$date2 - .data$date1,
-	          deathsAvg      = ifelse(deaths.summed, .data$deaths / .data$dif, .data$deaths),
+	          avg            = deaths.summed,
+	          deathsAvg      = ifelse(.data$avg, .data$deaths / .data$dif, .data$deaths),
 	          pop1           = as.double(.data$pop1),
 	          pop2           = as.double(.data$pop2),
 	          pop1cum        = lt_id_L_T(.data$pop1),
@@ -415,19 +416,43 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
 	if (! "leftterm" %in% colnames(codi)){
 		codi <- ggbMakeColumns(codi, minA = min(agesfit), maxA = max(agesfit), deaths.summed = deaths.summed)
 	}
+  
+  # eliminate repeated subsetting
+  codi <- codi %>% 
+    filter(age %in% agefit)
+  
   if (lm.method == "oldschool"){
   	#age <- codi$age
   	# TODO: find eq numbers to cite here
-  	slope       <- 	with(codi,sd(leftterm[age %in% agesfit]) /  
-  						sd(rightterm[age %in% agesfit]))
+  	slope       <- 	with(codi,sd(leftterm) /  
+  						sd(rightterm))
 
-  	# intercept   <- 	with(codi,mean(leftterm[age %in% agesfit]) * (1/slope) - 
-  	# 		            mean(rightterm[age %in% agesfit]))
   	# PJ: fix https://github.com/timriffe/AdultCoverage/issues/3
-  	intercept <- with(codi,mean(leftterm[age %in% agesfit]) - mean(rightterm[age %in% agesfit])) * slope
+  	intercept <- with(codi,mean(leftterm) - mean(rightterm)) * slope
   	
-  	#coefs <- with(codi,lm(leftterm[age %in% agesfit]~rightterm[age %in% agesfit]))$coef
+  	#coefs <- with(codi,lm(leftterm~rightterm))$coef
   }
+  
+  
+  if (lm.method %in% c("lm","ols")){
+    
+   ab        <- lm(leftterm~rightterm, data = codi)$coef
+   slope     <- ab["b"]
+   intercept <- ab["a"]
+  }
+  
+  if (lm.method %in% c("tls","orthogonal","deming")){
+    y <- codi$leftterm
+    x <- codi$rightterm
+    # let's avoid a new package dependency
+    # PJ's implementation via Wikipedia formulas
+    slope <- (var(y)-delta*var(x)+sqrt((var(y)-delta*var(x))^2+4*delta*cov(x,y)^2)) /
+      (2*cov(x,y))
+    
+    intercept <- mean(y) - slope3 * mean(x)
+  }
+  
+  
 	list(a = intercept, b = slope)
 }
 
