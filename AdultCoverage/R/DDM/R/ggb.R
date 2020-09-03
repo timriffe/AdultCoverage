@@ -172,7 +172,7 @@ ggbFittedFromAges <- function(codi, agesfit, deaths.summed = FALSE, lm.method = 
 #			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
 #	) 
 	coefs       <- slopeint(codi, agesfit, lm.method = lm.method)
-	codi$fitted <- coefs$a + codi$rightterm * 1/coefs$b 
+	codi$fitted <- coefs$a + codi$rightterm * coefs$b 
 	codi
 }
 
