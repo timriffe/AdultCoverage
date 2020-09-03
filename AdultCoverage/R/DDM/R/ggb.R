@@ -40,6 +40,7 @@ ggbgetRMS <- function(agesi, codi){
 
 
 
+
 #' @title estimate death registration coverage for a single year/sex/region using the GGB method
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. Called by \code{ggb()}. Users probably don't need to call this directly. Just use \code{ggb()} instead.
@@ -87,10 +88,13 @@ ggbcoverageFromYear <- function(codi,
 	# TR: test add this step, just in case
 	codi    <- codi[ order(codi$age), ]
 	
-	codi    <- ggbMakeColumns(codi = codi, 
-							  minA = minA, 
-							  maxA = maxA, 
-							  deaths.summed = deaths.summed)
+	# this is conditional in case function called repeatedly.
+	if (!"leftterm" %in% colnames(codi)){
+	  codi <- ggbMakeColumns(codi = codi, 
+	                         minA = minA, 
+	                         maxA = maxA, 
+	                         deaths.summed = deaths.summed)
+	}
 	
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		agesfit <- exact.ages
@@ -132,11 +136,13 @@ ggbcoverageFromYear <- function(codi,
 	result   <- data.frame(cod = unique(codi$cod), 
 			   coverage = coverage, 
 			   lower = min(agesfit), 
-			   upper = max(agesfit))
-	# can't have NULL column...
-    # TR: 3-4-2017 no longer optional, also returning more goods
+			   upper = max(agesfit),
+			   a = coefs$a, 
+			   b = coefs$b, 
+			   delta = delta, 
+			   k1 = k1, 
+			   k2 = k2)
    
-	result   <- cbind(result, a = coefs$a, b = coefs$b, delta = delta, k1 = k1, k2 = k2)
 	result
 }
 
@@ -552,16 +558,32 @@ ggbChooseAges <- function(
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		agesfit <- exact.ages
 	} else {
-		agesfit <- ggbgetAgesFit(codi, minAges, deaths.summed = deaths.summed)
+		agesfit <- ggbgetAgesFit(codi, 
+		                         minA = minA, 
+		                         maxA = maxA, 
+		                         minAges = minAges, 
+		                         deaths.summed = deaths.summed)
 	}
-	codi     <- ggbFittedFromAges(codi=codi, agesfit=agesfit, deaths.summed = deaths.summed)
 	
+	codi     <- ggbFittedFromAges(codi = codi, 
+	                              agesfit = agesfit, 
+	                              deaths.summed = deaths.summed,
+	                              lm.method = lm.method)
+	
+	
+	coverage <- ggbcoverageFromYear(codi = codi, 
+	                                exact.ages = agesfit, 
+	                                minA = minA, 
+	                                maxA = maxA,
+	                                minAges = minAges,
+	                                deaths.summed = deaths.summed,
+	                                lm.method = lm.method)
 	# starting values for abline
-	# si       <- slopeint(codi, agesfit, lm.method = lm.method)
+	#si       <- slopeint(codi, agesfit, lm.method = lm.method)
 	# 
 	# # this is the basic formula
 	# #coverage <- ggbcoverageFromAges(codi, agesfit)
-	# coverage <- 1/si$b
+	#coverage <- si$b
 	# some objects used throughout
 
 	
@@ -580,10 +602,10 @@ ggbChooseAges <- function(
 			xlab = "right term",
 			ylab = "left term",
 			main = paste0("Age range [",amin,
-					",",amax,"], est. coverage = ",round(coverage*100,1)),
+					",",amax,"], \nLine method = ",lm.method,"\nEst. coverage = ",round(coverage$coverage*100,1)),
 			sub = "(optimized age range)")
 	# automatically fit line (RMS of ggb)
-	abline(a = si$a, b = si$b, col = "blue")
+	abline(a = coverage$a, b = coverage$b, col = "blue")
 	# shows points used to fit line
 	points(rightt[age %in% agesfit], 
 			leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
@@ -611,10 +633,13 @@ ggbChooseAges <- function(
 			amin     <- min(agesfit)
 			amax     <- max(agesfit)
 			
-			# an estimate of the resulting coverage
-			coverage <- 1/si$b
-			# get params for abline..
-			si       <- slopeint(codi, agesfit, lm.method = lm.method)
+			coverage <- ggbcoverageFromYear(codi = codi, 
+			                                exact.ages = agesfit, 
+			                                minA = minA, 
+			                                maxA = maxA,
+			                                minAges = minAges,
+			                                deaths.summed = deaths.summed,
+			                                lm.method = lm.method)
 			
 			# redraw plot
 			plot(rightt, 
@@ -626,12 +651,12 @@ ggbChooseAges <- function(
 					xlab = "right term",
 					ylab = "left term",
 					main = paste0("Age range [", amin,
-							",", amax, "], est. coverage = %",round(coverage * 100, 1)),
+							",", amax, "], est. coverage = %",round(coverage$coverage * 100, 1)),
 					sub = "(optimized age range)")
 			# new fitted slope, intercept
 		    abline(a=0,b=1,col=gray(.8)) # line of perfection
 			#
-			abline(a = si$a, b = si$b, col = "blue")
+			abline(a = coverage$a, b = coverage$b, col = "blue")
 			# indicate which points used with color
 			points(rightt[age %in% agesfit], 
 					leftt[age %in% agesfit], col = "#FFFF00", pch = 19, cex = 1.6)
