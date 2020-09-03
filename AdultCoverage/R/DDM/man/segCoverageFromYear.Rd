@@ -11,7 +11,8 @@ segCoverageFromYear(
   minAges = 8,
   exact.ages = NULL,
   eOpen = NULL,
-  deaths.summed = FALSE
+  deaths.summed = FALSE,
+  nx.method = 2
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ segCoverageFromYear(
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{nx.method}{integer, either 2 or 4. 4 is smoother.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.

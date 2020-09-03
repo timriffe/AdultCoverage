@@ -11,7 +11,8 @@ ggb(
   minAges = 8,
   exact.ages = NULL,
   deaths.summed = FALSE,
-  lm.method = "oldschool"
+  lm.method = "oldschool",
+  nx.method = 2
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ ggb(
   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. \code{$a} and \code{$b} give the intercept and slope of the line on which the coverage estimate is based. \code{$delta}, \code{$k1}, and \code{$k2}  are further derived quantities that may be interesting for advanced users. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
@@ -45,8 +48,6 @@ Census dates can be given in a variety of ways: 1) using Date classes, and colum
 }
 \examples{
 # The Mozambique data
-library(dplyr)
-library(magrittr)
 res <- ggb(Moz)
 res
 # The Brasil data

@@ -11,7 +11,7 @@ adjustages(a, age, agesfit)
 
 \item{age}{ages present in dataset}
 
-\item{agesfit}{the former age range used for calculating the coverage coefficient}
+\item{agesfit}{the age range used for calculating the coverage coefficient}
 }
 \value{
 the adjusted set of ages used for calculating the coverage coefficient

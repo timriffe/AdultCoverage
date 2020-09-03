@@ -12,17 +12,19 @@ ddm(
   exact.ages.ggb = NULL,
   exact.ages.seg = NULL,
   eOpen = NULL,
-  deaths.summed = FALSE
+  deaths.summed = FALSE,
+  lm.method = "oldschool",
+  nx.method = 2
 )
 }
 \arguments{
 \item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}
 
-\item{minA}{the lowest age to be included in search}
+\item{minA}{the minimum of the age range searched. Default 15}
 
-\item{maxA}{the highest age to be included in search (the lower bound thereof)}
+\item{maxA}{the maximum of the age range searched. Default 75}
 
-\item{minAges}{the minimum number of adjacent ages to be used in estimating}
+\item{minAges}{the minimum number of adjacent ages needed as points for fitting. Default 8}
 
 \item{exact.ages.ggb}{optional. A user-specified vector of exact ages to use for coverage estimation in the GGB method and the GGB stage of the GGBSEG method.}
 
@@ -31,6 +33,15 @@ ddm(
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{lm.method}{character, one of:\itemize{
+  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+}}
+
+\item{nx.method}{integer. either 2 or 4. 4 is smoother.}
 }
 \value{
 data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}.
@@ -47,8 +58,6 @@ The synthetic extinct generation methods require an estimate of remaining life e
 }
 \examples{
 # The Mozambique data
-library(dplyr)
-library(magrittr)
 res <- ddm(Moz)
 head(res)
 # The Brasil data

@@ -25,9 +25,9 @@ library(dplyr)
 library(magrittr)
 
 # change data
-
-Moz <- Moz %>% 
-  rename(date1 = "year1", date2 = "year2")
+ggb(Moz)
+seg(Moz)
+ggbseg(Moz)
 res <- ddm(Moz)
 
 codi <- Moz %>% ggbMakeColumns() 

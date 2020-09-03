@@ -4,7 +4,14 @@
 \alias{segMakeColumns}
 \title{make the Bennett-Horiuchi quasi life table columns required by the estimation method}
 \usage{
-segMakeColumns(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE)
+segMakeColumns(
+  codi,
+  minA = 15,
+  maxA = 75,
+  eOpen = NULL,
+  deaths.summed = FALSE,
+  nx.method = 2
+)
 }
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{seg()}}
@@ -16,6 +23,8 @@ segMakeColumns(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE)
 \item{eOpen}{optional. A value for remaining life expectancy in the open age group.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \value{
 codi, with many columns added, most importantly \code{$Cx}.

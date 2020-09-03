@@ -73,9 +73,13 @@ seggetAgesFit <- function (codi,
                            minA = 15, 
                            maxA = 75, 
                            minAges = 8, 
-                           deaths.summed = FALSE) {
-  codi <- segMakeColumns(codi = codi, minA = minA, maxA = maxA, 
-                         deaths.summed = deaths.summed)
+                           deaths.summed = FALSE,
+                           nx.method = nx.method) {
+  codi <- segMakeColumns(codi = codi, 
+                         minA = minA, 
+                         maxA = maxA, 
+                         deaths.summed = deaths.summed,
+                         nx.method = nx.method)
   
   keep <- codi$age >= minA & codi$age <= maxA
   maxAges   <- sum(keep)
@@ -116,6 +120,12 @@ seggetRMS <- function(codi, agesFit){
 #' @description We try all possible age ranges given the constraints provided. Whichever age range has the lowest root mean square residual with respect to the corresponding coverage estimate is returned.
 #' @inheritParams ggbgetAgesFit
 #' @param agesFit.ggb integer vector of age trim from GGB method.
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
 #' @export
 #' @return integer vector of ages that minimize the RMSE.
 
@@ -124,14 +134,18 @@ ggbseggetAgesFit <- function (codi,
                            maxA = 75, 
                            minAges = 8, 
                            agesFit.ggb = NULL,
-                           deaths.summed = FALSE) {
+                           deaths.summed = FALSE,
+                           lm.method = "oldschool",
+                           nx.method = 2) {
   
   
   codi <- ggbsegMakeColumns(codi = codi, 
                             minA = minA, 
                             maxA = maxA, 
                             agesFit.ggb = agesFit.ggb,
-                            deaths.summed = deaths.summed)
+                            deaths.summed = deaths.summed,
+                            lm.method = lm.method,
+                            nx.method = nx.method)
   
   keep      <- codi$age >= minA & codi$age <= maxA
   maxAges   <- sum(keep)
@@ -181,6 +195,7 @@ segCoverageFromAges <- function(codi, agesFit){
 #' @param maxA the maximum of the age range searched. Default 75
 #' @param eOpen optional. A value for remaining life expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param nx.method either 2 or 4. 4 is smoother.
 #'
 #' @return codi, with many columns added, most importantly \code{$Cx}.
 #' 
@@ -191,7 +206,12 @@ segCoverageFromAges <- function(codi, agesFit){
 #' @importFrom DemoTools lt_id_L_T
 #' @importFrom DemoTools age2int
 
-segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summed = FALSE){
+segMakeColumns <- function(codi, 
+                           minA = 15, 
+                           maxA = 75, 
+                           eOpen = NULL, 
+                           deaths.summed = FALSE, 
+                           nx.method = 2){
   # group inf if necessary
   codi                   <- group01(codi)
   codi                   <- reduceOpen(codi, maxA = 95, group = TRUE)
@@ -210,7 +230,8 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
             deathcum       = lt_id_L_T(.data$deathsAvg),
             # TR: maybe rethink this line as a function?
             # this appears to have a strong assumption about census spacing (10 years?) in it.
-            birthdays      = c(0, sqrt(.data$pop1[ -N  ] * .data$pop2[ -1 ])) / .data$AgeInt,
+            birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
+                                           AgeInt = .data$AgeInt, nx.method = nx.method),
      
             growth         = log(.data$pop2 / .data$pop1) / .data$dif,
             growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
@@ -264,6 +285,7 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 #' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param nx.method integer, either 2 or 4. 4 is smoother.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
 #' 
@@ -272,13 +294,15 @@ segMakeColumns <- function(codi, minA = 15, maxA = 75, eOpen = NULL, deaths.summ
 #' @export
 
 
-segCoverageFromYear <-  function(codi, 
+segCoverageFromYear <-  function(
+                 codi, 
 								 minA = 15, 
 								 maxA = 75, 
 								 minAges = 8, 
 								 exact.ages = NULL, 
 								 eOpen = NULL, 
-								 deaths.summed = FALSE){       
+								 deaths.summed = FALSE,
+								 nx.method = 2){       
 	# if exact.ages is given, we override other age-parameters
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		if (min(exact.ages) < minA){
@@ -300,7 +324,8 @@ segCoverageFromYear <-  function(codi,
 								 minA = minA, 
 								 maxA = maxA, 
 								 minAges = minAges, 
-								 deaths.summed = deaths.summed)
+								 deaths.summed = deaths.summed,
+								 nx.method = nx.method)
 	} else {
 		agesFit <- exact.ages
 	}
@@ -309,7 +334,8 @@ segCoverageFromYear <-  function(codi,
 								minA = minA, 
 								maxA = maxA,
 								eOpen = eOpen,
-								deaths.summed = deaths.summed)
+								deaths.summed = deaths.summed,
+								nx.method = nx.method)
 	
 	coverage <- segCoverageFromAges(codi = codi, agesFit = agesFit)
 
@@ -346,7 +372,7 @@ segCoverageFromYear <-  function(codi,
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation. if left as \code{NULL} these are optimized.
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#'
+#' @param nx.method integer either 2 or 4. 4 is smoother.
 #' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable. \code{$l25} (\code{$u25}) give the mean of the lower (upper) quartile of the distribution of age-specific coverage estimates.
 #' 
 #' @export
@@ -357,8 +383,6 @@ segCoverageFromYear <-  function(codi,
 #' 
 #' @examples 
 #' # The Mozambique data
-#' library(dplyr)
-#' library(magrittr)
 #' res <- seg(Moz)
 #' res
 #' # The Brasil data
@@ -373,7 +397,8 @@ seg <- function(X,
 				minAges = 8, 
 				exact.ages = NULL, 
 				eOpen = NULL, 
-				deaths.summed = FALSE){
+				deaths.summed = FALSE,
+				nx.method = 2){
 	
     # TR: modularized Apr 2, 2017
 	tab1        <- headerPrep(X)
@@ -388,7 +413,8 @@ seg <- function(X,
 										minAges = minAges,  
 										exact.ages = exact.ages,
 										eOpen = eOpen,
-										deaths.summed = deaths.summed)$coverages	
+										deaths.summed = deaths.summed,
+										nx.method = nx.method)$coverages	
 							}
             )))
 	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
@@ -411,6 +437,7 @@ seg <- function(X,
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' @param log logical. should we log the y axis?
+#' @param nx.method integer 2 or 4. 4 is smoother
 #' 
 #' @return Function called for its graphical side effects
 #' 
@@ -432,7 +459,8 @@ segplot <- function(
 		exact.ages = NULL, 
 		eOpen = NULL, 
 		deaths.summed = FALSE,
-		log = FALSE){
+		log = FALSE,
+		nx.method = 2){
 	tab1        <- headerPrep(X)
 	
 	if (length(tab1) > 1){
@@ -446,7 +474,8 @@ segplot <- function(
 		                      minAges = minAges,  
 		                      exact.ages = exact.ages,
 		                      eOpen = eOpen,
-		                      deaths.summed = deaths.summed)
+		                      deaths.summed = deaths.summed,
+		                      nx.method = nx.method)
 	codi     <- goods$codi
 	coverage <- goods$coverages
 	keep 	   <- codi$age >= minA &  codi$age <= maxA
@@ -495,7 +524,13 @@ segplot <- function(
 #' @param eOpen optional. A value for remaining life expectancy in the open age group.
 #' @param agesFit.ggb vector of ages as passed in by \code{ggbsegCoverageFromYear)} 
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#'
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
+#' @param nx.method either 2 or 4. 4 is smoother.
 #' @return codi, with many columns added, most importantly \code{$Cx}.
 #' 
 #' @export
@@ -508,7 +543,9 @@ ggbsegMakeColumns <- function(
 		maxA = 75,  
 		agesFit.ggb, 
 		eOpen = NULL,
-		deaths.summed = FALSE){
+		deaths.summed = FALSE,
+		lm.method = "oldschool",
+		nx.method = 2){
   
   codi                   <- group01(codi)
   codi                   <- reduceOpen(codi, maxA = 95, group = TRUE)
@@ -516,14 +553,19 @@ ggbsegMakeColumns <- function(
   codi                   <- ggbMakeColumns(codi, 
                                            minA = minA, 
                                            maxA = maxA,	
-                                           deaths.summed = deaths.summed)
+                                           deaths.summed = deaths.summed,
+                                           nx.method = nx.method)
   
 	dif          <- codi$dif[1]
 	
 	# just get left term / right term
 	# slopeint() is in the ggb() family
 	# TR: this function will likely change.
-	ab           <- slopeint(codi = codi, agesfit = agesFit.ggb)
+	ab           <- slopeint(codi = codi, 
+	                         agesfit = agesFit.ggb, 
+	                         deaths.summed = deaths.summed, 
+	                         lm.method = lm.method, 
+	                         nx.method = nx.method)
 	
 	# the only difference between this method and seg is that
 	# in the next couple lines we use pop1adj instead of pop1...
@@ -536,7 +578,8 @@ ggbsegMakeColumns <- function(
     segMakeColumns(minA = minA,
                    maxA = maxA, 
                    eOpen = eOpen, 
-                   deaths.summed = deaths.summed)
+                   deaths.summed = deaths.summed,
+                   nx.method = nx.method)
 	
 	codi
 }
@@ -561,18 +604,22 @@ ggbsegCoverageFromYear <- function(codi,
 								exact.ages.ggb = NULL, 
 								exact.ages.seg = NULL,
 								eOpen = NULL, 
-								deaths.summed = FALSE){
+								deaths.summed = FALSE,
+								lm.method = "oldschool",
+								nx.method = 2){
 	codiggb      <- ggbMakeColumns(codi = codi, 
 								   minA = minA, 
 								   maxA = maxA, 
-								   deaths.summed = deaths.summed)
+								   deaths.summed = deaths.summed,
+								   nx.method = nx.method)
 	# Get age range using the GGB auto fitting
 	if (is.null(exact.ages.ggb)){
 		agesFit.ggb <- ggbgetAgesFit(codi = codiggb, 
 								minA = minA, 
 								maxA = maxA, 
 								minAges = minAges,
-								deaths.summed = deaths.summed)
+								deaths.summed = deaths.summed,
+								nx.method = nx.method)
 	} else {
 		agesFit.ggb <- exact.ages.ggb
 	}
@@ -584,7 +631,9 @@ ggbsegCoverageFromYear <- function(codi,
 	                              maxA = maxA, 
 	                              minAges = minAges,
 	                              agesFit.ggb = agesFit.ggb,
-	                              deaths.summed = deaths.summed)
+	                              deaths.summed = deaths.summed,
+	                              lm.method = lm.method,
+	                              nx.method = nx.method)
 	} else {
 	  agesFit.ggbseg <- exact.ages.seg
 	}
@@ -598,7 +647,9 @@ ggbsegCoverageFromYear <- function(codi,
 								    maxA = maxA, 	
 								    agesFit.ggb = agesFit.ggb,
 								    eOpen = eOpen,
-								    deaths.summed = deaths.summed)
+								    deaths.summed = deaths.summed,
+								    lm.method = lm.method,
+								    nx.method = nx.method)
 	coverage     <- segCoverageFromAges(codi = codi, agesFit = agesFit.ggbseg)
 	data.frame(cod = unique(codi$cod), 
 	           coverage = coverage, 
@@ -623,7 +674,13 @@ ggbsegCoverageFromYear <- function(codi,
 #' @param exact.ages.seg optional. A user-specified vector of exact ages to use for coverage estimation in the SEG (second stage) part of the estimation.
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
 #' @param deaths.summed logical. Is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#'
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
+#' @param nx.method integer. either 2 or 4. 4 is smoother.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
 #' 
@@ -637,8 +694,6 @@ ggbsegCoverageFromYear <- function(codi,
 #' 
 #' @examples 
 #' # The Mozambique data
-#' library(dplyr)
-#' library(magrittr)
 #' res <- ggbseg(Moz)
 #' res
 #' # The Brasil data
@@ -653,7 +708,9 @@ ggbseg <- function(X,
 				exact.ages.ggb = NULL, 
 				exact.ages.seg = NULL,
 				eOpen = NULL, 
-				deaths.summed = FALSE){
+				deaths.summed = FALSE,
+				nx.method = 2,
+				lm.method = "oldschool"){
 	# TR: modularized Apr 2, 2017
     tab1        <- headerPrep(X)
 	
@@ -669,7 +726,9 @@ ggbseg <- function(X,
 						exact.ages.ggb = exact.ages.ggb,
 						exact.ages.seg = exact.ages.seg,
 						eOpen = eOpen,
-						deaths.summed = deaths.summed
+						deaths.summed = deaths.summed,
+						lm.method = lm.method,
+						nx.method = nx.method
                   )))
 	coverages
 }

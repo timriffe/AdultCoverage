@@ -163,3 +163,32 @@ headerPrep <- function(X){
 	tab1
 }
 
+
+
+#' helper function to calculate Nx (birthdays)
+#' @description Approximate average birthdays per annum in a reference period and age group between two censuses. We do this by taking geometric means within ages, either from age x in census 1 and age x + 5 in census 2 (\code{nx.method = 2}), or from ages x and x+5 in both censuses. We also divide out the age group width, presumably 5.
+#' 
+#' @param pop1 numeric vector of population counts by age from census 1. 
+#' @param pop2 numeric vector of population counts by age from census 2. 
+#' @param AgeInt numeric vector of age interval widths
+#' @param nx.method either 2 or 4. 4 is smoother.
+#' @return numeric vector of estiamte birthdays per annum per age
+#' @export
+
+est_birthdays <- function(pop1, pop2, AgeInt = NULL, nx.method = 2){
+  stopifnot(nx.method %in% c(2,4))
+  
+  pop1l <- log(pop1)
+  pop2l <- log(pop2)
+  N <- length(pop1)
+  if (nx.method == 2){
+    birthdays <- c(0, exp((pop1l[ -N  ] + pop2l[ -1 ])/2)) / AgeInt
+  }
+  if (nx.method == 4){
+    birthdays <-   c(0,exp((pop1l[ -N  ] + pop1l[ -1 ] +  pop2l[ -N  ] + pop2l[ -1 ]) / 4)) / AgeInt
+  }
+  birthdays
+}
+
+
+

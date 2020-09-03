@@ -11,7 +11,8 @@ ggbcoverageFromYear(
   maxA = 75,
   minAges = 8,
   deaths.summed = FALSE,
-  lm.method = "oldschool"
+  lm.method = "oldschool",
+  nx.method = nx.method
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ ggbcoverageFromYear(
   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{nx.method}{integer. either 2 or 4. 4 is smoother.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.

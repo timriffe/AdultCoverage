@@ -11,7 +11,8 @@ seg(
   minAges = 8,
   exact.ages = NULL,
   eOpen = NULL,
-  deaths.summed = FALSE
+  deaths.summed = FALSE,
+  nx.method = 2
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ seg(
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{nx.method}{integer either 2 or 4. 4 is smoother.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$cod} variable. \code{$l25} (\code{$u25}) give the mean of the lower (upper) quartile of the distribution of age-specific coverage estimates.
@@ -42,8 +45,6 @@ If \code{exact.ages} is specified as \code{NULL}, coverage is estimated by minim
 }
 \examples{
 # The Mozambique data
-library(dplyr)
-library(magrittr)
 res <- seg(Moz)
 res
 # The Brasil data

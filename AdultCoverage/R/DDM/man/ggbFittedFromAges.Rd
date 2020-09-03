@@ -8,13 +8,14 @@ ggbFittedFromAges(
   codi,
   agesfit,
   deaths.summed = FALSE,
-  lm.method = "oldschool"
+  lm.method = "oldschool",
+  nx.method = 2
 )
 }
 \arguments{
-\item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
+\item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}
 
-\item{agesfit}{an a priori set of ages for which to calculate the fit}
+\item{agesfit}{a set of continuous ages to estimate coverage from}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
@@ -24,6 +25,8 @@ ggbFittedFromAges(
   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \value{
 codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.

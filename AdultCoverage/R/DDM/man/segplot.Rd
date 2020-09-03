@@ -12,7 +12,8 @@ segplot(
   exact.ages = NULL,
   eOpen = NULL,
   deaths.summed = FALSE,
-  log = FALSE
+  log = FALSE,
+  nx.method = 2
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ segplot(
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
 \item{log}{logical. should we log the y axis?}
+
+\item{nx.method}{integer 2 or 4. 4 is smoother}
 }
 \value{
 Function called for its graphical side effects

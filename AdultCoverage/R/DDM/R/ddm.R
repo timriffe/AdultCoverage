@@ -12,14 +12,20 @@
 #' 
 #' The synthetic extinct generation methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. That is a place where things can be improved.
 #' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
-#' @param minA the lowest age to be included in search
-#' @param maxA the highest age to be included in search (the lower bound thereof)
-#' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages.ggb optional. A user-specified vector of exact ages to use for coverage estimation in the GGB method and the GGB stage of the GGBSEG method.
 #' @param exact.ages.seg optional. A user-specified vector of exact ages to use for coverage estimation in the SEG method and the SEG stage of the GGBSEG method.
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param minA the minimum of the age range searched. Default 15
+#' @param maxA the maximum of the age range searched. Default 75
+#' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' 
+#' @param lm.method character, one of:\itemize{
+#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+#' }
+#' @param nx.method integer. either 2 or 4. 4 is smoother.
 #' @return data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}. 
 #' @references 
 #' Bennett Neil G, Shiro Horiuchi. Estimating the completeness of death registration in a closed population. Population Index. 1981; 1:207-221.
@@ -37,8 +43,6 @@
 #' 
 #' @examples 
 #' # The Mozambique data
-#' library(dplyr)
-#' library(magrittr)
 #' res <- ddm(Moz)
 #' head(res)
 #' # The Brasil data
@@ -55,20 +59,25 @@ ddm <- function(
 		exact.ages.ggb = NULL, 
 		exact.ages.seg = NULL, 
 		eOpen = NULL, 
-		deaths.summed = FALSE){
+		deaths.summed = FALSE,
+		lm.method = "oldschool",
+		nx.method = 2){
 	ggbres <- ggb(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
 					exact.ages = exact.ages.ggb,
-					deaths.summed = deaths.summed)
+					deaths.summed = deaths.summed,
+					lm.method = lm.method,
+					nx.method = nx.method)
 	segres <- seg(X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
 					exact.ages = exact.ages.seg, 
 					eOpen = eOpen,
-					deaths.summed = deaths.summed)
+					deaths.summed = deaths.summed,
+					nx.method = nx.method)
 	ggbsegres <- ggbseg(
 			        X = X, 
 					minA = minA, 
@@ -77,7 +86,9 @@ ddm <- function(
 					exact.ages.ggb = exact.ages.ggb,
 					exact.ages.seg = exact.ages.seg,
 					eOpen = eOpen,
-					deaths.summed = deaths.summed)
+					deaths.summed = deaths.summed,
+					lm.method = lm.method,
+					nx.method = nx.method)
 	# return all results
 	results <- data.frame(	
 			        cod = ggbres$cod,
@@ -108,8 +119,6 @@ ddm <- function(
 #' 
 #' @examples 
 #' # just a rough sketch of the results!
-#' library(dplyr)
-#' library(magrittr)
 #' res <- ddm(Moz)
 #' ddmplot(res)
 

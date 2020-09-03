@@ -4,7 +4,14 @@
 \alias{ggbgetAgesFit}
 \title{determine the age range that minimizes the mean squared error}
 \usage{
-ggbgetAgesFit(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed = FALSE)
+ggbgetAgesFit(
+  codi,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  deaths.summed = FALSE,
+  nx.method = 2
+)
 }
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
@@ -16,6 +23,8 @@ ggbgetAgesFit(codi, minA = 15, maxA = 75, minAges = 8, deaths.summed = FALSE)
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \value{
 a vector of ages that minimizes the RMSE

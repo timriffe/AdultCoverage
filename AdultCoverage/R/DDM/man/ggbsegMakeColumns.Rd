@@ -10,7 +10,9 @@ ggbsegMakeColumns(
   maxA = 75,
   agesFit.ggb,
   eOpen = NULL,
-  deaths.summed = FALSE
+  deaths.summed = FALSE,
+  lm.method = "oldschool",
+  nx.method = 2
 )
 }
 \arguments{
@@ -25,6 +27,15 @@ ggbsegMakeColumns(
 \item{eOpen}{optional. A value for remaining life expectancy in the open age group.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{lm.method}{character, one of:\itemize{
+  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+}}
+
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \value{
 codi, with many columns added, most importantly \code{$Cx}.

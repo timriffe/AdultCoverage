@@ -12,7 +12,8 @@ ggbChooseAges(
   exact.ages = NULL,
   maxit = 15,
   deaths.summed = FALSE,
-  lm.method = "oldschool"
+  lm.method = "oldschool",
+  nx.method = 2
 )
 }
 \arguments{
@@ -24,9 +25,9 @@ ggbChooseAges(
 
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
-\item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation.}
+\item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
 
-\item{maxit}{the maximum number of clicks you can take. Default 15.}
+\item{maxit}{up to how many times do you want to let yourself fiddle with the age range?}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
@@ -36,6 +37,8 @@ ggbChooseAges(
   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \value{
 \code{data.frame} containing elements \code{$coverage}, \code{$lower}, \code{$upper}, and \code{ages}.

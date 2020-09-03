@@ -19,8 +19,6 @@ produce a dot plot, where each x position is a unique value of \code{$cod}, and 
 }
 \examples{
 # just a rough sketch of the results!
-library(dplyr)
-library(magrittr)
 res <- ddm(Moz)
 ddmplot(res)
 }
