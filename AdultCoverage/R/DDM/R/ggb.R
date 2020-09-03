@@ -479,8 +479,8 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
   
   if (lm.method %in% c("tukey","resistant","median")){
     ab.etc <- eda_rline(x = codi$rightterm, y = codi$leftterm)
-    slope     <- ab.etc["b"]
-    intercept <- ab.etc["a"]
+    slope     <- ab.etc$b
+    intercept <- ab.etc$a
   }
   
 	list(a = intercept, b = slope)

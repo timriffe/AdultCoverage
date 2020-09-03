@@ -25,7 +25,8 @@ library(magrittr)
 Moz <- Moz %>% rename(date1 = "year1", date2 = "year2")
 res <- ddm(Moz)
 
-Moz %>% ggbMakeColumns() %>% ggbcoverageFromYear()
+codi <- Moz %>% ggbMakeColumns() 
+ggbcoverageFromYear(codi,lm.method = "ols")
 
 
 library(DependenciesGraphs)
