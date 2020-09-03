@@ -14,7 +14,6 @@
 #' @return the RMSE
 #' 
 #' @export 
-
 ggbgetRMS <- function(agesi, codi){
   # TODO: should this be sensitive to the line fitting method?
   
@@ -462,8 +461,8 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
   if (lm.method %in% c("lm","ols")){
     
    ab        <- lm("leftterm~rightterm", data = codi)$coef
-   slope     <- ab["b"]
-   intercept <- ab["a"]
+   slope     <- ab[2]
+   intercept <- ab[1]
   }
   
   if (lm.method %in% c("tls","orthogonal","deming")){

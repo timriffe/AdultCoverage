@@ -28,9 +28,17 @@ res <- ddm(Moz)
 Moz %>% ggbMakeColumns() %>% ggbcoverageFromYear()
 
 
+library(DependenciesGraphs)
+# Prepare data
+dep <- funDependencies("package:DDM","ggbgetRMS")
 
+# visualization
+plot(dep)
 
+dep <- envirDependencies("package:DDM")
 
+# visualization
+plot(dep)
 
 
 res <- seg(Moz)
