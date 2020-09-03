@@ -11,8 +11,8 @@ A data frame with 53940 rows and 10 variables:
   \item{pop1}{integer the census population count in 1991}
   \item{pop2}{integer the census population count in 2000}
   \item{deaths}{numeric average deaths between censuses}
-  \item{year1}{integer 1991}
-  \item{year2}{integer 2000}
+  \item{date1}{integer 1991}
+  \item{date2}{integer 2000}
   \item{age}{integer lower age bound for each age group}
   \item{sex}{character, 'f'}
 }

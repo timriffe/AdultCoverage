@@ -21,8 +21,6 @@ produce a dot plot, where each x position is a unique value of \code{$cod}, and 
 # just a rough sketch of the results!
 library(dplyr)
 library(magrittr)
-Moz <- Moz \%>\% 
-rename(date1 = "year1", date2 = "year2")
 res <- ddm(Moz)
 ddmplot(res)
 }

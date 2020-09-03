@@ -13,8 +13,8 @@ A data frame with 17 rows and 8 variables:
   \item{deaths}{integer average of 1997 and 2007 deaths}
   \item{age}{integer lower age bound for each age group}
   \item{sex}{character ``f'' for female}
-  \item{year1}{integer 1997}
-  \item{year2}{integer 2007}
+  \item{date1}{integer 1997}
+  \item{date2}{integer 2007}
 }
 }
 \source{

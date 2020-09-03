@@ -13,16 +13,21 @@
 #		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 #
 library(devtools)
-getwd()
-load_all("AdultCoverage/R/DDM")
-document("AdultCoverage/R/DDM")
-check("AdultCoverage/R/DDM")
 
+setwd("AdultCoverage/R/DDM")
+
+load_all()
+document()
+check()
 
 #--------------------
 library(dplyr)
 library(magrittr)
-Moz <- Moz %>% rename(date1 = "year1", date2 = "year2")
+
+# change data
+
+Moz <- Moz %>% 
+  rename(date1 = "year1", date2 = "year2")
 res <- ddm(Moz)
 
 codi <- Moz %>% ggbMakeColumns() 

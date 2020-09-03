@@ -39,15 +39,9 @@
 #' # The Mozambique data
 #' library(dplyr)
 #' library(magrittr)
-#' Moz <- Moz %>% 
-#' rename(date1 = "year1", date2 = "year2")
 #' res <- ddm(Moz)
 #' head(res)
 #' # The Brasil data
-#' BrasilMales <- BrasilMales %>% 
-#' rename(date1 = "year1", date2 = "year2")
-#' BrasilFemales <- BrasilFemales %>% 
-#' rename(date1 = "year1", date2 = "year2")
 #' BM <- ddm(BrasilMales)
 #' BF <- ddm(BrasilFemales)
 #' head(BM)
@@ -116,8 +110,6 @@ ddm <- function(
 #' # just a rough sketch of the results!
 #' library(dplyr)
 #' library(magrittr)
-#' Moz <- Moz %>% 
-#' rename(date1 = "year1", date2 = "year2")
 #' res <- ddm(Moz)
 #' ddmplot(res)
 

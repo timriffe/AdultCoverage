@@ -44,15 +44,9 @@ If \code{exact.ages} is specified as \code{NULL}, coverage is estimated by minim
 # The Mozambique data
 library(dplyr)
 library(magrittr)
-Moz <- Moz \%>\% 
-rename(date1 = "year1", date2 = "year2")
 res <- seg(Moz)
 res
 # The Brasil data
-BrasilMales <- BrasilMales \%>\% 
-rename(date1 = "year1", date2 = "year2")
-BrasilFemales <- BrasilFemales \%>\% 
-rename(date1 = "year1", date2 = "year2")
 BM <- seg(BrasilMales)
 BF <- seg(BrasilFemales)
 head(BM)
