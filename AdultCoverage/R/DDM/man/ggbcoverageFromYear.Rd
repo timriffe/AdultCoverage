@@ -12,19 +12,19 @@ ggbcoverageFromYear(
   minAges = 8,
   deaths.summed = FALSE,
   lm.method = "oldschool",
-  nx.method = nx.method
+  nx.method = 2
 )
 }
 \arguments{
-\item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}
+\item{codi}{a chunk of data from a single \code{id}}
 
-\item{exact.ages}{optional. use an exact set of ages to estimate coverage.}
+\item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
 
-\item{minA}{the minimum of the age range searched. Default 15}
+\item{minA}{the lowest age to be included in search}
 
-\item{maxA}{the maximum of the age range searched. Default 75}
+\item{maxA}{the highest age to be included in search (the lower bound thereof)}
 
-\item{minAges}{the minimum number of adjacent ages needed as points for fitting. Default 8}
+\item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
@@ -35,10 +35,7 @@ ggbcoverageFromYear(
   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 
-\item{nx.method}{integer. either 2 or 4. 4 is smoother.}
-}
-\value{
-a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \description{
 Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. Called by \code{ggb()}. Users probably don't need to call this directly. Just use \code{ggb()} instead.

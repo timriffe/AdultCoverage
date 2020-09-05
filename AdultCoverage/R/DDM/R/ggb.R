@@ -47,21 +47,8 @@ ggbgetRMS <- function(agesi, codi){
 #' 
 #' Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. 
 #' 
-#' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.
-#' @param exact.ages optional. use an exact set of ages to estimate coverage.
-#' @param minA the minimum of the age range searched. Default 15
-#' @param maxA the maximum of the age range searched. Default 75
-#' @param minAges the minimum number of adjacent ages needed as points for fitting. Default 8
-#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' @param lm.method character, one of:\itemize{
-#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
-#' }
-#' @param nx.method integer. either 2 or 4. 4 is smoother.
-#' @return a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based. 
-#' 
+#' @inheritParams ggb
+#' @param codi a chunk of data from a single \code{id}
 #' @export
 
 ggbcoverageFromYear <- function(codi, 
@@ -71,7 +58,7 @@ ggbcoverageFromYear <- function(codi,
 								minAges = 8, 
 								deaths.summed = FALSE,
 								lm.method = "oldschool",
-								nx.method = nx.method
+								nx.method = 2
 								){
 	
 	# if exact.ages is given, we override other age-parameters
@@ -138,18 +125,25 @@ ggbcoverageFromYear <- function(codi,
 	  k2 <- 1
 	}
 	# now get everything from the k parameters 
-	a <- log(delta) / dif
+	a        <- log(delta) / dif
 	coverage <- sqrt(k1 * k2) / coefs$b
 
-	result   <- data.frame(cod = unique(codi$cod), 
-			   coverage = coverage, 
+	result   <- data.frame(
+	       id = unique(codi$cod), 
+			   Mxcoverage = coverage, 
 			   lower = min(agesfit), 
 			   upper = max(agesfit),
 			   a = coefs$a, 
 			   b = coefs$b, 
 			   delta = delta, 
 			   k1 = k1, 
-			   k2 = k2)
+			   k2 = k2,
+			   k3 = 1 / coefs$b,
+			   t1 = codi$date1[1],
+			   t2 = codi$date2[2],
+			   t = dif,
+			   lm.method = lm.method,
+			   nx.method = nx.method)
    
 	result
 }
@@ -321,8 +315,23 @@ ggbgetAgesFit <- function(codi,
 #'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 #' }
 #' @param nx.method either 2 or 4. 4 is smoother.
-#' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. \code{$a} and \code{$b} give the intercept and slope of the line on which the coverage estimate is based. \code{$delta}, \code{$k1}, and \code{$k2}  are further derived quantities that may be interesting for advanced users. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
-#' 
+#' @return a \code{data.frame} with columns for: \itemize{
+#'   \item{id} group id
+#'   \item{Mxcoverage} coverage of the intercensal Mx values: \code{sqrt(k1*k2)/b}
+#'   \item{lower} lower bound of ages used for fitting
+#'   \item{upper} upper bound of ages used for fitting
+#'   \item{a} intercept
+#'   \item{b} slope
+#'   \item{delta} empirical link: \code{exp(t*a) = k1/k2}
+#'   \item{k1} completeness of census 1
+#'   \item{k2} completeness of census 2
+#'   \item{k3} completeness of deaths relative to census 2 (\code{1/b})
+#'   \item{t1} decimal date of census 1
+#'   \item{t2} decimal date of census 2
+#'   \item{t} intercensal interval (\code{t2 - t1})
+#'   \item{lm.method} line fitting method used
+#'   \item{nx.method} birthday (Nx) approximation used (2 or 4 points)
+#' }
 #' @export
 #' @references 
 #' Hill K. Estimating census and death registration completeness. Asian and Pacific Population Forum. 1987; 1:1-13.

@@ -91,8 +91,8 @@ ddm <- function(
 					nx.method = nx.method)
 	# return all results
 	results <- data.frame(	
-			        cod = ggbres$cod,
-					ggb = ggbres$coverage,
+			        id = ggbres$id,
+					ggb = ggbres$Mxcoverage,
 					seg = segres$coverage,
 					ggbseg = ggbsegres$coverage,
 					lower = ggbres$lower,

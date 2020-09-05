@@ -38,7 +38,23 @@ ggb(
 \item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \value{
-a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. \code{$a} and \code{$b} give the intercept and slope of the line on which the coverage estimate is based. \code{$delta}, \code{$k1}, and \code{$k2}  are further derived quantities that may be interesting for advanced users. Rows indicate data partitions, as indicated by the optional \code{$cod} variable.
+a \code{data.frame} with columns for: \itemize{
+  \item{id} group id
+  \item{Mxcoverage} coverage of the intercensal Mx values: \code{sqrt(k1*k2)/b}
+  \item{lower} lower bound of ages used for fitting
+  \item{upper} upper bound of ages used for fitting
+  \item{a} intercept
+  \item{b} slope
+  \item{delta} empirical link: \code{exp(t*a) = k1/k2}
+  \item{k1} completeness of census 1
+  \item{k2} completeness of census 2
+  \item{k3} completeness of deaths relative to census 2 (\code{1/b})
+  \item{t1} decimal date of census 1
+  \item{t2} decimal date of census 2
+  \item{t} intercensal interval (\code{t2 - t1})
+  \item{lm.method} line fitting method used
+  \item{nx.method} birthday (Nx) approximation used (2 or 4 points)
+}
 }
 \description{
 Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages.
