@@ -9,8 +9,13 @@ segMakeColumns(
   minA = 15,
   maxA = 75,
   eOpen = NULL,
+  nx.method = 2,
   deaths.summed = FALSE,
-  nx.method = 2
+  mig.summed = deaths.summed,
+  delta = FALSE,
+  exact.ages.ggb = NULL,
+  lm.method.ggb = "oldschool",
+  minAges.ggb = 8
 )
 }
 \arguments{
@@ -22,9 +27,9 @@ segMakeColumns(
 
 \item{eOpen}{optional. A value for remaining life expectancy in the open age group.}
 
-\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
-
 \item{nx.method}{either 2 or 4. 4 is smoother.}
+
+\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
 codi, with many columns added, most importantly \code{$Cx}.

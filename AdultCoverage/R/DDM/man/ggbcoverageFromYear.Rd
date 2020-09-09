@@ -11,6 +11,7 @@ ggbcoverageFromYear(
   maxA = 75,
   minAges = 8,
   deaths.summed = FALSE,
+  mig.summed = deaths.summed,
   lm.method = "oldschool",
   nx.method = 2
 )
@@ -27,6 +28,8 @@ ggbcoverageFromYear(
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{mig.summed}{logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
 \item{lm.method}{character, one of:\itemize{
   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin

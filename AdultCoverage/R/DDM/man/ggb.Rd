@@ -10,13 +10,14 @@ ggb(
   maxA = 75,
   minAges = 8,
   exact.ages = NULL,
-  deaths.summed = FALSE,
   lm.method = "oldschool",
-  nx.method = 2
+  nx.method = 2,
+  deaths.summed = FALSE,
+  mig.summed = deaths.summed
 )
 }
 \arguments{
-\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}
+\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$id} (if there are more than 1 region/sex/intercensal period).}
 
 \item{minA}{the lowest age to be included in search}
 
@@ -26,8 +27,6 @@ ggb(
 
 \item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
 
-\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
-
 \item{lm.method}{character, one of:\itemize{
   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
@@ -36,6 +35,10 @@ ggb(
 }}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}
+
+\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{mig.summed}{logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
 a \code{data.frame} with columns for: \itemize{
@@ -54,13 +57,14 @@ a \code{data.frame} with columns for: \itemize{
   \item{t} intercensal interval (\code{t2 - t1})
   \item{lm.method} line fitting method used
   \item{nx.method} birthday (Nx) approximation used (2 or 4 points)
+  \item{RMSE} the root mean square error of the optimized ages used for fitting (only if ages were automatically selected)
 }
 }
 \description{
 Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages.
 }
 \details{
-Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{ggbChooseAges()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term.
+Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$id} with unique values for each data chunk. Different values of \code{$id} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{ggbChooseAges()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term.
 }
 \examples{
 # The Mozambique data

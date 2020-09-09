@@ -7,7 +7,7 @@
 seggetRMS(codi, agesFit)
 }
 \arguments{
-\item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
+\item{codi}{\code{data.frame} as produced by \code{ggbMakeColumns()}}
 
 \item{agesFit}{ineger vector of age trim for SEG method.}
 }

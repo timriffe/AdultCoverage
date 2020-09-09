@@ -11,6 +11,7 @@ ggbsegMakeColumns(
   agesFit.ggb,
   eOpen = NULL,
   deaths.summed = FALSE,
+  mig.summed = deaths.summed,
   lm.method = "oldschool",
   nx.method = 2
 )

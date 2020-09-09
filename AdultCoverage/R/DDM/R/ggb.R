@@ -14,27 +14,16 @@
 #' @return the RMSE
 #' 
 #' @export 
-ggbgetRMS <- function(agesi, codi){
-  # TODO: should this be sensitive to the line fitting method?
-  
-	codi <- ggbFittedFromAges(codi, agesfit = agesi) %>% 
+ggbgetRMS <- function(agesi, codi, lm.method = "oldschool"){
+
+	codi <- ggbFittedFromAges(codi, agesfit = agesi, lm.method = lm.method) %>% 
 	  filter(.data$age %in% agesi)
 
 	(codi$leftterm - codi$fitted) %>% 
 	  '^'(2) %>% 
 	  mean() %>% 
 	  sqrt()
-	# get root mean square of residuals
-	# I'd do this with magrittr, but just to stay dependency-free...
-# 	sqrt(
-# 		sum(
-# 			  (
-# 				 (codi$leftterm - codi$fitted) ^ 2
-# 			   )
-# 	        ) / length(agesi)
-#          )
-	
-	
+
 	
 }
 
@@ -57,6 +46,7 @@ ggbcoverageFromYear <- function(codi,
 								maxA = 75, 
 								minAges = 8, 
 								deaths.summed = FALSE,
+								mig.summed = deaths.summed,
 								lm.method = "oldschool",
 								nx.method = 2
 								){
@@ -77,36 +67,34 @@ ggbcoverageFromYear <- function(codi,
 	# TR: test add this step, just in case
 	codi    <- codi[ order(codi$age), ]
 	
-	# this is conditional in case function called repeatedly.
-	if (!"leftterm" %in% colnames(codi)){
-	  codi <- ggbMakeColumns(codi = codi, 
-	                         minA = minA, 
-	                         maxA = maxA, 
-	                         deaths.summed = deaths.summed,
-	                         nx.method = nx.method)
-	}
+  if (!"leftterm" %in% colnames(codi)){
+	   codi <- ggbMakeColumns(codi = codi, 
+	                          minA = minA, 
+	                          maxA = maxA, 
+	                          deaths.summed = deaths.summed,
+	                          mig.summed = mig.summed,
+	                          nx.method = nx.method)
+  }
 	
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		agesfit <- exact.ages
 	} else {                          
-		agesfit <- ggbgetAgesFit(codi = codi, 
+		fit.res <- ggbgetAgesFit(codi = codi, 
 								 minA = minA, 
 								 maxA = maxA, 
-								 minAges = minAges, 
-								 deaths.summed = deaths.summed,
-								 nx.method = nx.method)
+								 minAges = minAges,
+								 lm.method = lm.method)
+		agesfit <- fit.res$agesfit
 	}
 	
 	# TR: added 17 June, 2016. Get Lambda to adjust first census:
 	# TR: 3-4-2017 no longer optional
 
 	coefs    <- slopeint(codi, 
-	                     deaths.summed = deaths.summed,
 	                     agesfit = agesfit, 
-	                     lm.method = lm.method,
-	                     nx.method = nx.method)
+	                     lm.method = lm.method)
 	# (time between censuses)
-	dif      <- codi$dif %>% '['(1)
+	dif      <- codi$dif[1]
 	# TR: 3-4-2017 this is k1/k2
 	# Relative completeness of Census 1 to Census 2
 	delta    <- exp(coefs$a * dif)
@@ -129,7 +117,7 @@ ggbcoverageFromYear <- function(codi,
 	coverage <- sqrt(k1 * k2) / coefs$b
 
 	result   <- data.frame(
-	       id = unique(codi$cod), 
+	       id = unique(codi$id), 
 			   Mxcoverage = coverage, 
 			   lower = min(agesfit), 
 			   upper = max(agesfit),
@@ -144,6 +132,10 @@ ggbcoverageFromYear <- function(codi,
 			   t = dif,
 			   lm.method = lm.method,
 			   nx.method = nx.method)
+	if (is.null(Exact.ages)){
+	  result$RMSE = fit.res$RMSE
+	}
+	# TR: Add r2 and RMSE to output
    
 	result
 }
@@ -154,37 +146,18 @@ ggbcoverageFromYear <- function(codi,
 #' 
 #' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.
 #' 
-#' @inheritParams ggb
-#' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.
-#' @param agesfit a set of continuous ages to estimate coverage from 
+#' @inheritParams slopeint
 #' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
 #' 
 #' @export
 
 ggbFittedFromAges <- function(codi, 
                               agesfit, 
-                              deaths.summed = FALSE, 
-                              lm.method = "oldschool", 
-                              nx.method = 2){
+                              lm.method = "oldschool"){
 	
-	if (! "leftterm" %in% colnames(codi)){
-		codi <- ggbMakeColumns(codi=codi, 
-		                       minA = min(agesfit), 
-		                       maxA = max(agesfit), 
-		                       deaths.summed = deaths.summed, 
-		                       nx.method =  nx.method)
-	}
-	# assumes ggbMakeColumns() has been run.
-#	slope       <- with(codi, 
-#			sd(leftterm[age %in% agesfit]) /  sd(rightterm[age %in% agesfit])
-#	)
-#	intercept   <-  with(codi, 
-#			(mean(leftterm[age %in% agesfit]) * slope - mean(rightterm[age %in% agesfit]))
-#	) 
 	coefs       <- slopeint(codi, 
 	                        agesfit, 
-	                        lm.method = lm.method,  
-	                        nx.method =  nx.method)
+	                        lm.method = lm.method)
 	codi$fitted <- coefs$a + codi$rightterm * coefs$b 
 	codi
 }
@@ -194,10 +167,7 @@ ggbFittedFromAges <- function(codi,
 #' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
 #' 
 #' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
-#' @param minA the minimum of the age range searched. Default 15
-#' @param maxA the maximum of the age range searched. Default 75
-#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' @param nx.method either 2 or 4. 4 is smoother.
+#' @inheritParams ggb
 #' 
 #' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
 #' 
@@ -208,35 +178,72 @@ ggbFittedFromAges <- function(codi,
 #' @import dplyr
 #' @import magrittr
 
-ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE, nx.method = 2){
-	# group inf if necessary
-	codi                   <- group01(codi)
-	N                      <- nrow(codi)
-	
-	codi <-
-	  codi %>% 
-	  mutate(	date1          = ifelse(is.numeric(.data$date1), .data$date1, decimal_date(.data$date1)),
-	          date2          = ifelse(is.numeric(.data$date2), .data$date2, decimal_date(.data$date2)),
-	          AgeInt         = age2int(.data$age),
-	          dif            = .data$date2 - .data$date1,
-	          avg            = deaths.summed,
-	          deathsAvg      = ifelse(.data$avg, .data$deaths / .data$dif, .data$deaths),
-	          pop1           = as.double(.data$pop1),
-	          pop2           = as.double(.data$pop2),
-	          pop1cum        = lt_id_L_T(.data$pop1),
-	          pop2cum        = lt_id_L_T(.data$pop2) ,
-	          deathcum       = lt_id_L_T(.data$deathsAvg),
-	          # TR: maybe rethink this line as a function?
-	          # this appears to have a strong assumption about census spacing (10 years?) in it.
-	          birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
-	                                         AgeInt = .data$AgeInt, nx.method = nx.method),
-	          Tx             = sqrt(.data$pop1cum * .data$pop2cum),
-	          cumgrowth      = log(.data$pop2cum / .data$pop1cum) / .data$dif,
-	          rightterm      = .data$deathcum / .data$Tx,
-	          leftterm       = (.data$birthdays / .data$Tx) - .data$cumgrowth,
-	          keep           = .data$Tx != 0 & .data$birthdays != 0 & .data$age >= minA & .data$age <= maxA)
-
-	codi
+ggbMakeColumns <- function(codi, 
+                           minA = 15, 
+                           maxA = 75, 
+                           nx.method = 2,
+                           deaths.summed = FALSE, #
+                           mig.summed = deaths.summed
+                           ){           # maybe add a flag for whether summed or avg
+  # group inf if necessary
+  codi                   <- group01(codi)
+  N                      <- nrow(codi)
+  
+  
+  if ((!"mig" %in% colnames(codi))){
+    codi <- codi %>% mutate(mig = 0)
+  }
+  
+  codi <-
+    codi %>% 
+    mutate(	date1          = ifelse(is.numeric(.data$date1), .data$date1, decimal_date(.data$date1)),
+            date2          = ifelse(is.numeric(.data$date2), .data$date2, decimal_date(.data$date2)),
+            AgeInt         = age2int(.data$age),
+            dif            = .data$date2 - .data$date1,
+            avg            = deaths.summed,
+            deathsAvg      = ifelse(.data$avg, .data$deaths / .data$dif, .data$deaths),
+            pop1           = as.double(.data$pop1),
+            pop2           = as.double(.data$pop2),
+            mig            = as.double(.data$mig),
+            
+            # RD: take geometric mean of pop1 and pop2
+            # refer to RD spreadsheet from IUSSP tools for ...
+            
+            
+            pop1cum        = lt_id_L_T(.data$pop1),
+            pop2cum        = lt_id_L_T(.data$pop2) ,
+            deathcum       = lt_id_L_T(.data$deathsAvg),
+            migcum         = lt_id_L_T(.data$mig),               # new
+            # TR: maybe rethink this line as a function?
+            # this appears to have a strong assumption about census spacing (10 years?) in it.
+            birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
+                                           AgeInt = .data$AgeInt, nx.method = nx.method),
+            Tx             = sqrt(.data$pop1cum * .data$pop2cum),
+            # this follows the SEG way of incorporating mig info, guarantees
+            growth         = log(.data$pop2 / .data$pop1) / .data$dif - .data$migAvg / Tx / .data$dif,
+            growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
+            cumgrowth      = .data$AgeInt * c(0,cumsum(.data$growth[ -N ])) + .data$AgeInt / 2 * .data$growth,
+            
+         
+            # # from BQL, and looks different than standard one
+            # cumgrowth      = ifelse(.data$age >= 5, (.data$pop2cum - .data$pop1cum - .data$migcum) / .data$Tx,NA),
+            # current cumgrowth definition.
+            # cumgrowth      = log(.data$pop2cum / .data$pop1cum) / .data$dif,
+            
+            # maybe should be this instead:
+            #cumgrowth      = log((.data$pop2cum - .data$migcum) / .data$pop1cum) / .data$dif,
+            
+            # or this this instead:
+            #cumgrowth      = log((.data$pop2cum - .data$migcum / 2) / (.data$pop1cum + .data$migcum / 2) )/ .data$dif,
+            
+            # try to get same results as RD. does adjustment on age-specific growthrates rather than cumulative.
+            
+            # same
+            rightterm      = .data$deathcum / .data$Tx,
+            leftterm       = (.data$birthdays / .data$Tx) - .data$cumgrowth,
+            keep           = .data$Tx != 0 & .data$birthdays != 0 & .data$age >= minA & .data$age <= maxA)
+  
+  codi
 }
 
 
@@ -245,12 +252,10 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE, nx
 #' @description Called by \code{ggbcoverageFromYear()} whenever \code{exact.ages} are not given. This automates what one typically does visually.
 #' @seealso code{\link{ggbChooseAges}}
 #' 
-#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
 #' @param minAges the minimum number of adjacent ages to be used in estimating
-#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
-#' @param nx.method either 2 or 4. 4 is smoother.
+#' @inheritParams slopeint
 #' 
 #' @return a vector of ages that minimizes the RMSE
 #' 
@@ -259,18 +264,21 @@ ggbMakeColumns <- function(codi, minA = 15, maxA = 75, deaths.summed = FALSE, nx
 ggbgetAgesFit <- function(codi, 
                           minA = 15, 
                           maxA = 75, 
-                          minAges = 8, 
-                          deaths.summed = FALSE,
-                          nx.method = 2){
+                          minAges = 8,
+                          lm.method = "oldschool"){#, 
+                          # deaths.summed = FALSE,
+                          # mig.summed = deaths.summed,
+                          # nx.method = 2){
 		
-	if (!"leftterm" %in% colnames(codi)){
-		codi <- ggbMakeColumns(
-		             codi = codi, 
-				         minA = minA, 
-							   maxA = maxA, 
-							   deaths.summed = deaths.summed,
-							   nx.method = nx.method)
-	}
+	# if (!"leftterm" %in% colnames(codi)){
+	# 	codi <- ggbMakeColumns(
+	# 	             codi = codi, 
+	# 			         minA = minA, 
+	# 						   maxA = maxA, 
+	# 						   deaths.summed = deaths.summed,
+	# 						   mig.summed = mig.summed,
+	# 						   nx.method = nx.method)
+	# }
 	
 	maxAges   <- sum(codi$keep)
 	agesUniv  <- codi$age[codi$keep]
@@ -290,8 +298,13 @@ ggbgetAgesFit <- function(codi,
 	
 	# these are the ages that give the best r2 or RMS
 	# this would be much better using pipes, but hey, one less dependency...
-	agesfit     <- agesL[[which.min(unlist(lapply(agesL, ggbgetRMS, codi = codi)))]]
-	agesfit
+	
+	RMSE        <- lapply(agesL, ggbgetRMS, codi = codi, lm.method = lm.method) %>% unlist()
+	minRMSE     <- which.min(RMSE)
+	agesfit     <- agesL[[minRMSE]]
+	
+	# PG: also return RMSE?
+	list(agesfit = agesfit, RMSE = RMSE[minRMSE])
 }
 
 
@@ -300,21 +313,18 @@ ggbgetAgesFit <- function(codi,
 #' 
 #' @description Given two censuses and an average annual number of deaths in each age class between censuses, we can use stable population assumptions to estimate the degree of underregistration of deaths. The method is based on finding a best-fitting linear relationship between two modeled parameters (right term and left term), but the fit, and resulting coverage estimate, depend on exactly which age range is taken. This function either finds a nice age range for you automatically, or you can specify an exact vector of ages. 
 #' 
-#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$cod} with unique values for each data chunk. Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{ggbChooseAges()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term.
+#' @details Census dates can be given in a variety of ways: 1) using Date classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month. If you want coverage estimates for a variety of intercensal periods/regions/by sex, then stack them, and use a variable called \code{$id} with unique values for each data chunk. Different values of \code{$id} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. To identify an age-range in the traditional visual way, see \code{ggbChooseAges()}, when working with a single year/sex/region of data. The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the square of the average squared residual between the fitted line and right term.
 #' 
-#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).
+#' @param X \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$id} (if there are more than 1 region/sex/intercensal period).
 #' @param minA the lowest age to be included in search
 #' @param maxA the highest age to be included in search (the lower bound thereof)
 #' @param minAges the minimum number of adjacent ages to be used in estimating
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
-#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' @param lm.method character, one of:\itemize{
-#'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-#'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-#'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-#'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
-#' }
 #' @param nx.method either 2 or 4. 4 is smoother.
+#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param mig.summed logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @inheritParams slopeint
+
 #' @return a \code{data.frame} with columns for: \itemize{
 #'   \item{id} group id
 #'   \item{Mxcoverage} coverage of the intercensal Mx values: \code{sqrt(k1*k2)/b}
@@ -331,6 +341,7 @@ ggbgetAgesFit <- function(codi,
 #'   \item{t} intercensal interval (\code{t2 - t1})
 #'   \item{lm.method} line fitting method used
 #'   \item{nx.method} birthday (Nx) approximation used (2 or 4 points)
+#'   \item{RMSE} the root mean square error of the optimized ages used for fitting (only if ages were automatically selected)
 #' }
 #' @export
 #' @references 
@@ -354,9 +365,10 @@ ggb <- function(
 		maxA = 75, 
 		minAges = 8, 
 		exact.ages = NULL, 
-		deaths.summed = FALSE,
 		lm.method = "oldschool",
-		nx.method = 2){         
+		nx.method = 2,
+		deaths.summed = FALSE,
+		mig.summed = deaths.summed){         
 	
 	# TR: modularized Apr 2, 2017
 	tab1        <- headerPrep(X)
@@ -372,6 +384,7 @@ ggb <- function(
 						  maxA= maxA,
 						  minAges = minAges,
 						  deaths.summed = deaths.summed,
+						  mig.summed = mig.summed,
 						  lm.method = lm.method,
 						  nx.method = nx.method
 					)))
@@ -452,14 +465,12 @@ adjustages <- function(a, age, agesfit){
 #' @description Called by \code{ggbFittedFromAges()} and \code{ggbChooseAges()}
 #' @param codi \code{data.frame} as produced by \code{ggbMakeColumns()}
 #' @param agesfit a set of continuous ages to estimate coverage from 
-#' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' @param lm.method character, one of:\itemize{
 #'   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
 #'   \item{\code{"lm"} or \code{"ols"}} for a simple linear model
 #'   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 #'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 #' }
-#' @param nx.method interger. either 2 or 4. 4 is smoother.
 #' @return a pairlist with elements \code{$a} for the intercept and \code{$b} for the slope
 #' @importFrom tukeyedar eda_rline
 #' @importFrom stats lm
@@ -467,20 +478,13 @@ adjustages <- function(a, age, agesfit){
 #' @importFrom stats var
 #' @importFrom stats sd
 #' @export
-slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschool", nx.method = 2){
+slopeint <- function(codi, 
+                     agesfit, 
+                     lm.method = "oldschool"){
   
   lm.method <- match.arg(lm.method, choices = c("oldschool", "lm", "ols", "tls","orthogonal","deming","tukey","resistant","median"))
-  
-	# a robustness measure
-	if (! "leftterm" %in% colnames(codi)){
-		codi <- ggbMakeColumns(codi, 
-		                       minA = min(agesfit), 
-		                       maxA = max(agesfit), 
-		                       deaths.summed = deaths.summed,
-		                       nx.method = nx.method)
-	}
-  
-  # eliminate repeated subsetting
+  stopifnot("leftterm" %in% colnames(codi))
+
   codi <- codi %>% 
     filter(.data$age %in% agesfit)
   
@@ -521,6 +525,7 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
     intercept <- ab.etc$a
   }
   
+  # PG: return r2 also
 	list(a = intercept, b = slope)
 }
 
@@ -546,6 +551,8 @@ slopeint <- function(codi, agesfit, deaths.summed = FALSE, lm.method = "oldschoo
 #' # *click in margin to stop and return coverage results
 #' ggbChooseAges(Moz)
 #' }
+
+# TR: simplify this code by using top level functinos inside.
 
 ggbChooseAges <- function(
               codi, 
@@ -574,36 +581,37 @@ ggbChooseAges <- function(
 			minAges <- length(exact.ages)
 		}
 	}
+  
+  codi_in <- codi
 	codi    <- data.frame(codi)           
-	colnames(codi) <- tolower(colnames(codi))
+
 
 	# guess which column is the deaths column, rename it deaths
-	codi    <- guessDeathsColumn(codi)
+	# codi    <- guessDeathsColumn(codi)
 	
 	# start GGB stuff
 	codi    <- ggbMakeColumns(codi, 
 	                          minA = minA, 
 	                          maxA = maxA, 
+	                          nx.method = nx.method,
 	                          deaths.summed = deaths.summed,
-	                          nx.method = nx.method)
+	                          mig.summed = mig.summed)
 	
 	# some potential starting ages. either auto or self-supplied
 	if (!is.null(exact.ages) & length(exact.ages) >= 3){
 		agesfit <- exact.ages
 	} else {
-		agesfit <- ggbgetAgesFit(codi, 
+		fit.res <- ggbgetAgesFit(codi, 
 		                         minA = minA, 
 		                         maxA = maxA, 
-		                         minAges = minAges, 
-		                         deaths.summed = deaths.summed,
-		                         nx.method = nx.method)
+		                         minAges = minAges,
+		                         lm.method = lm.method)
+		agesfit <- fit.res$agesfit
 	}
 	
 	codi     <- ggbFittedFromAges(codi = codi, 
 	                              agesfit = agesfit, 
-	                              deaths.summed = deaths.summed,
-	                              lm.method = lm.method,
-	                              nx.method = nx.method)
+	                              lm.method = lm.method)
 	
 	
 	coverage <- ggbcoverageFromYear(codi = codi, 
@@ -612,15 +620,9 @@ ggbChooseAges <- function(
 	                                maxA = maxA,
 	                                minAges = minAges,
 	                                deaths.summed = deaths.summed,
+	                                mig.summed = mig.summed,
 	                                lm.method = lm.method,
 	                                nx.method = nx.method)
-	# starting values for abline
-	#si       <- slopeint(codi, agesfit, lm.method = lm.method)
-	# 
-	# # this is the basic formula
-	# #coverage <- ggbcoverageFromAges(codi, agesfit)
-	#coverage <- si$b
-	# some objects used throughout
 
 	
 	age      <- codi$age
@@ -638,7 +640,7 @@ ggbChooseAges <- function(
 			xlab = "right term",
 			ylab = "left term",
 			main = paste0("Age range [",amin,
-					",",amax,"], \nLine method = ",lm.method,"\nEst. coverage = ",round(coverage$coverage*100,1)),
+					",",amax,"], \nLine method = ",lm.method,"\nEst. coverage = ",round(coverage$Mxcoverage*100,1)),
 			sub = "(optimized age range)")
 	# automatically fit line (RMS of ggb)
 	abline(a = coverage$a, b = coverage$b, col = "blue")
@@ -675,6 +677,7 @@ ggbChooseAges <- function(
 			                                maxA = maxA,
 			                                minAges = minAges,
 			                                deaths.summed = deaths.summed,
+			                                mig.summed = mig.summed,
 			                                lm.method = lm.method,
 			                                nx.method = nx.method)
 			
@@ -688,7 +691,7 @@ ggbChooseAges <- function(
 					xlab = "right term",
 					ylab = "left term",
 					main = paste0("Age range [", amin,
-							",", amax, "], est. coverage = %",round(coverage$coverage * 100, 1)),
+							",", amax, "], est. coverage = %",round(coverage$Mxcoverage * 100, 1)),
 					sub = "(optimized age range)")
 			# new fitted slope, intercept
 		    abline(a=0,b=1,col=gray(.8)) # line of perfection
@@ -705,7 +708,15 @@ ggbChooseAges <- function(
 	}
 	
 	# click outside the margin to return results
-    out <- list(coverage = coverage, lower = min(agesfit), upper = max(agesfit), ages = agesfit)
+    out <- ggb(X = codi_in,
+               minA = minA, 
+               maxA = maxA, 
+               minAges = minAges, 
+               exact.ages = agesfit, 
+               lm.method = lm.method,
+               nx.method =  nx.method,
+               deaths.summed = deaths.summed,
+               mig.summed = deaths.summed)
 	out
 }
 

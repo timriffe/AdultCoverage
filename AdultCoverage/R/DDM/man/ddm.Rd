@@ -18,13 +18,13 @@ ddm(
 )
 }
 \arguments{
-\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$cod} (if there are more than 1 region/sex/intercensal period).}
+\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$id} (if there are more than 1 region/sex/intercensal period).}
 
-\item{minA}{the minimum of the age range searched. Default 15}
+\item{minA}{the lowest age to be included in search}
 
-\item{maxA}{the maximum of the age range searched. Default 75}
+\item{maxA}{the highest age to be included in search (the lower bound thereof)}
 
-\item{minAges}{the minimum number of adjacent ages needed as points for fitting. Default 8}
+\item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
 \item{exact.ages.ggb}{optional. A user-specified vector of exact ages to use for coverage estimation in the GGB method and the GGB stage of the GGBSEG method.}
 
@@ -41,7 +41,7 @@ ddm(
   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 
-\item{nx.method}{integer. either 2 or 4. 4 is smoother.}
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 }
 \value{
 data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}.

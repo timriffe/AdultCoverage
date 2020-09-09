@@ -4,7 +4,7 @@
 \alias{ggbgetRMS}
 \title{calculate the root means square of the error to help find optimal age range}
 \usage{
-ggbgetRMS(agesi, codi)
+ggbgetRMS(agesi, codi, lm.method = "oldschool")
 }
 \arguments{
 \item{agesi}{the set of ages used for this iteration}

@@ -4,20 +4,12 @@
 \alias{slopeint}
 \title{get the slope the slope and intercept implied by a set of ages}
 \usage{
-slopeint(
-  codi,
-  agesfit,
-  deaths.summed = FALSE,
-  lm.method = "oldschool",
-  nx.method = 2
-)
+slopeint(codi, agesfit, lm.method = "oldschool")
 }
 \arguments{
 \item{codi}{\code{data.frame} as produced by \code{ggbMakeColumns()}}
 
 \item{agesfit}{a set of continuous ages to estimate coverage from}
-
-\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
 \item{lm.method}{character, one of:\itemize{
   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
@@ -25,8 +17,6 @@ slopeint(
   \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
-
-\item{nx.method}{interger. either 2 or 4. 4 is smoother.}
 }
 \value{
 a pairlist with elements \code{$a} for the intercept and \code{$b} for the slope

@@ -4,17 +4,10 @@
 \alias{ggbgetAgesFit}
 \title{determine the age range that minimizes the mean squared error}
 \usage{
-ggbgetAgesFit(
-  codi,
-  minA = 15,
-  maxA = 75,
-  minAges = 8,
-  deaths.summed = FALSE,
-  nx.method = 2
-)
+ggbgetAgesFit(codi, minA = 15, maxA = 75, minAges = 8, lm.method = "oldschool")
 }
 \arguments{
-\item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}}
+\item{codi}{\code{data.frame} as produced by \code{ggbMakeColumns()}}
 
 \item{minA}{the lowest age to be included in search}
 
@@ -22,9 +15,12 @@ ggbgetAgesFit(
 
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
-\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
-
-\item{nx.method}{either 2 or 4. 4 is smoother.}
+\item{lm.method}{character, one of:\itemize{
+  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
+  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+}}
 }
 \value{
 a vector of ages that minimizes the RMSE

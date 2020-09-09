@@ -11,12 +11,16 @@ segCoverageFromYear(
   minAges = 8,
   exact.ages = NULL,
   eOpen = NULL,
+  nx.method = 2,
   deaths.summed = FALSE,
-  nx.method = 2
+  mig.summed = deaths.summed,
+  delta = FALSE,
+  exact.ages.ggb = NULL,
+  lm.method.ggb = "oldschool"
 )
 }
 \arguments{
-\item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$sex}, \code{$age}, and \code{$cod} (to indicate regions, periods, sexes).}
+\item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$sex}, \code{$age}, and \code{$id} (to indicate regions, periods, sexes).}
 
 \item{minA}{the minimum of the age range searched. Default 15}
 
@@ -28,9 +32,9 @@ segCoverageFromYear(
 
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
-\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
-
 \item{nx.method}{integer, either 2 or 4. 4 is smoother.}
+
+\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.
