@@ -109,7 +109,7 @@ ggbcoverageFromYear <- function(codi,
 	  k2 <- 1
 	}
 	# now get everything from the k parameters 
-	a        <- log(delta) / dif
+#	a        <- log(delta) / dif
 	coverage <- sqrt(k1 * k2) / coefs$b
 
 	result   <- data.frame(
@@ -208,7 +208,7 @@ ggbMakeColumns <- function(codi,
             pop1cum        = lt_id_L_T(.data$pop1),
             pop2cum        = lt_id_L_T(.data$pop2) ,
             deathcum       = lt_id_L_T(.data$deathsAvg),
-            migcum         = lt_id_L_T(.data$mig),               # new
+            migcum         = lt_id_L_T(.data$migAvg),               # new
             # Nx
             birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
                                            AgeInt = .data$AgeInt, nx.method = nx.method) * .data$dif,
@@ -216,7 +216,7 @@ ggbMakeColumns <- function(codi,
             # this follows the SEG way of incorporating mig info, guarantees
             bxp            = .data$birthdays / .data$Tx,  # from RD spreadsheet bx+
             cumgrowth      = (.data$pop2cum - .data$pop1cum - .data$migcum) / .data$Tx,
-            rightterm       = .data$deathcum / .data$Tx,   # from RD spreadsheet (X)
+            rightterm      = .data$dif * .data$deathcum / .data$Tx,   # from RD spreadsheet (X)
             leftterm       = .data$bxp - .data$cumgrowth, # from RD spreadsheet (Y)
             # growth         = log(.data$pop2 / .data$pop1) / .data$dif - .data$migAvg / .data$Tx / .data$dif,
             # growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
