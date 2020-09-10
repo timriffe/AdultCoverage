@@ -212,7 +212,7 @@ segMakeColumns <- function(codi,
                                            AgeInt = .data$AgeInt, nx.method = nx.method),
             # TR: follows RD column G calc
             growth         = (log(.data$pop2)- log(.data$pop1)) / .data$dif - 
-                             .data$migAvg / sqrt(.data$pop2 * .data$pop1) / .data$dif + 
+                             .data$migAvg / sqrt(.data$pop2 * .data$pop1) + 
                               del,
             growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
             # cumulative growth, needed for estimating eOpen..
@@ -343,8 +343,7 @@ segCoverageFromYear <-  function(
 			   u25 = coverage[4],
 			   weighted = coverage["weighted"],
 			   lower = min(agesFit), 
-			   upper = max(agesFit),
-         RMSE = fit.res$RMSE
+			   upper = max(agesFit)
 			   )
 	if (is.null(exact.ages)){
 	  meta$RMSE <- fit.res$RMSE
