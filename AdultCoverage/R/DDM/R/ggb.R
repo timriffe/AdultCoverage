@@ -109,7 +109,7 @@ ggbcoverageFromYear <- function(codi,
 	  k2 <- 1
 	}
 	if (delta < 1){
-	  k1 <- 1 / delta
+	  k1 <- delta
 	  k2 <- 1
 	}
 	# now get everything from the k parameters 
@@ -213,19 +213,28 @@ ggbMakeColumns <- function(codi,
             pop2cum        = lt_id_L_T(.data$pop2) ,
             deathcum       = lt_id_L_T(.data$deathsAvg),
             migcum         = lt_id_L_T(.data$mig),               # new
-            # TR: maybe rethink this line as a function?
-            # this appears to have a strong assumption about census spacing (10 years?) in it.
+            # Nx
             birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
-                                           AgeInt = .data$AgeInt, nx.method = nx.method),
-            Tx             = sqrt(.data$pop1cum * .data$pop2cum),
+                                           AgeInt = .data$AgeInt, nx.method = nx.method) * .data$dif,
+            Tx             = sqrt(.data$pop1cum * .data$pop2cum) * .data$dif, # PYL in RD spreadsheet
             # this follows the SEG way of incorporating mig info, guarantees
-            growth         = log(.data$pop2 / .data$pop1) / .data$dif - .data$migAvg / .data$Tx / .data$dif,
-            growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
-            cumgrowth      = .data$AgeInt * c(0,cumsum(.data$growth[ -N ])) + .data$AgeInt / 2 * .data$growth,
-            
+            bxp            = .data$birthdays / .data$Tx,  # from RD spreadsheet bx+
+            cumgrowth      = (.data$pop2cum - .data$pop1cum - .data$migcum) / .data$Tx,
+            rightterm       = .data$deathcum / .data$Tx,   # from RD spreadsheet (X)
+            leftterm       = .data$bxp - .data$cumgrowth, # from RD spreadsheet (Y)
+            # growth         = log(.data$pop2 / .data$pop1) / .data$dif - .data$migAvg / .data$Tx / .data$dif,
+            # growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
+            #cumgrowth      = .data$AgeInt * c(0,cumsum(.data$growth[ -N ])) + .data$AgeInt / 2 * .data$growth,
+            #cumgrowth_old  = log(.data$pop2cum / .data$pop1cum) / .data$dif,
+            #growth_old     = c(0,diff(.data$cumgrowth_old)),
+            #cumgrowth_bq   =  (.data$pop2cum - .data$pop1cum - .data$migcum) / .data$Tx,
            # same
-            rightterm      = .data$deathcum / .data$Tx,
-            leftterm       = (.data$birthdays / .data$Tx) - .data$cumgrowth,
+            #rightterm      = .data$deathcum / .data$Tx,
+            #rightterm_test = .data$rightterm / .data$dif,
+            #leftterm       = (.data$birthdays / .data$Tx) - .data$cumgrowth,
+            #leftterm_old   = (.data$birthdays / .data$Tx) - .data$cumgrowth_old,
+            #leftterm_bq   = (.data$birthdays / .data$Tx) - .data$cumgrowth_bq,
+
             keep           = .data$Tx != 0 & .data$birthdays != 0 & .data$age >= minA & .data$age <= maxA)
   
   codi

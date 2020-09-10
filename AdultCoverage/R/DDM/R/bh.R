@@ -554,7 +554,7 @@ ggbsegMakeColumns <- function(
   codi                   <- group01(codi)
   codi                   <- reduceOpen(codi, maxA = 95, group = TRUE)
 
-  codi1                   <- ggbMakeColumns(codi, 
+  codi1                  <- ggbMakeColumns(codi, 
                                            minA = minA, 
                                            maxA = maxA,	
                                            nx.method = nx.method,
@@ -620,41 +620,30 @@ ggbsegCoverageFromYear <- function(codi,
 								exact.ages.seg = NULL,
 								eOpen = NULL, 
 								deaths.summed = FALSE,
+								mig.summed = deaths.summed,
 								lm.method = "oldschool",
 								nx.method = 2){
-	codiggb      <- ggbMakeColumns(codi = codi, 
-								   minA = minA, 
-								   maxA = maxA, 
-								   nx.method = nx.method,
-								   deaths.summed = deaths.summed,
-								   mig.summed = mig.summed)
+	
 	# Get age range using the GGB auto fitting
 	if (is.null(exact.ages.ggb)){
+	  codiggb      <- ggbMakeColumns(codi = codi, 
+	                                 minA = minA, 
+	                                 maxA = maxA, 
+	                                 nx.method = nx.method,
+	                                 deaths.summed = deaths.summed,
+	                                 mig.summed = mig.summed)
 		fit.res.ggb <- ggbgetAgesFit(
 		                codi = codiggb, 
 								    minA = minA, 
 							    	maxA = maxA, 
 								    minAges = minAges,
 								    lm.method = lm.method)
-	} else {
 		agesFit.ggb <- fit.res.ggb$agesfit
+	} else {
+		agesFit.ggb <- 	exact.ages.ggb
 	}
 	# Get age range using the SEG auto fitting
 
-	if (is.null(exact.ages.seg)){
-	  fit.res.seg <- seggetAgesFit(codi = codi, 
-	                           minA = minA, 
-	                           maxA = maxA, 
-	                           minAges = minAges)
-	  
-	  agesFit.ggbseg <-  fit.res.seg$agesfit
-	} else {
-	  agesFit.ggbseg <- exact.ages.seg
-	}
-	# TODO: TR: make this function take two exact.ages args (exact.ages.ggb and exact.ages.seg)
-	# by default equal, but potentially different if desired. Per Ken Hill recommendations 
-	# TODO nr 2: make an seg automatic age selection function(horizontal criteria) so that 
-	# automatic age selection can happen twice. (re PG comment)
 	codi         <- ggbsegMakeColumns(
 								    codi = codiggb, 
 								    minA = minA, 
@@ -666,6 +655,18 @@ ggbsegCoverageFromYear <- function(codi,
 								    lm.method = lm.method,
 								    nx.method = nx.method)
 
+	# TR: this moved to after column creation.
+	if (is.null(exact.ages.seg)){
+	  fit.res.seg <- seggetAgesFit(codi = codi, 
+	                               minA = minA, 
+	                               maxA = maxA, 
+	                               minAges = minAges)
+	  
+	  agesFit.ggbseg <-  fit.res.seg$agesfit
+	} else {
+	  agesFit.ggbseg <- exact.ages.seg
+	}
+	
 	coverage     <- segCoverageFromAges(codi = codi, agesFit = agesFit.ggbseg)
 	
 	res <- data.frame( 

@@ -61,7 +61,7 @@ The synthetic extinct generation methods require an estimate of remaining life e
 }
 \examples{
 # The Mozambique data
-#res <- ddm(Moz)
+res <- ddm(Moz)
 head(res)
 # The Brasil data
 #BM <- ddm(BrasilMales)

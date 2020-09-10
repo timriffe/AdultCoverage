@@ -32,7 +32,11 @@ res <- ddm(Moz)
 
 codi <- Moz %>% ggbMakeColumns() 
 ggbcoverageFromYear(codi,lm.method = "ols")
-
+ZA <- readr::read_csv("/home/tim/workspace/AdultCoverage/AdultCoverage/Data/AM_SEG_South Africa_males_3_1.csv")
+ZA <- 
+ZA %>% 
+  mutate(date1 = mdy(date1),
+         date2 = mdy(date2))
 
 library(DependenciesGraphs)
 # Prepare data
