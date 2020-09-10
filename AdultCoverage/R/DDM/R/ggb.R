@@ -117,7 +117,7 @@ ggbcoverageFromYear <- function(codi,
 	coverage <- sqrt(k1 * k2) / coefs$b
 
 	result   <- data.frame(
-	       id = unique(codi$id), 
+	       #id = unique(codi$id), 
 			   Mxcoverage = coverage, 
 			   lower = min(agesfit), 
 			   upper = max(agesfit),
@@ -132,7 +132,7 @@ ggbcoverageFromYear <- function(codi,
 			   t = dif,
 			   lm.method = lm.method,
 			   nx.method = nx.method)
-	if (is.null(Exact.ages)){
+	if (is.null(exact.ages)){
 	  result$RMSE = fit.res$RMSE
 	}
 	# TR: Add r2 and RMSE to output
@@ -205,11 +205,10 @@ ggbMakeColumns <- function(codi,
             pop1           = as.double(.data$pop1),
             pop2           = as.double(.data$pop2),
             mig            = as.double(.data$mig),
-            
+            avg            = mig.summed,
+            migAvg         = ifelse(.data$avg, .data$mig / .data$dif, .data$mig),
             # RD: take geometric mean of pop1 and pop2
-            # refer to RD spreadsheet from IUSSP tools for ...
-            
-            
+            # refer to RD spreadsheet 
             pop1cum        = lt_id_L_T(.data$pop1),
             pop2cum        = lt_id_L_T(.data$pop2) ,
             deathcum       = lt_id_L_T(.data$deathsAvg),
@@ -220,25 +219,11 @@ ggbMakeColumns <- function(codi,
                                            AgeInt = .data$AgeInt, nx.method = nx.method),
             Tx             = sqrt(.data$pop1cum * .data$pop2cum),
             # this follows the SEG way of incorporating mig info, guarantees
-            growth         = log(.data$pop2 / .data$pop1) / .data$dif - .data$migAvg / Tx / .data$dif,
+            growth         = log(.data$pop2 / .data$pop1) / .data$dif - .data$migAvg / .data$Tx / .data$dif,
             growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
             cumgrowth      = .data$AgeInt * c(0,cumsum(.data$growth[ -N ])) + .data$AgeInt / 2 * .data$growth,
             
-         
-            # # from BQL, and looks different than standard one
-            # cumgrowth      = ifelse(.data$age >= 5, (.data$pop2cum - .data$pop1cum - .data$migcum) / .data$Tx,NA),
-            # current cumgrowth definition.
-            # cumgrowth      = log(.data$pop2cum / .data$pop1cum) / .data$dif,
-            
-            # maybe should be this instead:
-            #cumgrowth      = log((.data$pop2cum - .data$migcum) / .data$pop1cum) / .data$dif,
-            
-            # or this this instead:
-            #cumgrowth      = log((.data$pop2cum - .data$migcum / 2) / (.data$pop1cum + .data$migcum / 2) )/ .data$dif,
-            
-            # try to get same results as RD. does adjustment on age-specific growthrates rather than cumulative.
-            
-            # same
+           # same
             rightterm      = .data$deathcum / .data$Tx,
             leftterm       = (.data$birthdays / .data$Tx) - .data$cumgrowth,
             keep           = .data$Tx != 0 & .data$birthdays != 0 & .data$age >= minA & .data$age <= maxA)
@@ -265,20 +250,7 @@ ggbgetAgesFit <- function(codi,
                           minA = 15, 
                           maxA = 75, 
                           minAges = 8,
-                          lm.method = "oldschool"){#, 
-                          # deaths.summed = FALSE,
-                          # mig.summed = deaths.summed,
-                          # nx.method = 2){
-		
-	# if (!"leftterm" %in% colnames(codi)){
-	# 	codi <- ggbMakeColumns(
-	# 	             codi = codi, 
-	# 			         minA = minA, 
-	# 						   maxA = maxA, 
-	# 						   deaths.summed = deaths.summed,
-	# 						   mig.summed = mig.summed,
-	# 						   nx.method = nx.method)
-	# }
+                          lm.method = "oldschool"){
 	
 	maxAges   <- sum(codi$keep)
 	agesUniv  <- codi$age[codi$keep]

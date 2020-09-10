@@ -13,6 +13,7 @@ ddm(
   exact.ages.seg = NULL,
   eOpen = NULL,
   deaths.summed = FALSE,
+  mig.summed = deaths.summed,
   lm.method = "oldschool",
   nx.method = 2
 )
@@ -33,6 +34,8 @@ ddm(
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{mig.summed}{logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
 \item{lm.method}{character, one of:\itemize{
   \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
@@ -58,11 +61,11 @@ The synthetic extinct generation methods require an estimate of remaining life e
 }
 \examples{
 # The Mozambique data
-res <- ddm(Moz)
+#res <- ddm(Moz)
 head(res)
 # The Brasil data
-BM <- ddm(BrasilMales)
-BF <- ddm(BrasilFemales)
+#BM <- ddm(BrasilMales)
+#BF <- ddm(BrasilFemales)
 head(BM)
 head(BF)
 }

@@ -35,8 +35,8 @@
 #' res <- ddm(Moz)
 #' head(res)
 #' # The Brasil data
-#' BM <- ddm(BrasilMales)
-#' BF <- ddm(BrasilFemales)
+#' #BM <- ddm(BrasilMales)
+#' #BF <- ddm(BrasilFemales)
 #' head(BM)
 #' head(BF)
 
@@ -49,6 +49,7 @@ ddm <- function(
 		exact.ages.seg = NULL, 
 		eOpen = NULL, 
 		deaths.summed = FALSE,
+		mig.summed = deaths.summed,
 		lm.method = "oldschool",
 		nx.method = 2){
 	ggbres <- ggb(X = X, 
@@ -57,6 +58,7 @@ ddm <- function(
 					minAges = minAges, 
 					exact.ages = exact.ages.ggb,
 					deaths.summed = deaths.summed,
+					mig.summed = mig.summed,
 					lm.method = lm.method,
 					nx.method = nx.method)
 	segres <- seg(X = X, 
@@ -65,8 +67,12 @@ ddm <- function(
 					minAges = minAges, 
 					exact.ages = exact.ages.seg, 
 					eOpen = eOpen,
+					nx.method = nx.method,
 					deaths.summed = deaths.summed,
-					nx.method = nx.method)
+					delta = FALSE,
+					exact.ages.ggb = exact.ages.ggb,
+					lm.method.ggb = lm.method,
+					mig.summed = mig.summed)
 	ggbsegres <- ggbseg(
 			        X = X, 
 					minA = minA, 
@@ -82,11 +88,8 @@ ddm <- function(
 	results <- data.frame(	
 			        id = ggbres$id,
 					ggb = ggbres$Mxcoverage,
-					seg = segres$coverage,
-					ggbseg = ggbsegres$coverage,
-					lower = ggbres$lower,
-					upper = ggbres$upper,
-					delta = ggbres$delta)
+					seg = segres$Mxcoverage,
+					ggbseg = ggbsegres$Mxcoverage)
 #	if (delta){
 #		results$delta <- ggbres$delta
 #		#results <- cbind(results, delta = ggbres$delta)

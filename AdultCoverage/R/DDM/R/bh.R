@@ -132,7 +132,7 @@ segCoverageFromAges <- function(codi, agesFit){
 	  median = qt[2],
 	  l25 = qt[1],
 	  u25 = qt[1],
-	  weighted = sum(qt*c*.25,.5,.25))
+	  weighted = sum(qt*c(.25,.5,.25)))
 }
 
 
@@ -740,6 +740,7 @@ ggbseg <- function(X,
 				exact.ages.seg = NULL,
 				eOpen = NULL, 
 				deaths.summed = FALSE,
+				mig.summed = deaths.summed,
 				nx.method = 2,
 				lm.method = "oldschool"){
 	# TR: modularized Apr 2, 2017
@@ -758,6 +759,7 @@ ggbseg <- function(X,
 						exact.ages.seg = exact.ages.seg,
 						eOpen = eOpen,
 						deaths.summed = deaths.summed,
+						mig.summed = mig.summed,
 						lm.method = lm.method,
 						nx.method = nx.method
                   )))

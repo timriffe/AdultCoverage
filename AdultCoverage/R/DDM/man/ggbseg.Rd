@@ -13,6 +13,7 @@ ggbseg(
   exact.ages.seg = NULL,
   eOpen = NULL,
   deaths.summed = FALSE,
+  mig.summed = deaths.summed,
   nx.method = 2,
   lm.method = "oldschool"
 )
