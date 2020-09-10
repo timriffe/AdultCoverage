@@ -37,7 +37,14 @@ ZA <-
 ZA %>% 
   mutate(date1 = mdy(date1),
          date2 = mdy(date2))
+ggb(ZA, exact.ages=seq(5,80,by=5),lm.method="deming", deaths.summed = TRUE, mig.summed=TRUE)
+Moz$id<-1
+ggb(Moz, exact.ages=seq(5,75,by=5),lm.method="deming", deaths.summed = FALSE, mig.summed=FALSE)
 
+seg(ZA, exact.ages=seq(5,80,by=5), deaths.summed = TRUE, mig.summed=TRUE, delta=TRUE,eOpen=4.35)
+seg(Moz, exact.ages=seq(5,75,by=5), deaths.summed = FALSE, mig.summed=FALSE)
+seg(ZA)
+ggbseg(ZA)
 library(DependenciesGraphs)
 # Prepare data
 dep <- funDependencies("package:DDM","ggbgetRMS")
@@ -49,36 +56,3 @@ dep <- envirDependencies("package:DDM")
 
 # visualization
 plot(dep)
-
-
-res <- seg(Moz)
-res
-# The Brasil data
-BM <- seg(BrasilMales)
-BF <- seg(BrasilFemales)
-ggbseg(Moz)
-ggb(Moz)
-seg(Moz)
-
-ggb_res    <- ggb(BrasilMales)
-seg_res    <- seg(BrasilMales)
-ggbseg_res <- ggbseg(BrasilMales)
-
-ggb_res$method <- "GGB"
-seg_res$method <- "SEG"
-ggbseg_res$method <- "GGBSEG"
-colnames(ggbseg_res) <- c("cod","coverage", "lower.ggb","upper.ggb","lower","upper","method")
-res <- rbind(ggb_res[,c("cod","method","lower","upper")],
-             seg_res[,c("cod","method","lower","upper")],
-             ggbseg_res[,c("cod","method","lower","upper")]
-)
-library(tidyverse)
-library(ggplot2)
-res %>% 
-  as.data.frame() %>% 
-  ggplot(aes(x=as.factor(cod),ymin=lower, ymax = upper,color = method)) + 
-  geom_errorbar(position = "dodge")
-
-segplot(subset(BrasilMales, cod == 51))
-ggbsegplot
-ggbChooseAges(subset(BrasilMales, cod == 51))

@@ -131,7 +131,7 @@ segCoverageFromAges <- function(codi, agesFit){
 	c(mean = mn,
 	  median = qt[2],
 	  l25 = qt[1],
-	  u25 = qt[1],
+	  u25 = qt[3],
 	  weighted = sum(qt*c(.25,.5,.25)))
 }
 
@@ -206,15 +206,16 @@ segMakeColumns <- function(codi,
             pop1           = as.double(.data$pop1),
             pop2           = as.double(.data$pop2),
             mig            = as.double(.data$mig),
-            deathcum       = lt_id_L_T(.data$deathsAvg),
+            obs_rd         = sqrt(.data$pop1*.data$pop2) * .data$dif,
+            # deathcum       = lt_id_L_T(.data$deathsAvg),
             birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
                                            AgeInt = .data$AgeInt, nx.method = nx.method),
             # TR: follows RD column G calc
-            growth         = log(.data$pop2 / .data$pop1) / .data$dif - 
+            growth         = (log(.data$pop2)- log(.data$pop1)) / .data$dif - 
                              .data$migAvg / sqrt(.data$pop2 * .data$pop1) / .data$dif + 
                               del,
             growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
-            # cumulative growth
+            # cumulative growth, needed for estimating eOpen..
             cumgrowth      = .data$AgeInt * c(0,cumsum(.data$growth[ -N ])) + .data$AgeInt / 2 * .data$growth,
             deathLT        = .data$deathsAvg * exp(.data$cumgrowth))
   
@@ -243,7 +244,8 @@ segMakeColumns <- function(codi,
 	  codi %>% 
 	  mutate(
 	    pop_a = calc_pop_a(.data$deathsAvg,eON,.data$AgeInt,.data$growth),
-	    Cx = .data$pop_a / .data$birthdays)
+	    Cx = .data$pop_a / .data$birthdays,
+	    Cx = ifelse(is.infinite(.data$Cx),NA,.data$Cx))
 
 			
 	################
@@ -407,7 +409,9 @@ seg <- function(X,
 						lapply(
 							tab1,
 							function(X){
-								segCoverageFromYear(X,minA = minA, 
+								segCoverageFromYear(
+								    X,
+								    minA = minA, 
 										maxA = maxA,
 										minAges = minAges,  
 										exact.ages = exact.ages,
