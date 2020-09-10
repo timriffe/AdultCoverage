@@ -108,7 +108,7 @@ seggetRMS <- function(codi, agesFit){
   coverage      <- segCoverageFromAges(codi, agesFit = agesFit)
   Cx            <- codi$Cx
   keep          <- codi$age %in% agesFit  
-  sqrt(mean((Cx[keep] - coverage) ^ 2, na.rm = TRUE))
+  sqrt(mean((Cx[keep] - coverage["mean"]) ^ 2, na.rm = TRUE))
 }
 
 #' @title given a set of ages, what is the implied death registration coverage?
@@ -126,8 +126,8 @@ segCoverageFromAges <- function(codi, agesFit){
 	inds    <- codi$age %in% agesFit
 	
 	Cx <- codi$Cx[inds]
-	mn <-  mean(Cx)
-	qt <- quantile(Cx, c(.25,.5,.75))
+	mn <- mean(Cx)
+	qt <- quantile(Cx, c(.25,.5,.75),na.rm=TRUE)
 	c(mean = mn,
 	  median = qt[2],
 	  l25 = qt[1],
@@ -335,10 +335,10 @@ segCoverageFromYear <-  function(
 
 	meta <- 	data.frame(
 	       id = unique(codi$id), 
-			   Mxcoverage = coverage["mean"], 
-			   median = coverage["median"],
-			   l25 = coverage["l25"],
-			   u25 = coverage["u25"],
+			   Mxcoverage = coverage[1], 
+			   median = coverage[2],
+			   l25 = coverage[3],
+			   u25 = coverage[4],
 			   weighted = coverage["weighted"],
 			   lower = min(agesFit), 
 			   upper = max(agesFit),
@@ -579,7 +579,7 @@ ggbsegMakeColumns <- function(
     codi %>% 
     # just call it pop1 still, used to be pop1adj, but this lets us recycle code easier.
     mutate(
-      pop1in = pop1,
+      pop1in = .data$pop1,
       pop1 = .data$pop1in / relcomp) %>% 
     segMakeColumns(minA = minA,
                    maxA = maxA, 
@@ -589,7 +589,7 @@ ggbsegMakeColumns <- function(
                    nx.method = nx.method,
                    delta = FALSE) %>% 
     # rename back to original intended names
-    dplyr::rename(pop1adj = pop1, pop1 = pop1in)
+    dplyr::rename(pop1adj = .data$pop1, pop1 = .data$pop1in)
   # TR: add in migraion cals to SEG then activate this.
   #,
   #                 mig = mig)
@@ -671,10 +671,10 @@ ggbsegCoverageFromYear <- function(codi,
 	
 	res <- data.frame( 
 	           id = unique(codi$id), 
-	           Mxcoverage = coverage["mean"], 
-	           median = coverage["median"],
-	           l25 = coverage["l25"],
-	           u25 = coverage["u25"],
+	           Mxcoverage = coverage[1], 
+	           median = coverage[2],
+	           l25 = coverage[3],
+	           u25 = coverage[4],
 	           weighted = coverage["weighted"], 
 	           lower.ggb = min(agesFit.ggb), 
 	           upper.ggb = max(agesFit.ggb),

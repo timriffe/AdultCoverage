@@ -19,12 +19,8 @@ ggbgetRMS <- function(agesi, codi, lm.method = "oldschool"){
 	codi <- ggbFittedFromAges(codi, agesfit = agesi, lm.method = lm.method) %>% 
 	  filter(.data$age %in% agesi)
 
-	(codi$leftterm - codi$fitted) %>% 
-	  '^'(2) %>% 
-	  mean() %>% 
-	  sqrt()
+	sqrt(mean((codi$leftterm - codi$fitted)^2) )
 
-	
 }
 
 
