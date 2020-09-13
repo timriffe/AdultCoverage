@@ -171,7 +171,8 @@ segMakeColumns <- function(codi,
   
   if (delta){
     ggb.res <- ggb(X = codi,
-                   minA =minA,
+                   minA = minA,
+                   maxA = maxA,
                    nx.method = nx.method,
                    exact.ages = exact.ages.ggb,
                    lm.method = lm.method.ggb,
@@ -212,7 +213,7 @@ segMakeColumns <- function(codi,
                                            AgeInt = .data$AgeInt, nx.method = nx.method),
             # TR: follows RD column G calc
             growth         = (log(.data$pop2)- log(.data$pop1)) / .data$dif - 
-                             .data$migAvg / sqrt(.data$pop2 * .data$pop1) + 
+                             .data$migAvg / sqrt(.data$pop2 * .data$pop1) / .data$dif + 
                               del,
             growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
             # cumulative growth, needed for estimating eOpen..

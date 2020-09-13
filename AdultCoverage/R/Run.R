@@ -41,7 +41,8 @@ ggb(ZA, exact.ages=seq(5,80,by=5),lm.method="deming", deaths.summed = TRUE, mig.
 Moz$id<-1
 ggb(Moz, exact.ages=seq(5,75,by=5),lm.method="deming", deaths.summed = FALSE, mig.summed=FALSE)
 
-seg(ZA, exact.ages=seq(5,80,by=5), deaths.summed = TRUE, mig.summed=TRUE, delta=TRUE,eOpen=4.35)
+seg(ZA,maxA=80,minA=15,exact.ages=seq(5,80,by=5), deaths.summed = TRUE, mig.summed=TRUE, eOpen=4.35,exact.ages.ggb=seq(5,80,y=5),delta=TRUE)
+
 seg(Moz, exact.ages=seq(5,75,by=5), deaths.summed = FALSE, mig.summed=FALSE)
 seg(ZA)
 ggbseg(ZA)
