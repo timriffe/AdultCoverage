@@ -207,7 +207,7 @@ segMakeColumns <- function(codi,
             pop1           = as.double(.data$pop1),
             pop2           = as.double(.data$pop2),
             mig            = as.double(.data$mig),
-            obs_rd         = sqrt(.data$pop1*.data$pop2) * .data$dif,
+            #obs_rd         = sqrt(.data$pop1*.data$pop2) * .data$dif,
             # deathcum       = lt_id_L_T(.data$deathsAvg),
             birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
                                            AgeInt = .data$AgeInt, nx.method = nx.method),
@@ -244,6 +244,7 @@ segMakeColumns <- function(codi,
 	codi <-
 	  codi %>% 
 	  mutate(
+	    #bd = .data$birthdays * .data$dif,
 	    pop_a = calc_pop_a(.data$deathsAvg,eON,.data$AgeInt,.data$growth),
 	    Cx = .data$pop_a / .data$birthdays,
 	    Cx = ifelse(is.infinite(.data$Cx),NA,.data$Cx))
@@ -401,16 +402,15 @@ seg <- function(X,
 				exact.ages.ggb = NULL,
 				lm.method.ggb = "oldschool"){
 	
-    # TR: modularized Apr 2, 2017
 	tab1        <- headerPrep(X)
 	coverages <- as.data.frame(
 					do.call(
 						rbind,
 						lapply(
 							tab1,
-							function(X){
+							function(Y){
 								segCoverageFromYear(
-								    X,
+								    Y,
 								    minA = minA, 
 										maxA = maxA,
 										minAges = minAges,  
@@ -419,12 +419,12 @@ seg <- function(X,
 										nx.method = nx.method,
 										deaths.summed = deaths.summed,
 										mig.summed = mig.summed,
+										delta = delta,
 										exact.ages.ggb = exact.ages.ggb,
 										lm.method.ggb = lm.method.ggb
 										)$coverages	
 							}
             )))
-	#return(data.frame(Coverage = coverages,correctionFactor = 1/coverages))
 	
 	coverages
 }

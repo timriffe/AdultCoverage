@@ -20,13 +20,46 @@ load_all()
 document()
 check()
 
+seg(ZA,
+    deaths.summed=TRUE,
+    mig.summed =TRUE,
+    exact.ages=seq(20,65,by=5),
+    exact.ages.ggb=seq(5,80,by=5),
+    delta=TRUE,
+    lm.method="ols",
+    eOpen=4.35)
+segMakeColumns(ZA,
+               deaths.summed=TRUE,
+               mig.summed =TRUE,
+               exact.ages.ggb=seq(5,80,by=5),
+               delta=TRUE,
+               lm.method="tls",
+               eOpen=4.35) %>% 
+  segCoverageFromAges(agesFit=seq(20,60,by=5))
+
+segCoverageFromYear(ZA,
+               deaths.summed=TRUE,
+               mig.summed =TRUE,
+               exact.ages.ggb=seq(5,80,by=5),
+               delta=TRUE,
+               lm.method="tls",
+               eOpen=4.35)$codi %>% View()
+
+seg(ZA,
+    deaths.summed=TRUE,
+    mig.summed =TRUE,
+    exact.ages.ggb=seq(5,80,by=5),
+    delta=TRUE,
+    lm.method="tls",
+    eOpen=4.35)
+
 #--------------------
 library(dplyr)
 library(magrittr)
 
 # change data
 ggb(Moz)
-seg(Moz)
+seg(Moz,delta=F)
 ggbseg(Moz)
 res <- ddm(Moz)
 
