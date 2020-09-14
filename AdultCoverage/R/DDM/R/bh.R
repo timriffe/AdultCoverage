@@ -230,10 +230,12 @@ segMakeColumns <- function(codi,
 	eON   <- eOpen * codi$growth[N]
 
 	# TR: this little thing is ugly for my taste, hoping it gets replaced.
-	calc_pop_a <- function(deathsAvg,eON,AgeInt,growth){
+	calc_pop_a <- function(deathsAvg,eON,AgeInt,growth,dif){
 	  N        <- length(deathsAvg)
-	  pop_aa   <- rep(0,N)                       
-	  pop_aa[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
+	  pop_aa   <- rep(0,N)          
+	  # PJ fix, modified
+	  pop_aa[N] <-  deathsAvg[N] * ((exp(eON) - (eON ^ 2) / 6)) 
+	  #pop_aa[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
 	  for(j in N:2){
 	    pop_aa[j - 1] <- pop_aa[j] * exp( AgeInt[j-1] * growth[j - 1]) + 
 	      deathsAvg[j - 1] * exp( AgeInt[j-1] / 2 * growth[j - 1])
@@ -245,7 +247,7 @@ segMakeColumns <- function(codi,
 	  codi %>% 
 	  mutate(
 	    #bd = .data$birthdays * .data$dif,
-	    pop_a = calc_pop_a(.data$deathsAvg,eON,.data$AgeInt,.data$growth),
+	    pop_a = calc_pop_a(.data$deathsAvg,eON,.data$AgeInt,.data$growth,.data$dif),
 	    Cx = .data$pop_a / .data$birthdays,
 	    Cx = ifelse(is.infinite(.data$Cx),NA,.data$Cx))
 

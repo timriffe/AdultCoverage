@@ -23,19 +23,19 @@ check()
 seg(ZA,
     deaths.summed=TRUE,
     mig.summed =TRUE,
-    exact.ages=seq(20,65,by=5),
+    exact.ages=seq(20,60,by=5),
     exact.ages.ggb=seq(5,80,by=5),
     delta=TRUE,
-    lm.method="ols",
+    lm.method="tls",
     eOpen=4.35)
 segMakeColumns(ZA,
                deaths.summed=TRUE,
                mig.summed =TRUE,
                exact.ages.ggb=seq(5,80,by=5),
                delta=TRUE,
-               lm.method="tls",
+               lm.method="ols",
                eOpen=4.35) %>% 
-  segCoverageFromAges(agesFit=seq(20,60,by=5))
+  View()
 
 segCoverageFromYear(ZA,
                deaths.summed=TRUE,
