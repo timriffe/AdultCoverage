@@ -24,10 +24,10 @@ ggbMakeColumns(
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
-\item{mig.summed}{logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+\item{mig.summed}{logical. Is the (optional) net migration column \code{mig} given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
-codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
+codi, with many columns added, most importantly \code{rightterm}, \code{leftterm}, and \code{keep}.
 }
 \description{
 Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly.

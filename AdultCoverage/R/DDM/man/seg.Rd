@@ -16,11 +16,11 @@ seg(
   mig.summed = deaths.summed,
   delta = FALSE,
   exact.ages.ggb = NULL,
-  lm.method.ggb = "oldschool"
+  lm.method = "oldschool"
 )
 }
 \arguments{
-\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, \code{$sex}, and \code{$id} (if there are more than 1 region/sex/intercensal period).}
+\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$id} (if there are more than 1 region/sex/intercensal period).}
 
 \item{minA}{the lowest age to be included in search}
 
@@ -28,13 +28,26 @@ seg(
 
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
-\item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation. if left as \code{NULL} these are optimized.}
+\item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
 
 \item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
-\item{nx.method}{integer either 2 or 4. 4 is smoother.}
+\item{nx.method}{either 2 or 4. 4 is smoother.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{mig.summed}{logical. Is the (optional) net migration column \code{mig} given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{delta}{logical. Do we perform the so-called delta adjustment?}
+
+\item{exact.ages.ggb}{optional vector of ages used to estimate GGB coverage (if \code{delta} is \code{TRUE})}
+
+\item{lm.method}{character, one of:\itemize{
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+}}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$id} variable. \code{$l25} (\code{$u25}) give the mean of the lower (upper) quartile of the distribution of age-specific coverage estimates.

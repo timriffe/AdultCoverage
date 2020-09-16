@@ -19,7 +19,8 @@ setwd("AdultCoverage/R/DDM")
 load_all()
 document()
   check()
-
+ddm(Moz,delta=TRUE)
+ddm(BrasilMales)
 ggb(ZA,
       deaths.summed=TRUE,
       mig.summed =TRUE,
@@ -32,13 +33,12 @@ ggbMakeColumns(ZA) %>% View()
 seg(ZA,
     deaths.summed=TRUE,
     mig.summed =TRUE,
-    exact.ages=seq(20,60,by=5),
+    exact.ages=seq(25,60,by=5),
     exact.ages.ggb=seq(5,80,by=5),
     delta=TRUE,
     lm.method="oldschool",
-    eOpen=4.35)
+    eOpen=4.34676243530911)
 
-gg
 
 segMakeColumns(ZA,
                deaths.summed=TRUE,
@@ -102,3 +102,14 @@ dep <- envirDependencies("package:DDM")
 
 # visualization
 plot(dep)
+minA = 15 
+maxA = 75 
+minAges = 8 
+exact.ages.ggb = NULL
+exact.ages.seg = NULL 
+eOpen = NULL
+deaths.summed = FALSE
+mig.summed = deaths.summed
+lm.method = "oldschool"
+nx.method = 2
+delta = FALSE

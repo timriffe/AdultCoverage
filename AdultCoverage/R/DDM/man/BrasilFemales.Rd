@@ -7,14 +7,14 @@
 \format{
 A data frame with 53940 rows and 10 variables:
 \describe{
-  \item{id}{integer an id number for each state}
-  \item{pop1}{integer the census population count in 1991}
-  \item{pop2}{integer the census population count in 2000}
-  \item{deaths}{numeric average deaths between censuses}
-  \item{date1}{integer 1991}
-  \item{date2}{integer 2000}
-  \item{age}{integer lower age bound for each age group}
-  \item{sex}{character, 'f'}
+\item{id}{integer an id number for each state}
+\item{pop1}{integer the census population count in 1991}
+\item{pop2}{integer the census population count in 2000}
+\item{deaths}{numeric average deaths between censuses}
+\item{date1}{integer 1991}
+\item{date2}{integer 2000}
+\item{age}{integer lower age bound for each age group}
+\item{sex}{character, 'f'}
 }
 }
 \source{

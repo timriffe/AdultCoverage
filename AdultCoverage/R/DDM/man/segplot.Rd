@@ -39,7 +39,7 @@ segplot(
 Function called for its graphical side effects
 }
 \description{
-the SEG method works by averaging the coverage estimates over a range of ages. 
+the SEG method works by averaging the coverage estimates over a range of ages.
 Users may wish to see the age pattern for diagnostic purposes.
 }
 \details{

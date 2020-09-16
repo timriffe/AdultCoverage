@@ -29,13 +29,13 @@ ggbcoverageFromYear(
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
-\item{mig.summed}{logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+\item{mig.summed}{logical. Is the (optional) net migration column \code{mig} given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
 \item{lm.method}{character, one of:\itemize{
-  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}

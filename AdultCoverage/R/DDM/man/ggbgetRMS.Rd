@@ -10,6 +10,13 @@ ggbgetRMS(agesi, codi, lm.method = "oldschool")
 \item{agesi}{the set of ages used for this iteration}
 
 \item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}
+
+\item{lm.method}{character, one of:\itemize{
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+}}
 }
 \value{
 the RMSE

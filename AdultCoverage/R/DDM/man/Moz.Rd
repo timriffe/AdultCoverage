@@ -7,14 +7,14 @@
 \format{
 A data frame with 17 rows and 8 variables:
 \describe{
-  \item{id}{integer a column of 1s}
-  \item{sex}{character ``f'' for female}
-  \item{pop1}{integer the census population count in 1997}
-  \item{pop2}{integer the census population count in 2007}
-  \item{deaths}{integer average of 1997 and 2007 deaths}
-  \item{age}{integer lower age bound for each age group}
-  \item{date1}{integer 1997}
-  \item{date2}{integer 2007}
+\item{id}{integer a column of 1s}
+\item{sex}{character ``f'' for female}
+\item{pop1}{integer the census population count in 1997}
+\item{pop2}{integer the census population count in 2007}
+\item{deaths}{integer average of 1997 and 2007 deaths}
+\item{age}{integer lower age bound for each age group}
+\item{date1}{integer 1997}
+\item{date2}{integer 2007}
 }
 }
 \source{

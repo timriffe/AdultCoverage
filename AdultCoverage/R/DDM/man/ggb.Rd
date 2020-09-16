@@ -28,36 +28,36 @@ ggb(
 \item{exact.ages}{optional. A user-specified vector of exact ages to use for coverage estimation}
 
 \item{lm.method}{character, one of:\itemize{
-  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
-\item{mig.summed}{logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+\item{mig.summed}{logical. Is the (optional) net migration column \code{mig} given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 }
 \value{
 a \code{data.frame} with columns for: \itemize{
-  \item{id} group id
-  \item{Mxcoverage} coverage of the intercensal Mx values: \code{sqrt(k1*k2)/b}
-  \item{lower} lower bound of ages used for fitting
-  \item{upper} upper bound of ages used for fitting
-  \item{a} intercept
-  \item{b} slope
-  \item{delta} empirical link: \code{exp(t*a) = k1/k2}
-  \item{k1} completeness of census 1
-  \item{k2} completeness of census 2
-  \item{k3} completeness of deaths relative to census 2 (\code{1/b})
-  \item{t1} decimal date of census 1
-  \item{t2} decimal date of census 2
-  \item{t} intercensal interval (\code{t2 - t1})
-  \item{lm.method} line fitting method used
-  \item{nx.method} birthday (Nx) approximation used (2 or 4 points)
-  \item{RMSE} the root mean square error of the optimized ages used for fitting (only if ages were automatically selected)
+\item{id} group id
+\item{Mxcoverage} coverage of the intercensal Mx values: \code{sqrt(k1*k2)/b}
+\item{lower} lower bound of ages used for fitting
+\item{upper} upper bound of ages used for fitting
+\item{a} intercept
+\item{b} slope
+\item{delta} empirical link: \code{exp(t*a) = k1/k2}
+\item{k1} completeness of census 1
+\item{k2} completeness of census 2
+\item{k3} completeness of deaths relative to census 2 (\code{1/b})
+\item{t1} decimal date of census 1
+\item{t2} decimal date of census 2
+\item{t} intercensal interval (\code{t2 - t1})
+\item{lm.method} line fitting method used
+\item{nx.method} birthday (Nx) approximation used (2 or 4 points)
+\item{RMSE} the root mean square error of the optimized ages used for fitting (only if ages were automatically selected)
 }
 }
 \description{

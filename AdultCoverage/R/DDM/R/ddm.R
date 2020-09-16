@@ -35,11 +35,16 @@
 #' # The Mozambique data
 #' res <- ddm(Moz)
 #' head(res)
-#' # The Brasil data
-#' #BM <- ddm(BrasilMales)
-#' #BF <- ddm(BrasilFemales)
-#' head(BM)
-#' head(BF)
+#'  # The Brasil data
+#'  BM <- ddm(BrasilMales,
+#'            exact.ages.ggb=seq(15,75,by=5),
+#'            exact.ages.seg=seq(25,60,by=5),
+#'            delta = TRUE,
+#'            lm.method = "resistant")
+#'  \dontrun{
+#'  ddmplot(BM)
+#'  abline(h=1)
+#' }
 
 ddm <- function(
 		X, 
@@ -73,7 +78,7 @@ ddm <- function(
 					deaths.summed = deaths.summed,
 					delta = delta,
 					exact.ages.ggb = exact.ages.ggb,
-					lm.method.ggb = lm.method,
+					lm.method = lm.method,
 					mig.summed = mig.summed)
 	ggbsegres <- ggbseg(
 			        X = X, 
@@ -84,6 +89,7 @@ ddm <- function(
 					exact.ages.seg = exact.ages.seg,
 					eOpen = eOpen,
 					deaths.summed = deaths.summed,
+					mig.summed = mig.summed,
 					lm.method = lm.method,
 					nx.method = nx.method)
 	# return all results

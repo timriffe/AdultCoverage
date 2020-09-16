@@ -12,14 +12,14 @@ ggbFittedFromAges(codi, agesfit, lm.method = "oldschool")
 \item{agesfit}{a set of continuous ages to estimate coverage from}
 
 \item{lm.method}{character, one of:\itemize{
-  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 }
 \value{
-codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
+codi, with the column \code{fitted} added.
 }
 \description{
 Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.

@@ -36,13 +36,13 @@ ddm(
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
-\item{mig.summed}{logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+\item{mig.summed}{logical. Is the (optional) net migration column \code{mig} given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
 \item{lm.method}{character, one of:\itemize{
-  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}
@@ -56,9 +56,9 @@ data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \cod
 Estimate the generalized growth balance method, and the two Bennett-Horiuchi methods of estimating death registration coverage. This requires two censuses and an estimate of the deaths in each 5-year age group between censuses. This might be the arithmetic average of deaths in each age class, or simply the average of deaths around the time of the two censuses. All methods use some stable population assumptions.
 }
 \details{
-All methods require some specification about which age range to base results on. If not given, an optimal age range will be estimated automatically, and this information is returned to the user. To identify an age-range in the visually, see \code{ggbChooseAges()}, when working with a single year/sex/region of data (SEG varient of this visual picker is forthcoming). The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the root of the average squared residual (RMSE) between the fitted line and right term for GGB, and we minimize the RMSE of a horizontal sequence of Cx estimates for SEG. If you want coverage estimates for a variety of partitions (intercensal periods/regions/by sex), then stack them, and use a variable called \code{$cod} with unique values for each data partition. If data is partitioned using the variable \code{$cod}, then the age range automatically determined might not be the same for each partition. If user-specified, (using vectors of specified ages \code{exact.ages.ggb} and/or \code{exact.ages.seg}) the age ranges will be the same for all partitions. If you want to specify particular age ranges for each data partition, then you'll need to loop it somehow. 
+All methods require some specification about which age range to base results on. If not given, an optimal age range will be estimated automatically, and this information is returned to the user. To identify an age-range in the visually, see \code{ggbChooseAges()}, when working with a single year/sex/region of data (SEG varient of this visual picker is forthcoming). The automatic age-range determination feature of this function tries to implement an intuitive way of picking ages that follows the advice typically given for doing so visually. We minimize the root of the average squared residual (RMSE) between the fitted line and right term for GGB, and we minimize the RMSE of a horizontal sequence of Cx estimates for SEG. If you want coverage estimates for a variety of partitions (intercensal periods/regions/by sex), then stack them, and use a variable called \code{$cod} with unique values for each data partition. If data is partitioned using the variable \code{$cod}, then the age range automatically determined might not be the same for each partition. If user-specified, (using vectors of specified ages \code{exact.ages.ggb} and/or \code{exact.ages.seg}) the age ranges will be the same for all partitions. If you want to specify particular age ranges for each data partition, then you'll need to loop it somehow.
 
-All three methods require time points of the two censuses. Census dates can be given in a variety of ways: 1) (preferred) using \code{Date} classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing respective integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.  Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2. 
+All three methods require time points of the two censuses. Census dates can be given in a variety of ways: 1) (preferred) using \code{Date} classes, and column names \code{$date1} and \code{$date2} (or an unambiguous character string of the date, like, \code{"1981-05-13"}) or 2) by giving column names \code{"day1","month1","year1","day2","month2","year2"} containing respective integers. If only \code{year1} and \code{year2} are given, then we assume January 1 dates. If year and month are given, then we assume dates on the first of the month.  Different values of \code{$cod} could indicate sexes, regions, intercensal periods, etc. The \code{$deaths} column should refer to the average annual deaths for each age class in the intercensal period. Sometimes one uses the arithmetic average of recorded deaths in each age, or simply the average of the deaths around the time of census 1 and census 2.
 
 The synthetic extinct generation methods require an estimate of remaining life expectancy in the open age group of the data provided. This is produced using a standard reference to the Coale-Demeny West model life tables. That is a place where things can be improved.
 }
@@ -66,11 +66,16 @@ The synthetic extinct generation methods require an estimate of remaining life e
 # The Mozambique data
 res <- ddm(Moz)
 head(res)
-# The Brasil data
-#BM <- ddm(BrasilMales)
-#BF <- ddm(BrasilFemales)
-head(BM)
-head(BF)
+ # The Brasil data
+ BM <- ddm(BrasilMales,
+           exact.ages.ggb=seq(15,75,by=5),
+           exact.ages.seg=seq(25,60,by=5),
+           delta = TRUE,
+           lm.method = "resistant")
+ \dontrun{
+ ddmplot(BM)
+ abline(h=1)
+}
 }
 \references{
 Bennett Neil G, Shiro Horiuchi. Estimating the completeness of death registration in a closed population. Population Index. 1981; 1:207-221.

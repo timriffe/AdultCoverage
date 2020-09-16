@@ -16,10 +16,10 @@ ggbgetAgesFit(codi, minA = 15, maxA = 75, minAges = 8, lm.method = "oldschool")
 \item{minAges}{the minimum number of adjacent ages to be used in estimating}
 
 \item{lm.method}{character, one of:\itemize{
-  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 }
 \value{

@@ -54,13 +54,13 @@ detectSex <- function(Dat, sexColumn = "Sex"){
 addcod <- function(X){
 	stopifnot(is.data.frame(X))
 	
-	if (!"cod" %in% colnames(X)){
-		X$cod <- 1
+	if (!"id" %in% colnames(X)){
+		X$id <- 1
 		if ("sex" %in% colnames(X)){
 			sexes         <- unique(X$sex)
 			recvec        <- 1:length(sexes)
 			names(recvec) <- sexes
-			X$cod         <- recvec[X$sex]
+			X$id         <- recvec[X$sex]
 		}
 	}
     X
@@ -158,7 +158,7 @@ headerPrep <- function(X){
 	tab$pop2    <- as.double(tab$pop2)
 	tab$deaths  <- as.double(tab$deaths)
 	
-	tab1        <- split(tab, tab$cod)
+	tab1        <- split(tab, tab$id)
 	
 	tab1
 }

@@ -15,5 +15,5 @@ seggetRMS(codi, agesFit)
 numeric. RMSE
 }
 \description{
-return the RMSE of `Cx` with respect to the coverage estimate for a given range of ages.
+return the RMSE of \code{Cx} with respect to the coverage estimate for a given range of ages.
 }

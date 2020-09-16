@@ -10,6 +10,7 @@
 #' 
 #' @param agesi the set of ages used for this iteration
 #' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}. 
+#' @inheritParams slopeint
 #' 
 #' @return the RMSE
 #' 
@@ -140,10 +141,10 @@ ggbcoverageFromYear <- function(codi,
 
 #' @title make the growth-adjusted quasi life table columns required by GGB method
 #' 
-#' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by \code{ggbMakeColumns()} are not present, then we call it here just to keep things from breaking.
+#' @description Called by `ggbChooseAges()` and `ggbcoverageFromYear()`. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. If columns produced by `ggbMakeColumns()` are not present, then we call it here just to keep things from breaking.
 #' 
 #' @inheritParams slopeint
-#' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
+#' @return codi, with the column `fitted` added.
 #' 
 #' @export
 
@@ -160,12 +161,12 @@ ggbFittedFromAges <- function(codi,
 
 #' @title make the growth-adjusted quasi life table columns required by GGB method
 #' 
-#' @description Called by \code{ggbChooseAges()} and \code{ggbcoverageFromYear()}. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
+#' @description Called by `ggbChooseAges()` and `ggbcoverageFromYear()`. This simply modulates some code that would otherwise be repeated. Users probably don't need to call this function directly. 
 #' 
-#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by \code{ggb()}
+#' @param codi a chunk of data (single sex, year, region, etc) with all columns required by `ggb()`
 #' @inheritParams ggb
 #' 
-#' @return codi, with many columns added, most importantly \code{$rightterm}, \code{$leftterm}, and \code{$keep}.
+#' @return codi, with many columns added, most importantly `rightterm`, `leftterm`, and `keep`.
 #' 
 #' @export
 #' @importFrom DemoTools age2int 
@@ -309,7 +310,7 @@ ggbgetAgesFit <- function(codi,
 #' @param exact.ages optional. A user-specified vector of exact ages to use for coverage estimation
 #' @param nx.method either 2 or 4. 4 is smoother.
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
-#' @param mig.summed logical. is the (optional) \code{mig} column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
+#' @param mig.summed logical. Is the (optional) net migration column \code{mig} given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.
 #' @inheritParams slopeint
 
 #' @return a \code{data.frame} with columns for: \itemize{
@@ -523,7 +524,6 @@ slopeint <- function(codi,
 #' @details If you want to send the results of this into \code{ggb()}, you can do so by setting \code{Exact.ages} to \code{seq(lower,upper,by=5)}, where \code{$lower}, and \code{$upper} are the results returned from \code{ggbChooseAges()} after you're done manually determining the age range.
 #' 
 #' @inheritParams ggb
-#' @param codi \code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}. 
 #' @param maxit up to how many times do you want to let yourself fiddle with the age range?
 #' @return \code{data.frame} containing elements \code{$coverage}, \code{$lower}, \code{$upper}, and \code{ages}.
 #' 
@@ -539,16 +539,15 @@ slopeint <- function(codi,
 #' ggbChooseAges(Moz)
 #' }
 
-# TR: simplify this code by using top level functinos inside.
-
 ggbChooseAges <- function(
-              codi, 
+              X, 
 		          minA = 15, 
 						  maxA = 75, 
 						  minAges = 8, 
 						  exact.ages = NULL, 
 						  maxit = 15, 
 						  deaths.summed = FALSE,
+						  mig.summed = deaths.summed,
 						  lm.method = "oldschool",
 						  nx.method = 2){
 	# this is the automatic age selection.
@@ -569,8 +568,8 @@ ggbChooseAges <- function(
 		}
 	}
   
-  codi_in <- codi
-	codi    <- data.frame(codi)           
+  codi_in <- X
+	codi    <- data.frame(X)           
 
 
 	# guess which column is the deaths column, rename it deaths

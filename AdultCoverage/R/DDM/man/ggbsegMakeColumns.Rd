@@ -19,24 +19,26 @@ ggbsegMakeColumns(
 \arguments{
 \item{codi}{a chunk of data (single sex, year, region, etc) with all columns required by \code{ggbseg()}}
 
-\item{minA}{the minimum of the age range searched. Default 15}
+\item{minA}{the lowest age to be included in search}
 
-\item{maxA}{the maximum of the age range searched. Default 75}
+\item{maxA}{the highest age to be included in search (the lower bound thereof)}
 
-\item{agesFit.ggb}{vector of ages as passed in by \code{ggbsegCoverageFromYear)}}
+\item{agesFit.ggb}{vector of ages for calculating coverage in the GGB method.}
 
-\item{eOpen}{optional. A value for remaining life expectancy in the open age group.}
+\item{eOpen}{optional. A user-specified value for remaining life-expectancy in the open age group.}
 
-\item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+\item{deaths.summed}{logical. Is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
+\item{mig.summed}{logical. Is the (optional) net migration column \code{mig} given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
 \item{lm.method}{character, one of:\itemize{
-  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 
-\item{nx.method}{either 2 or 4. 4 is smoother.}
+\item{nx.method}{integer. either 2 or 4. 4 is smoother.}
 }
 \value{
 codi, with many columns added, most importantly \code{$Cx}.

@@ -5,19 +5,20 @@
 \title{interactively determine ages to use for estimating coverage}
 \usage{
 ggbChooseAges(
-  codi,
+  X,
   minA = 15,
   maxA = 75,
   minAges = 8,
   exact.ages = NULL,
   maxit = 15,
   deaths.summed = FALSE,
+  mig.summed = deaths.summed,
   lm.method = "oldschool",
   nx.method = 2
 )
 }
 \arguments{
-\item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}
+\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$id} (if there are more than 1 region/sex/intercensal period).}
 
 \item{minA}{the lowest age to be included in search}
 
@@ -31,11 +32,13 @@ ggbChooseAges(
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
 
+\item{mig.summed}{logical. Is the (optional) net migration column \code{mig} given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
+
 \item{lm.method}{character, one of:\itemize{
-  \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
-  \item{\code{"lm"} or \code{"ols"}} for a simple linear model
-  \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
-  \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
+\item{\code{"oldschool"}} default sd ratio operation of still unknown origin
+\item{\code{"lm"} or \code{"ols"}} for a simple linear model
+\item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
+\item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}
