@@ -169,6 +169,30 @@ segMakeColumns <- function(codi,
                            lm.method.ggb = "oldschool",
                            minAges.ggb = 8){
   
+  calc_bdaymean <- function(birthdays, AgeInt){
+    mn <- rep(NA,length(birthdays))
+    N <- length(birthdays)
+    for (i in 1:(N-1)){
+      mn[i] <- (birthdays[i] + birthdays[i+1]) *AgeInt[i] / 2
+    }
+    mn
+  }
+  
+  # TR: this little thing is ugly for my taste, hoping it gets replaced.
+  calc_pop_a <- function(deathsAvg,eON,AgeInt,growth){
+    N        <- length(deathsAvg)
+    pop_aa   <- rep(0,N)          
+    # PJ fix, modified
+    pop_aa[N] <-  deathsAvg[N] * ((exp(eON) - (eON ^ 2) / 6)) 
+    #pop_aa[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
+    for(j in N:2){
+      pop_aa[j - 1] <- pop_aa[j] * exp( AgeInt[j-1] * growth[j - 1]) + 
+        deathsAvg[j - 1] * exp( AgeInt[j-1] / 2 * growth[j - 1])
+    }
+    pop_aa
+  }
+  
+  
   if (delta){
     ggb.res <- ggb(X = codi,
                    minA = minA,
@@ -209,11 +233,9 @@ segMakeColumns <- function(codi,
             mig            = as.double(.data$mig),
             #obs_rd         = sqrt(.data$pop1*.data$pop2) * .data$dif,
             # deathcum       = lt_id_L_T(.data$deathsAvg),
-            birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
-                                           AgeInt = .data$AgeInt, nx.method = nx.method),
             # TR: follows RD column G calc
             growth         = (log(.data$pop2)- log(.data$pop1)) / .data$dif - 
-                             .data$migAvg / sqrt(.data$pop2 * .data$pop1) / .data$dif + 
+                             .data$migAvg / sqrt(.data$pop2 * .data$pop1) + 
                               del,
             growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
             # cumulative growth, needed for estimating eOpen..
@@ -229,27 +251,14 @@ segMakeColumns <- function(codi,
 	
 	eON   <- eOpen * codi$growth[N]
 
-	# TR: this little thing is ugly for my taste, hoping it gets replaced.
-	calc_pop_a <- function(deathsAvg,eON,AgeInt,growth,dif){
-	  N        <- length(deathsAvg)
-	  pop_aa   <- rep(0,N)          
-	  # PJ fix, modified
-	  pop_aa[N] <-  deathsAvg[N] * ((exp(eON) - (eON ^ 2) / 6)) 
-	  #pop_aa[N] <- deathsAvg[N] * exp(eON) - ((eON ^ 2) ^ (1 / 6))
-	  for(j in N:2){
-	    pop_aa[j - 1] <- pop_aa[j] * exp( AgeInt[j-1] * growth[j - 1]) + 
-	      deathsAvg[j - 1] * exp( AgeInt[j-1] / 2 * growth[j - 1])
-	  }
-	  pop_aa
-	}
-
 	codi <-
 	  codi %>% 
 	  mutate(
-	    #bd = .data$birthdays * .data$dif,
-	    pop_a = calc_pop_a(.data$deathsAvg,eON,.data$AgeInt,.data$growth,.data$dif),
-	    Cx = .data$pop_a / .data$birthdays,
-	    Cx = ifelse(is.infinite(.data$Cx),NA,.data$Cx))
+	    estNx = calc_pop_a(.data$deathsAvg,eON,.data$AgeInt,.data$growth) * .data$dif,
+	    est5Nx = calc_bdaymean(.data$estNx, .data$AgeInt),
+	    obs5Nx =  sqrt(.data$pop2 * .data$pop1) * .data$dif,
+	    Cx = .data$est5Nx / .data$obs5Nx)
+
 
 			
 	################

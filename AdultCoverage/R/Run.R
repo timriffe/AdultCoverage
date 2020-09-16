@@ -20,14 +20,23 @@ load_all()
 document()
   check()
 
+ggb(ZA,
+      deaths.summed=TRUE,
+      mig.summed =TRUE,
+      exact.ages=seq(5,80,by=5))
+  
+  
 seg(ZA,
     deaths.summed=TRUE,
     mig.summed =TRUE,
     exact.ages=seq(20,60,by=5),
     exact.ages.ggb=seq(5,80,by=5),
     delta=TRUE,
-    lm.method="tls",
+    lm.method="oldschool",
     eOpen=4.35)
+
+gg
+
 segMakeColumns(ZA,
                deaths.summed=TRUE,
                mig.summed =TRUE,
@@ -61,7 +70,7 @@ library(magrittr)
 ggb(Moz)
 seg(Moz,delta=F)
 ggbseg(Moz)
-res <- ddm(Moz)
+res <- ddm(Moz,delta=TRUE)
 
 codi <- Moz %>% ggbMakeColumns() 
 ggbcoverageFromYear(codi,lm.method = "ols")
