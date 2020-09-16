@@ -15,7 +15,8 @@ ddm(
   deaths.summed = FALSE,
   mig.summed = deaths.summed,
   lm.method = "oldschool",
-  nx.method = 2
+  nx.method = 2,
+  delta = FALSE
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ ddm(
 }}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}
+
+\item{delta}{logical. Should the delta variant of SEG be done?}
 }
 \value{
 data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}.

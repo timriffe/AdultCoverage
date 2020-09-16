@@ -651,7 +651,7 @@ ggbsegCoverageFromYear <- function(codi,
 	# Get age range using the SEG auto fitting
 
 	codi         <- ggbsegMakeColumns(
-								    codi = codiggb, 
+								    codi = codi, 
 								    minA = minA, 
 								    maxA = maxA, 	
 								    agesFit.ggb = agesFit.ggb,

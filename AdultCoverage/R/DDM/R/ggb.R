@@ -113,7 +113,7 @@ ggbcoverageFromYear <- function(codi,
 	coverage <- sqrt(k1 * k2) / coefs$b
 
 	result   <- data.frame(
-	       #id = unique(codi$id), 
+	       id = unique(codi$id), 
 			   Mxcoverage = coverage, 
 			   lower = min(agesfit), 
 			   upper = max(agesfit),

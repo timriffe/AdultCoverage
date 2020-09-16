@@ -14,6 +14,7 @@
 #' @param exact.ages.ggb optional. A user-specified vector of exact ages to use for coverage estimation in the GGB method and the GGB stage of the GGBSEG method.
 #' @param exact.ages.seg optional. A user-specified vector of exact ages to use for coverage estimation in the SEG method and the SEG stage of the GGBSEG method.
 #' @param eOpen optional. A user-specified value for remaining life-expectancy in the open age group.
+#' @param delta logical. Should the delta variant of SEG be done?
 #' @inheritParams ggb
 #' @return data.frame with columns \code{$cod}, \code{$ggb}, \code{$bh1}, \code{$bh2}, \code{$lower}, and \code{$upper}. 
 #' @references 
@@ -51,7 +52,8 @@ ddm <- function(
 		deaths.summed = FALSE,
 		mig.summed = deaths.summed,
 		lm.method = "oldschool",
-		nx.method = 2){
+		nx.method = 2,
+		delta = FALSE){
 	ggbres <- ggb(X = X, 
 					minA = minA, 
 					maxA = maxA, 
@@ -69,7 +71,7 @@ ddm <- function(
 					eOpen = eOpen,
 					nx.method = nx.method,
 					deaths.summed = deaths.summed,
-					delta = FALSE,
+					delta = delta,
 					exact.ages.ggb = exact.ages.ggb,
 					lm.method.ggb = lm.method,
 					mig.summed = mig.summed)

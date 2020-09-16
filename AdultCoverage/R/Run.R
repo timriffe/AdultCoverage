@@ -18,7 +18,7 @@ setwd("AdultCoverage/R/DDM")
 
 load_all()
 document()
-check()
+  check()
 
 seg(ZA,
     deaths.summed=TRUE,

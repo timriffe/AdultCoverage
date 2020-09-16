@@ -78,6 +78,6 @@
 #'   \item{date2}{Date class, 2007-02-15}
 #' }
 #' 
-#' @source Data from IUSSP tools for demographic estimation GGB or SEG templates. \url{http://demographicestimation.iussp.org/sites/demographicestimation.iussp.org/files/AM_GGB_South%20Africa_males_4_0.xlsx}
+#' @source Data from IUSSP tools for demographic estimation GGB or SEG templates. \href{http://demographicestimation.iussp.org/sites/demographicestimation.iussp.org/files/AM\_GGB_South%20Africa\_males\_4\_0.xlsx}
 #' 
 "ZA"
