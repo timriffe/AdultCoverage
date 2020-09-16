@@ -209,15 +209,25 @@ ggbMakeColumns <- function(codi,
             pop2cum        = lt_id_L_T(.data$pop2) ,
             deathcum       = lt_id_L_T(.data$deathsAvg),
             migcum         = lt_id_L_T(.data$migAvg),               # new
+            migcum2        = rev(cumsum(rev(.data$migAvg * .data$dif))),
             # Nx
             birthdays      = est_birthdays(pop1 = .data$pop1, pop2 = .data$pop2, 
                                            AgeInt = .data$AgeInt, nx.method = nx.method) * .data$dif,
             Tx             = sqrt(.data$pop1cum * .data$pop2cum) * .data$dif, # PYL in RD spreadsheet
             # this follows the SEG way of incorporating mig info, guarantees
-            bxp            = .data$birthdays / .data$Tx,  # from RD spreadsheet bx+
-            cumgrowth      = (.data$pop2cum - .data$pop1cum - .data$migcum) / .data$Tx,
-            rightterm      = .data$dif * .data$deathcum / .data$Tx,   # from RD spreadsheet (X)
-            leftterm       = .data$bxp - .data$cumgrowth, # from RD spreadsheet (Y)
+          
+            #cumgrowth      = (.data$pop2cum - .data$pop1cum - .data$migcum) / .data$Tx,
+            #rightterm      = .data$dif * .data$deathcum / .data$Tx,   # from RD spreadsheet (X)
+           # leftterm       = .data$bxp - .data$cumgrowth, # from RD spreadsheet (Y)
+            
+            Dxp = rev(cumsum(rev(.data$deathsAvg * .data$dif))),
+            Mxp = rev(cumsum(rev(.data$migAvg * .data$dif))),
+            PYL = .data$dif * sqrt(.data$pop1cum * .data$pop2cum),
+            Nx = c(0,sqrt(.data$pop1[-N] * .data$pop2[-1]))/.data$AgeInt * .data$dif,
+            bxp = .data$Nx / .data$PYL,
+            rxp_m_ixp = (.data$pop2cum - .data$pop1cum - .data$migcum2) / .data$PYL,
+            rightterm = .data$Dxp / .data$PYL,
+            leftterm = .data$bxp - .data$rxp_m_ixp,
             # growth         = log(.data$pop2 / .data$pop1) / .data$dif - .data$migAvg / .data$Tx / .data$dif,
             # growth         = ifelse(is.infinite(.data$growth) | is.nan(.data$growth), 0, .data$growth),
             #cumgrowth      = .data$AgeInt * c(0,cumsum(.data$growth[ -N ])) + .data$AgeInt / 2 * .data$growth,

@@ -220,8 +220,8 @@ segMakeColumns <- function(codi,
   # TR: add migration arithmetic identical to in GGB changes.
   codi <-
     codi %>% 
-    mutate(	date1          = ifelse(is.numeric(.data$date1), .data$date1, decimal_date(.data$date1)),
-            date2          = ifelse(is.numeric(.data$date2), .data$date2, decimal_date(.data$date2)),
+    mutate(	date1          = ifelse(is.numeric(.data$date1), .data$date1, decimal_date(.data$date1)+1),
+            date2          = ifelse(is.numeric(.data$date2), .data$date2, decimal_date(.data$date2)+1),
             AgeInt         = age2int(.data$age),
             dif            = .data$date2 - .data$date1,
             avg            = deaths.summed,

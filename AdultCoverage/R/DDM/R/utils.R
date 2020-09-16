@@ -190,5 +190,3 @@ est_birthdays <- function(pop1, pop2, AgeInt = NULL, nx.method = 2){
   birthdays
 }
 
-
-

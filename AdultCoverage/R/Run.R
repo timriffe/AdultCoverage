@@ -23,8 +23,11 @@ document()
 ggb(ZA,
       deaths.summed=TRUE,
       mig.summed =TRUE,
-      exact.ages=seq(5,80,by=5))
-  
+      exact.ages=seq(5,80,by=5),
+      lm.method = "oldschool")
+
+load_all()
+ggbMakeColumns(ZA) %>% View()
   
 seg(ZA,
     deaths.summed=TRUE,
