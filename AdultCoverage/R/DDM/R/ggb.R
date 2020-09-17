@@ -15,13 +15,24 @@
 #' @return the RMSE
 #' 
 #' @export 
-ggbgetRMS <- function(agesi, codi, lm.method = "oldschool"){
+ggbgetRMS <- function(agesi, codi, lm.method = "oldschool", opt.method = "RMS"){
 
 	codi <- ggbFittedFromAges(codi, agesfit = agesi, lm.method = lm.method) %>% 
 	  filter(.data$age %in% agesi)
 
-	sqrt(mean((codi$leftterm - codi$fitted)^2) )
-
+	if (opt.method == "RMS"){
+	  out <- sqrt(mean((codi$leftterm - codi$fitted)^2) )
+	}
+	if (opt.method == "logRMS"){
+	  out <- sqrt(mean((log(codi$leftterm) - log(codi$fitted))^2) )
+	}
+	if (opt.method == "ORSS"){
+	  out <- prcomp(cbind(codi$fitted,codi$leftterm))$sdev[1]
+	}
+	if (opt.method == "ORSS"){
+	  out <- prcomp(cbind(log(codi$fitted),log(codi$leftterm)))$sdev[1]
+	}
+  out
 }
 
 
