@@ -29,7 +29,7 @@ ggbgetRMS <- function(agesi, codi, lm.method = "oldschool", opt.method = "RMS"){
 	if (opt.method == "ORSS"){
 	  out <- prcomp(cbind(codi$fitted,codi$leftterm))$sdev[1]
 	}
-	if (opt.method == "ORSS"){
+	if (opt.method == "logORSS"){
 	  out <- prcomp(cbind(log(codi$fitted),log(codi$leftterm)))$sdev[1]
 	}
   out
@@ -277,7 +277,8 @@ ggbgetAgesFit <- function(codi,
                           minA = 15, 
                           maxA = 75, 
                           minAges = 8,
-                          lm.method = "oldschool"){
+                          lm.method = "oldschool",
+                          opt.method = "RMS"){
 	
 	maxAges   <- sum(codi$keep)
 	agesUniv  <- codi$age[codi$keep]
@@ -298,7 +299,11 @@ ggbgetAgesFit <- function(codi,
 	# these are the ages that give the best r2 or RMS
 	# this would be much better using pipes, but hey, one less dependency...
 	
-	RMSE        <- lapply(agesL, ggbgetRMS, codi = codi, lm.method = lm.method) %>% unlist()
+	RMSE        <- lapply(agesL, 
+	                      ggbgetRMS, 
+	                      codi = codi, 
+	                      lm.method = lm.method,
+	                      opt.method = opt.method) %>% unlist()
 	minRMSE     <- which.min(RMSE)
 	agesfit     <- agesL[[minRMSE]]
 	
