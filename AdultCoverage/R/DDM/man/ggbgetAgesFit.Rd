@@ -4,10 +4,17 @@
 \alias{ggbgetAgesFit}
 \title{determine the age range that minimizes the mean squared error}
 \usage{
-ggbgetAgesFit(codi, minA = 15, maxA = 75, minAges = 8, lm.method = "oldschool")
+ggbgetAgesFit(
+  codi,
+  minA = 15,
+  maxA = 75,
+  minAges = 8,
+  lm.method = "oldschool",
+  opt.method = "RMS"
+)
 }
 \arguments{
-\item{codi}{\code{data.frame} as produced by \code{ggbMakeColumns()}}
+\item{codi}{\code{data.frame} as returbed by \code{ggbMakeColumns()}}
 
 \item{minA}{the lowest age to be included in search}
 
@@ -21,6 +28,8 @@ ggbgetAgesFit(codi, minA = 15, maxA = 75, minAges = 8, lm.method = "oldschool")
 \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
 }
 \value{
 a vector of ages that minimizes the RMSE

@@ -4,12 +4,12 @@
 \alias{ggbgetRMS}
 \title{calculate the root means square of the error to help find optimal age range}
 \usage{
-ggbgetRMS(agesi, codi, lm.method = "oldschool")
+ggbgetRMS(agesi, codi, lm.method = "oldschool", opt.method = "RMS")
 }
 \arguments{
-\item{agesi}{the set of ages used for this iteration}
+\item{agesi}{the vector of ages used for this iteration}
 
-\item{codi}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, and \code{$age}.}
+\item{codi}{\code{data.frame} as returned by \code{ggbMakeColumns()}}
 
 \item{lm.method}{character, one of:\itemize{
 \item{\code{"oldschool"}} default sd ratio operation of still unknown origin
@@ -17,10 +17,15 @@ ggbgetRMS(agesi, codi, lm.method = "oldschool")
 \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{opt.method}{What should we try to minimize when picking age trims? Current options are \code{"RMS"}, \code{"logRMS"}, \code{"ORSS"}, and \code{"logORSS"}. See details}
 }
 \value{
 the RMSE
 }
 \description{
-Called by \code{ggbgetAgesFit()} whenever the user does not want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to \code{ggbcoverageFromYear()} where \code{ggbgetRMS} is called and add another condition or make it call something else.
+Called by \code{ggbgetAgesFit()} whenever the user does not want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to\code{ggbcoverageFromYear()}where \code{ggbgetRMS} is called and add another condition or make it call something else.
+}
+\details{
+Given a vector of ages and a line fitting method, we take one of several potential residuals
 }

@@ -7,7 +7,7 @@
 seggetAgesFit(codi, minA = 15, maxA = 75, minAges = 8)
 }
 \arguments{
-\item{codi}{\code{data.frame} as produced by \code{ggbMakeColumns()}}
+\item{codi}{\code{data.frame} as returbed by \code{ggbMakeColumns()}}
 
 \item{minA}{the lowest age to be included in search}
 

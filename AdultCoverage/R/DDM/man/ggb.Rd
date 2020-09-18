@@ -11,13 +11,14 @@ ggb(
   minAges = 8,
   exact.ages = NULL,
   lm.method = "oldschool",
+  opt.method = "RMS",
   nx.method = 2,
   deaths.summed = FALSE,
   mig.summed = deaths.summed
 )
 }
 \arguments{
-\item{X}{\code{data.frame} with columns, \code{$pop1}, \code{$pop2}, \code{$deaths}, \code{$date1}, \code{$date2}, \code{$age}, and \code{$id} (if there are more than 1 region/sex/intercensal period).}
+\item{X}{\code{data.frame} with columns, \code{pop1}, \code{pop2}, \code{deaths}, \code{mig} (optional), \code{date1}, \code{date2}, \code{age}, and \code{id} (if there are more than 1 region/sex/intercensal period).}
 
 \item{minA}{the lowest age to be included in search}
 
@@ -33,6 +34,8 @@ ggb(
 \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}
 

@@ -102,6 +102,15 @@ dep <- envirDependencies("package:DDM")
 
 # visualization
 plot(dep)
+
+
+
+
+
+
+
+
+
 minA = 15 
 maxA = 75 
 minAges = 8 
