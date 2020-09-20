@@ -13,33 +13,49 @@
 #' @param agesi the vector of ages used for this iteration
 #' @param codi `data.frame` as returned by `ggbMakeColumns()`
 #' @param opt.method What should we try to minimize when picking age trims? Current options are `"RMS"`, `"logRMS"`, `"ORSS"`, and `"logORSS"`. See details
+#' @param scale scale factor for the objective
 #' @inheritParams slopeint
 #' 
 #' @return the RMSE
 #' 
 #' @importFrom stats prcomp
 #' @export 
-ggbgetRMS <- function(agesi, codi, lm.method = "oldschool", opt.method = "RMS"){
+ggbgetRMS <- function(agesi, 
+                      codi, 
+                      lm.method = "oldschool", 
+                      opt.method = "RMS",
+                      scale = 1){
 
   opt.method <-
     match.arg(opt.method,
-              choices = c("RMS","logRMS","ORSS","logORSS"))
-	codi <- ggbFittedFromAges(codi, agesfit = agesi, lm.method = lm.method) %>% 
+              choices = c("RMS","ORSS","r2"))
+	codi <- ggbFittedFromAges(codi, 
+	                          agesfit = agesi, 
+	                          lm.method = lm.method) %>% 
 	  filter(.data$age %in% agesi)
 
 	if (opt.method == "RMS"){
-	  out <- sqrt(mean((codi$leftterm - codi$fitted)^2) )
+	  out <- sqrt(mean((codi$leftterm - codi$fitted)^2) ) * scale
 	}
-	if (opt.method == "logRMS"){
-	  out <- sqrt(mean((log(codi$leftterm) - log(codi$fitted))^2) )
-	}
+	# if (opt.method == "logRMS"){
+	#   #out <- sqrt(mean((log(codi$leftterm) - log(codi$fitted))^2) )
+	#   out <- var(expit(codi$leftterm) - expit(codi$fitted)) / length(agesi)
+	# }
 	if (opt.method == "ORSS"){
-	  out <- prcomp(cbind(codi$fitted,codi$leftterm))$sdev[1]
+	  out <- prcomp(cbind(codi$fitted,codi$leftterm))$sdev[1] * scale
 	}
-	if (opt.method == "logORSS"){
-	  out <- prcomp(cbind(log(codi$fitted),log(codi$leftterm)))$sdev[1]
+	# if (opt.method == "logORSS"){
+	#   out <- prcomp(cbind(log(codi$fitted),log(codi$leftterm)))$sdev[1]
+	# }
+	if (opt.method == "r2"){
+	  out <- lm(codi$fitted~codi$leftterm) %>% 
+	    summary() %>% 
+	    '[['("r.squared") %>% 
+	    
+	    '*'(-scale)
 	}
-  out
+	
+  out 
 }
 
 
@@ -64,6 +80,7 @@ ggbcoverageFromYear <- function(codi,
 								mig.summed = deaths.summed,
 								lm.method = "oldschool",
 								opt.method = "RMS",
+								scale = 1,
 								nx.method = 2
 								){
 	
@@ -100,7 +117,8 @@ ggbcoverageFromYear <- function(codi,
 								 maxA = maxA, 
 								 minAges = minAges,
 								 lm.method = lm.method,
-								 opt.method = opt.method)
+								 opt.method = opt.method,
+								 scale = scale)
 		agesfit <- fit.res$agesfit
 	}
 	
@@ -133,6 +151,10 @@ ggbcoverageFromYear <- function(codi,
 #	a        <- log(delta) / dif
 	coverage <- sqrt(k1 * k2) / coefs$b
 
+	rsq <- ggbgetRMS(agesi = agesfit,
+	                 codi = codi,
+	                 lm.method = lm.method,
+	                 opt.method = "r2")
 	result   <- data.frame(
 	       id = unique(codi$id), 
 			   Mxcoverage = coverage, 
@@ -148,10 +170,10 @@ ggbcoverageFromYear <- function(codi,
 			   t2 = codi$date2[2],
 			   t = dif,
 			   lm.method = lm.method,
-			   nx.method = nx.method)
-	if (is.null(exact.ages)){
-	  result$RMSE = fit.res$RMSE
-	}
+			   nx.method = nx.method,
+			   opt.method = opt.method,
+			   r2 = -rsq)
+
 	# TR: Add r2 and RMSE to output
    
 	result
@@ -266,11 +288,12 @@ ggbMakeColumns <- function(codi,
 #' @export
 
 ggbgetAgesFit <- function(codi, 
-                          minA = 15, 
+                          minA = 5, 
                           maxA = 75, 
                           minAges = 8,
-                          lm.method = "oldschool",
-                          opt.method = "RMS"){
+                          lm.method = "tukey",
+                          opt.method = "r2",
+                          scale = 1){
 	
 	maxAges   <- sum(codi$keep)
 	agesUniv  <- codi$age[codi$keep]
@@ -290,17 +313,36 @@ ggbgetAgesFit <- function(codi,
 	
 	# these are the ages that give the best r2 or RMS
 	# this would be much better using pipes, but hey, one less dependency...
-	
+	if (opt.method == "hybrid"){
+	  hyb <- TRUE
+	  opt.method <- "RMS"
+	} else {
+	  hyb <- FALSE
+	}
 	RMSE        <- lapply(agesL, 
 	                      ggbgetRMS, 
 	                      codi = codi, 
 	                      lm.method = lm.method,
-	                      opt.method = opt.method) %>% unlist()
+	                      opt.method = opt.method,
+	                      scale = scale) %>% unlist()
 	minRMSE     <- which.min(RMSE)
 	agesfit     <- agesL[[minRMSE]]
 	
+	if (hyb){
+	  opt.method <- "ORSS"
+	  RMSE        <- lapply(agesL, 
+	                        ggbgetRMS, 
+	                        codi = codi, 
+	                        lm.method = lm.method,
+	                        opt.method = opt.method,
+	                        scale = scale) %>% unlist()
+	  minRMSE     <- which.min(RMSE)
+	  agesfit2     <- agesL[[minRMSE]]
+	  agesfit <- c(agesfit,agesfit2) %>% unique() %>% sort()
+	}
+
 	# PG: also return RMSE?
-	list(agesfit = agesfit, RMSE = RMSE[minRMSE])
+	list(agesfit = agesfit)
 }
 
 
@@ -320,6 +362,7 @@ ggbgetAgesFit <- function(codi,
 #' @param deaths.summed logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume `FALSE`, i.e. that the average annual was given.
 #' @param mig.summed logical. Is the (optional) net migration column `mig` given as the total per age in the intercensal period (`TRUE`). By default we assume `FALSE`, i.e. that the average annual was given.
 #' @param opt.method what kind of residual do we minimize? choices `"RMS"`,`"logRMS"`, `"ORSS"`, `"logORSS"` (experimental)
+#' @param scale multiplicative scale factor for the minimized residual
 #' @inheritParams slopeint
 
 #' @return a \code{data.frame} with columns for: \itemize{
@@ -338,7 +381,7 @@ ggbgetAgesFit <- function(codi,
 #'   \item{t} intercensal interval (\code{t2 - t1})
 #'   \item{lm.method} line fitting method used
 #'   \item{nx.method} birthday (Nx) approximation used (2 or 4 points)
-#'   \item{RMSE} the root mean square error of the optimized ages used for fitting (only if ages were automatically selected)
+#'   \item{r2} the r2 of the optimized ages used for fitting (only if ages were automatically selected)
 #' }
 #' @export
 #' @references 
@@ -362,8 +405,9 @@ ggb <- function(
 		maxA = 75, 
 		minAges = 8, 
 		exact.ages = NULL, 
-		lm.method = "oldschool",
-		opt.method = "RMS",
+		lm.method = "tukey",
+		opt.method = "r2",
+		scale = 1,
 		nx.method = 2,
 		deaths.summed = FALSE,
 		mig.summed = deaths.summed){         
@@ -385,7 +429,8 @@ ggb <- function(
 						  mig.summed = mig.summed,
 						  lm.method = lm.method,
 						  nx.method = nx.method,
-						  opt.method = opt.method
+						  opt.method = opt.method,
+						  scale = scale
 					)))
 	
 	# this has cod as a column, but no year, sex. 
