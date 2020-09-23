@@ -14,6 +14,16 @@
 #' 
 #' @examples 
 #' \dontrun{
+#' ZAmx_r2 <-
+#' ggbAgeTrimSensitivity(ZA,
+#'                       maxA=80,
+#'                       deaths.summed = TRUE,
+#'                       type = "resid")
+#' ZAmx_coverage <-
+#'   ggbAgeTrimSensitivity(ZA,
+#'                         maxA=80,
+#'                         deaths.summed = TRUE,
+#'                         type = "Mxcoverage")
 #' }
 ggbAgeTrimSensitivity <-
   function(X, 
