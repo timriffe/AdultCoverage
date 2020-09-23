@@ -323,74 +323,12 @@ BrasilMales %>%
   geom_line()
 
 
-ggbSensitivityPlot <-
-  function(X, 
-           minA =5, 
-           MaxA = 75,
-           minAges = 8,
-           deaths.summed = FALSE,
-           mig.summed = deaths.summed,
-           lm.method = "tukey", 
-           nx.method = 2,
-           type = "Mxcoverage"){
-    
-    codi <- X %>% 
-      ggbMakeColumns(minA = minA,
-                     maxA = maxA,
-                     deaths.summed = deaths.summed,
-                     mig.summed = mig.summed,
-                     nx.method = nx.method)
-    maxAges   <- sum(codi$keep)
-    agesUniv  <- codi$age[codi$keep]
-    
-    FirstAges <- agesUniv[agesUniv < 30]
-    
-    
-    # Create list of all possible age trims
-    ind       <- 0
-    agesL     <- list()
-    # determine ages to test
-    for (Nr in maxAges:minAges){ #
-      its <- length(agesUniv) - Nr + 1
-      for (set in 1:its){ # 
-        ind <- ind + 1
-        agesL[[ind]] <- agesUniv[set:(set+Nr-1)]
-      }
-    }
-    
-    # some reference containers
-    res   <- rep(NA,length(agesL))
-    mat   <- lapply(agesL,range) %>% do.call("rbind",.)
-    mat   <- mat %>% 
-             as_tibble() %>% 
-             mutate(value = NA,
-                    optimum = FALSE)
-    
-    for (i in 1:length(res)){
-      #scl<- sqrt(diff(range(agesL[[i]])))
-      fc          <- as.character(min(agesL[[i]]))
-      tc          <- as.character(max(agesL[[i]]))
-      
-      mn <- ggb(ZA,
-                exact.ages = agesL[[i]],
-                deaths.summed =  deaths.summed,
-                mig.summed = mig.summed,
-                lm.method = lm.method,
-                nx.method = nx.method)
-      
-      if (type == "Mxcoverage"){
-        MAT[fc,tc]  <- mn$Mxcoverage
-      }
-      if (type == "resid"){
-        MAT[fc,tc]  <-
-          ggbgetRMS(agesL[[i]],
-                    codi,
-                    lm.method = lm.method,
-                    opt.method = opt.method,
-                    scale = 1)
-      }
-    }
-    
-     
-  }
 
+ZAmx_sen <-
+  ggbAgeTrimSensitivity(ZA,
+                        maxA=80,
+                        deaths.summed = TRUE,
+                        type = "resid")
+
+
+ggbAgeTrimSensitivity(ZA,deaths.summed=TRUE,maxA=80,type="Mxcoverage")

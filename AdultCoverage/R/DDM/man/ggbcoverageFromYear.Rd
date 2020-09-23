@@ -14,6 +14,7 @@ ggbcoverageFromYear(
   mig.summed = deaths.summed,
   lm.method = "oldschool",
   opt.method = "RMS",
+  scale = 1,
   nx.method = 2
 )
 }
@@ -40,6 +41,8 @@ ggbcoverageFromYear(
 }}
 
 \item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
+
+\item{scale}{multiplicative scale factor for the minimized residual}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}
 }

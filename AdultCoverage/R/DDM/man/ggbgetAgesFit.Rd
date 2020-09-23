@@ -6,11 +6,12 @@
 \usage{
 ggbgetAgesFit(
   codi,
-  minA = 15,
+  minA = 5,
   maxA = 75,
   minAges = 8,
-  lm.method = "oldschool",
-  opt.method = "RMS"
+  lm.method = "tukey",
+  opt.method = "r2",
+  scale = 1
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ ggbgetAgesFit(
 }}
 
 \item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
+
+\item{scale}{multiplicative scale factor for the minimized residual}
 }
 \value{
 a vector of ages that minimizes the RMSE

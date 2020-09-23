@@ -10,8 +10,9 @@ ggb(
   maxA = 75,
   minAges = 8,
   exact.ages = NULL,
-  lm.method = "oldschool",
-  opt.method = "RMS",
+  lm.method = "tukey",
+  opt.method = "r2",
+  scale = 1,
   nx.method = 2,
   deaths.summed = FALSE,
   mig.summed = deaths.summed
@@ -37,6 +38,8 @@ ggb(
 
 \item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
 
+\item{scale}{multiplicative scale factor for the minimized residual}
+
 \item{nx.method}{either 2 or 4. 4 is smoother.}
 
 \item{deaths.summed}{logical. is the deaths column given as the total per age in the intercensal period (\code{TRUE}). By default we assume \code{FALSE}, i.e. that the average annual was given.}
@@ -60,7 +63,7 @@ a \code{data.frame} with columns for: \itemize{
 \item{t} intercensal interval (\code{t2 - t1})
 \item{lm.method} line fitting method used
 \item{nx.method} birthday (Nx) approximation used (2 or 4 points)
-\item{RMSE} the root mean square error of the optimized ages used for fitting (only if ages were automatically selected)
+\item{r2} the r2 of the optimized ages used for fitting (only if ages were automatically selected)
 }
 }
 \description{

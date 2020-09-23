@@ -4,7 +4,7 @@
 \alias{ggbgetRMS}
 \title{calculate the root means square of the error to help find optimal age range}
 \usage{
-ggbgetRMS(agesi, codi, lm.method = "oldschool", opt.method = "RMS")
+ggbgetRMS(agesi, codi, lm.method = "oldschool", opt.method = "RMS", scale = 1)
 }
 \arguments{
 \item{agesi}{the vector of ages used for this iteration}
@@ -19,6 +19,8 @@ ggbgetRMS(agesi, codi, lm.method = "oldschool", opt.method = "RMS")
 }}
 
 \item{opt.method}{What should we try to minimize when picking age trims? Current options are \code{"RMS"}, \code{"logRMS"}, \code{"ORSS"}, and \code{"logORSS"}. See details}
+
+\item{scale}{scale factor for the objective}
 }
 \value{
 the RMSE
