@@ -64,7 +64,7 @@ ggbAgeTrimSensitivity <-
     
     # some reference containers
     res   <- rep(NA,length(agesL))
-    mat   <- lapply(agesL,range) %>% do.call("rbind",.)
+    mat   <- do.call("rbind",lapply(agesL,range))
     colnames(mat) <- c("from","to")
     mat   <- mat %>% 
       as_tibble() %>% 
@@ -72,7 +72,7 @@ ggbAgeTrimSensitivity <-
              optimum = FALSE)
     res <- rep(NA,nrow(mat))
     for (i in 1:length(res)){
-      mn <- ggb(ZA,
+      mn <- ggb(codi,
                 exact.ages = agesL[[i]],
                 deaths.summed =  deaths.summed,
                 mig.summed = mig.summed,
@@ -92,7 +92,7 @@ ggbAgeTrimSensitivity <-
       }
     }
     
-    mn <- ggb(ZA,
+    mn <- ggb(codi,
               minA = minA,
               maxA = maxA,
               minAges = minAges,
@@ -105,20 +105,20 @@ ggbAgeTrimSensitivity <-
     sen <-
       mat %>% 
       mutate(value = res,
-             optimum = ifelse((from == mn[["lower"]] & to == mn[["upper"]]),TRUE,FALSE) )
+             optimum = ifelse((.data$from == mn[["lower"]] & .data$to == mn[["upper"]]),TRUE,FALSE) )
     opt <- sen %>% 
-      filter(optimum)
+      filter(.data$optimum)
     
     
     if (plot){
       if (type == "Mxcoverage"){
         plotit <-
           sen %>% 
-          ggplot(aes(x=from,y=to,fill=value)) + 
+          ggplot(aes_string(x="from",y="to",fill="value")) + 
           geom_tile()+
           scale_fill_continuous_diverging("Blue-Red3",
                                           trans ="log") +
-          geom_point(opt,mapping=aes(x=from,y=to),
+          geom_point(opt,mapping=aes_string(x="from",y="to"),
                      size = 3,
                      fill="black",
                      color='white',
@@ -130,10 +130,11 @@ ggbAgeTrimSensitivity <-
       if (type == "resid"){
         plotit <- 
           sen %>% 
-          ggplot(aes(x=from,y=to,fill=-value)) + 
+          mutate(value = -.data$value) %>% 
+          ggplot(aes_string(x="from",y="to",fill="value")) + 
           geom_tile()+
           scale_fill_continuous_sequential("Burg")+
-          geom_point(opt,mapping=aes(x=from,y=to),
+          geom_point(opt,mapping=aes_string(x="from",y="to"),
                      size = 3,
                      fill="black",
                      color='white',
