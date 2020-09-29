@@ -15,7 +15,8 @@ ggbsegCoverageFromYear(
   deaths.summed = FALSE,
   mig.summed = deaths.summed,
   lm.method = "oldschool",
-  nx.method = 2
+  nx.method = 2,
+  opt.method = "r2"
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ ggbsegCoverageFromYear(
 }}
 
 \item{nx.method}{integer. either 2 or 4. 4 is smoother.}
+
+\item{opt.method}{What should we try to minimize when picking ggb age trims? Current options are \code{"RMSE"}, \code{"ORSS"}, \code{"MAE"}, \code{"MAPE"}, or \code{"r2"}. Default \code{"r2"}.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.

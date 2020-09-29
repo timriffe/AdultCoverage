@@ -84,7 +84,7 @@ ggbAgeTrimSensitivity <-
       }
       if (type == "resid"){
         res[i]  <- 
-          ggbgetRMS(agesL[[i]],
+          ggbgetResidual(agesL[[i]],
                     codi,
                     lm.method = lm.method,
                     opt.method = opt.method,
@@ -311,6 +311,7 @@ ggbChooseAges <- function(
   deaths.summed = FALSE,
   mig.summed = deaths.summed,
   lm.method = "oldschool",
+  opt.method = "r2",
   nx.method = 2){
   # this is the automatic age selection.
   
@@ -353,7 +354,8 @@ ggbChooseAges <- function(
                              minA = minA, 
                              maxA = maxA, 
                              minAges = minAges,
-                             lm.method = lm.method)
+                             lm.method = lm.method,
+                             opt.method = opt.method)
     agesfit <- fit.res$agesfit
   }
   
@@ -370,7 +372,8 @@ ggbChooseAges <- function(
                                   deaths.summed = deaths.summed,
                                   mig.summed = mig.summed,
                                   lm.method = lm.method,
-                                  nx.method = nx.method)
+                                  nx.method = nx.method,
+                                  opt.method = opt.method)
   
   
   age      <- codi$age
@@ -427,7 +430,8 @@ ggbChooseAges <- function(
                                       deaths.summed = deaths.summed,
                                       mig.summed = mig.summed,
                                       lm.method = lm.method,
-                                      nx.method = nx.method)
+                                      nx.method = nx.method,
+                                      opt.method = opt.method)
       
       # redraw plot
       plot(rightt, 
@@ -464,7 +468,8 @@ ggbChooseAges <- function(
              lm.method = lm.method,
              nx.method =  nx.method,
              deaths.summed = deaths.summed,
-             mig.summed = deaths.summed)
+             mig.summed = deaths.summed,
+             opt.method = opt.method)
   out
 }
 

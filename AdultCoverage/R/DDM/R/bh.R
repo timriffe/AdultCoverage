@@ -163,6 +163,7 @@ segMakeColumns <- function(codi,
                            delta = FALSE,
                            exact.ages.ggb = NULL,
                            lm.method = "oldschool",
+                           opt.method  = "r2",
                            minAges.ggb = 8){
   
   calc_bdaymean <- function(birthdays, AgeInt){
@@ -198,6 +199,7 @@ segMakeColumns <- function(codi,
                    lm.method = lm.method,
                    deaths.summed = deaths.summed,
                    mig.summed = mig.summed,
+                   opt.method = opt.method,
                    minAges = minAges.ggb)
     del <- ggb.res$a
   } else {
@@ -291,7 +293,8 @@ segCoverageFromYear <-  function(
 								 # New args to support delta method.
 								 delta = FALSE,
 								 exact.ages.ggb = NULL,
-								 lm.method = "oldschool"){       
+								 lm.method = "oldschool",
+								 opt.method = "r2"){       
   
   
 	# if exact.ages is given, we override other age-parameters
@@ -319,6 +322,7 @@ segCoverageFromYear <-  function(
 								delta = delta,
 								exact.ages.ggb = exact.ages.ggb,
 								lm.method = lm.method,
+								opt.method = opt.method,
 								minAges.ggb = minAges)
 	
 	# TR: 09.09.2020 switched order, for whatever reason agesFit was
@@ -397,7 +401,8 @@ seg <- function(X,
 				mig.summed = deaths.summed,
 				delta = FALSE,
 				exact.ages.ggb = NULL,
-				lm.method = "oldschool"){
+				lm.method = "oldschool",
+				opt.method = "r2"){
 	
 	tab1        <- headerPrep(X)
 	coverages <- as.data.frame(
@@ -418,7 +423,8 @@ seg <- function(X,
 										mig.summed = mig.summed,
 										delta = delta,
 										exact.ages.ggb = exact.ages.ggb,
-										lm.method = lm.method
+										lm.method = lm.method,
+										opt.method = 	opt.method
 										)$coverages	
 							}
             )))
@@ -613,7 +619,8 @@ ggbsegCoverageFromYear <- function(codi,
 								deaths.summed = FALSE,
 								mig.summed = deaths.summed,
 								lm.method = "oldschool",
-								nx.method = 2){
+								nx.method = 2,
+								opt.method = "r2"){
 	
 	# Get age range using the GGB auto fitting
 	if (is.null(exact.ages.ggb)){
@@ -628,7 +635,8 @@ ggbsegCoverageFromYear <- function(codi,
 								    minA = minA, 
 							    	maxA = maxA, 
 								    minAges = minAges,
-								    lm.method = lm.method)
+								    lm.method = lm.method,
+								    opt.method =opt.method )
 		agesFit.ggb <- fit.res.ggb$agesfit
 	} else {
 		agesFit.ggb <- 	exact.ages.ggb
@@ -643,7 +651,6 @@ ggbsegCoverageFromYear <- function(codi,
 								    eOpen = eOpen,
 								    deaths.summed = deaths.summed,
 								    mig.summed = mig.summed,
-								    lm.method = lm.method,
 								    nx.method = nx.method)
 
 	# TR: this moved to after column creation.
@@ -705,6 +712,7 @@ ggbsegCoverageFromYear <- function(codi,
 #'   \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 #' }
 #' @param nx.method integer. either 2 or 4. 4 is smoother.
+#' @param opt.method What should we try to minimize when picking ggb age trims? Current options are `"RMSE"`, `"ORSS"`, `"MAE"`, `"MAPE"`, or `"r2"`. Default `"r2"`.
 #' 
 #' @return a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$id} variable.
 #' 
@@ -735,7 +743,8 @@ ggbseg <- function(X,
 				deaths.summed = FALSE,
 				mig.summed = deaths.summed,
 				nx.method = 2,
-				lm.method = "oldschool"){
+				lm.method = "oldschool",
+				opt.method = "r2"){
 	# TR: modularized Apr 2, 2017
     tab1        <- headerPrep(X)
 	
@@ -754,7 +763,8 @@ ggbseg <- function(X,
 						deaths.summed = deaths.summed,
 						mig.summed = mig.summed,
 						lm.method = lm.method,
-						nx.method = nx.method
+						nx.method = nx.method,
+						opt.method = opt.method
                   )))
 	coverages
 }

@@ -57,6 +57,7 @@ ddm <- function(
 		deaths.summed = FALSE,
 		mig.summed = deaths.summed,
 		lm.method = "oldschool",
+		opt.method = "r2",
 		nx.method = 2,
 		delta = FALSE){
 	ggbres <- ggb(X = X, 
@@ -67,7 +68,8 @@ ddm <- function(
 					deaths.summed = deaths.summed,
 					mig.summed = mig.summed,
 					lm.method = lm.method,
-					nx.method = nx.method)
+					nx.method = nx.method,
+					opt.method = opt.method)
 	segres <- seg(X = X, 
 					minA = minA, 
 					maxA = maxA, 
@@ -79,9 +81,10 @@ ddm <- function(
 					delta = delta,
 					exact.ages.ggb = exact.ages.ggb,
 					lm.method = lm.method,
-					mig.summed = mig.summed)
+					mig.summed = mig.summed,
+					opt.method = opt.method)
 	ggbsegres <- ggbseg(
-			        X = X, 
+			    X = X, 
 					minA = minA, 
 					maxA = maxA, 
 					minAges = minAges, 
@@ -91,7 +94,8 @@ ddm <- function(
 					deaths.summed = deaths.summed,
 					mig.summed = mig.summed,
 					lm.method = lm.method,
-					nx.method = nx.method)
+					nx.method = nx.method,
+					opt.method = opt.method)
 	# return all results
 	results <- data.frame(	
 			        id = ggbres$id,

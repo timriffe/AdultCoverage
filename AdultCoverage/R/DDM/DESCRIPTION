@@ -1,8 +1,8 @@
 Package: DDM
 Type: Package
 Title: Death Registration Coverage Estimation
-Version: 1.3-18
-Date: 2020-09-28
+Version: 1.3-19
+Date: 2020-09-29
 Authors@R: c(
    person("Tim", "Riffe", role = c("aut", "cre"), 
           email = "tim.riffe@gmail.com", comment = c(ORCID = "0000-0002-2673-4622")),
@@ -11,7 +11,7 @@ Authors@R: c(
    person("Peter", "Johnson", role = "ctb"),
    person("Rafaella", "Canevali", role = "ctb"))
 Maintainer: Tim Riffe <riffe@demogr.mpg.de>
-Description: A set of four two-census methods to the estimate the degree of death registration coverage for a population. Implemented methods include the Generalized Growth Balance method (GGB), the Synthetic Extinct Generation method (SEG) (including the R. Dorrington's delta method), and a hybrid of the two, GGB-SEG. Each method offers automatic estimation, but users may also specify exact parameters or use a graphical interface to guess parameters in the traditional way if desired.
+Description: A set of four two-census methods to the estimate the degree of death registration coverage for a population. Implemented methods include the Generalized Growth Balance method (GGB), the Synthetic Extinct Generation method (SEG) (including the R. Dorrington's delta method), and a hybrid of the two, GGB-SEG. Each method offers automatic estimation of age trims, but users may also specify exact parameters or use a graphical interface to guess parameters in the traditional way if desired.
 Depends:
     R (>= 2.15)
 Imports:

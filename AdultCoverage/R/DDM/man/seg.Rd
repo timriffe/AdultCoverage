@@ -16,7 +16,8 @@ seg(
   mig.summed = deaths.summed,
   delta = FALSE,
   exact.ages.ggb = NULL,
-  lm.method = "oldschool"
+  lm.method = "oldschool",
+  opt.method = "r2"
 )
 }
 \arguments{
@@ -48,6 +49,8 @@ seg(
 \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$id} variable. \code{$l25} (\code{$u25}) give the mean of the lower (upper) quartile of the distribution of age-specific coverage estimates.

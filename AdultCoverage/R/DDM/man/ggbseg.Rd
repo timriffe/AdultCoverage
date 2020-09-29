@@ -15,7 +15,8 @@ ggbseg(
   deaths.summed = FALSE,
   mig.summed = deaths.summed,
   nx.method = 2,
-  lm.method = "oldschool"
+  lm.method = "oldschool",
+  opt.method = "r2"
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ ggbseg(
 \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{opt.method}{What should we try to minimize when picking ggb age trims? Current options are \code{"RMSE"}, \code{"ORSS"}, \code{"MAE"}, \code{"MAPE"}, or \code{"r2"}. Default \code{"r2"}.}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient \code{$coverage}, and the minimum \code{$lower} and maximum \code{$upper} of the age range on which it is based. Rows indicate data partitions, as indicated by the optional \code{$id} variable.

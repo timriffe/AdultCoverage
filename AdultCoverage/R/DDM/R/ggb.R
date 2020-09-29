@@ -6,13 +6,13 @@
 
 #' @title calculate the root means square of the error to help find optimal age range
 #' 
-#' @description Called by `ggbgetAgesFit()` whenever the user does not want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to` ggbcoverageFromYear() `where `ggbgetRMS` is called and add another condition or make it call something else.
+#' @description Called by `ggbgetAgesFit()` whenever the user does not want to manually determine the age range used to determine registration coverage. Probably no need to be called by top-level users. If a user would rather determine the optimal age range some other way, then look to` ggbcoverageFromYear() `where `ggbgetResidual` is called and add another condition or make it call something else.
 #' 
-#' @details Given a vector of ages and a line fitting method, we take one of several potential residuals 
+#' @details Given a vector of ages and a line fitting method, we take one of several potential residuals. RMSE is the root of the mean squared error, MAE is the mean absolute error, MAPE is the mean absolute proportional error, ORSS is the standard deviation of the orthogonal residuals, and r2 is the r2 of an OLS fit.
 #' 
 #' @param agesi the vector of ages used for this iteration
 #' @param codi `data.frame` as returned by `ggbMakeColumns()`
-#' @param opt.method What should we try to minimize when picking age trims? Current options are `"RMS"`, `"logRMS"`, `"ORSS"`, and `"logORSS"`. See details
+#' @param opt.method What should we try to minimize when picking age trims? Current options are `"RMSE"`, `"ORSS"`, `"MAE"`, `"MAPE"`, or `"r2"`. Default `"r2"`.
 #' @param scale scale factor for the objective
 #' @inheritParams slopeint
 #' 
@@ -20,23 +20,20 @@
 #' 
 #' @importFrom stats prcomp
 #' @export 
-ggbgetRMS <- function(agesi, 
+ggbgetResidual <- function(agesi, 
                       codi, 
                       lm.method = "oldschool", 
-                      opt.method = "RMS",
+                      opt.method = "RMSE",
                       scale = 1){
 
   opt.method <-
     match.arg(opt.method,
-              choices = c("RMS","ORSS","r2"))
+              choices = c("RMSE","ORSS","r2","MAE","MAPE"))
 	codi <- ggbFittedFromAges(codi, 
 	                          agesfit = agesi, 
 	                          lm.method = lm.method) %>% 
 	  filter(.data$age %in% agesi)
 
-	if (opt.method == "RMS"){
-	  out <- sqrt(mean((codi$leftterm - codi$fitted)^2) ) * scale
-	}
 	# if (opt.method == "logRMS"){
 	#   #out <- sqrt(mean((log(codi$leftterm) - log(codi$fitted))^2) )
 	#   out <- var(expit(codi$leftterm) - expit(codi$fitted)) / length(agesi)
@@ -53,6 +50,22 @@ ggbgetRMS <- function(agesi,
 	    '[['("r.squared") %>% 
 	    
 	    '*'(-scale)
+	}
+	
+	if (opt.method == "RMSE"){
+	  out <- sqrt(mean((codi$leftterm - codi$fitted)^2) ) * scale
+	}
+	if (opt.method %in% c("RMSE","MAE","MAPE")){
+	  resids <- codi$leftterm - codi$fitted
+	  if (opt.method == "RMSE"){
+	    out <- sqrt(mean(resids^2) ) * scale
+	  }
+	  if (opt.method == "MAE"){
+	    out <- mean(abs(resids))
+	  }
+	  if (opt.method == "MAPE"){
+	    out <- mean(abs(resids / codi$leftterm))
+	  }
 	}
 	
   out 
@@ -79,7 +92,7 @@ ggbcoverageFromYear <- function(codi,
 								deaths.summed = FALSE,
 								mig.summed = deaths.summed,
 								lm.method = "oldschool",
-								opt.method = "RMS",
+								opt.method = "RMSE",
 								scale = 1,
 								nx.method = 2
 								){
@@ -151,7 +164,7 @@ ggbcoverageFromYear <- function(codi,
 #	a        <- log(delta) / dif
 	coverage <- sqrt(k1 * k2) / coefs$b
 
-	rsq <- ggbgetRMS(agesi = agesfit,
+	rsq <- ggbgetResidual(agesi = agesfit,
 	                 codi = codi,
 	                 lm.method = lm.method,
 	                 opt.method = "r2")
@@ -320,7 +333,7 @@ ggbgetAgesFit <- function(codi,
 	  hyb <- FALSE
 	}
 	RMSE        <- lapply(agesL, 
-	                      ggbgetRMS, 
+	                      ggbgetResidual, 
 	                      codi = codi, 
 	                      lm.method = lm.method,
 	                      opt.method = opt.method,
@@ -331,7 +344,7 @@ ggbgetAgesFit <- function(codi,
 	if (hyb){
 	  opt.method <- "ORSS"
 	  RMSE        <- lapply(agesL, 
-	                        ggbgetRMS, 
+	                        ggbgetResidual, 
 	                        codi = codi, 
 	                        lm.method = lm.method,
 	                        opt.method = opt.method,

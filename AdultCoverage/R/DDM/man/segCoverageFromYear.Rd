@@ -16,7 +16,8 @@ segCoverageFromYear(
   mig.summed = deaths.summed,
   delta = FALSE,
   exact.ages.ggb = NULL,
-  lm.method = "oldschool"
+  lm.method = "oldschool",
+  opt.method = "r2"
 )
 }
 \arguments{
@@ -48,6 +49,8 @@ segCoverageFromYear(
 \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
 }
 \value{
 a \code{data.frame} with columns for the coverage coefficient, and the min and max of the age range on which it is based.

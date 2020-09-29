@@ -15,6 +15,7 @@ segMakeColumns(
   delta = FALSE,
   exact.ages.ggb = NULL,
   lm.method = "oldschool",
+  opt.method = "r2",
   minAges.ggb = 8
 )
 }
@@ -43,6 +44,8 @@ segMakeColumns(
 \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
 
 \item{minAges.ggb}{the minimum number of adjacent ages to be used in estimating GGB coverage.}
 }

@@ -13,7 +13,7 @@ ggbcoverageFromYear(
   deaths.summed = FALSE,
   mig.summed = deaths.summed,
   lm.method = "oldschool",
-  opt.method = "RMS",
+  opt.method = "RMSE",
   scale = 1,
   nx.method = 2
 )
