@@ -1,8 +1,8 @@
 Package: DDM
 Type: Package
 Title: Death Registration Coverage Estimation
-Version: 1.3-19
-Date: 2020-09-29
+Version: 1.3-20
+Date: 2021-01-21
 Authors@R: c(
    person("Tim", "Riffe", role = c("aut", "cre"), 
           email = "tim.riffe@gmail.com", comment = c(ORCID = "0000-0002-2673-4622")),

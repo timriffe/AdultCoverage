@@ -18,7 +18,15 @@ setwd("AdultCoverage/R/DDM")
 
 load_all()
 document()
-  check()
+check()
+  
+# data(BrasilFemales)  
+# data(BrasilMales)  
+# data(ZA)
+# data(Moz)
+# library(usethis)
+# use_data(BrasilFemales, BrasilMales, ZA, Moz, overwrite = TRUE)  
+#   
 ddm(Moz,delta=TRUE)
 ddm(BrasilMales)
 ggb(ZA,
