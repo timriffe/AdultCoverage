@@ -14,6 +14,7 @@ ggbChooseAges(
   deaths.summed = FALSE,
   mig.summed = deaths.summed,
   lm.method = "oldschool",
+  opt.method = "r2",
   nx.method = 2
 )
 }
@@ -40,6 +41,8 @@ ggbChooseAges(
 \item{\code{"tls"}, \code{"orthogonal"}, or \code{"deming"}} for total least squares
 \item{\code{"tukey"}, \code{"resistant"}, or "\code{"median"}} for Tukey's resistant line method
 }}
+
+\item{opt.method}{what kind of residual do we minimize? choices \code{"RMS"},\code{"logRMS"}, \code{"ORSS"}, \code{"logORSS"} (experimental)}
 
 \item{nx.method}{either 2 or 4. 4 is smoother.}
 }

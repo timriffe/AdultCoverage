@@ -13,7 +13,7 @@
 #		header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 #
 library(devtools)
-
+remotes::install_github("josehcms/fertestr", force = TRUE)
 setwd("AdultCoverage/R/DDM")
 
 load_all()
